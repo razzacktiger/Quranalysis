@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { signInWithGoogle } from "../../../lib/supabase";
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -16,27 +17,37 @@ export default function RegisterPage() {
     setSuccess("");
 
     try {
-      // For now, we'll simulate successful registration
-      // In production, this would use Supabase Google OAuth
-      const simulatedUser = {
-        id: "google-user-new-123",
-        email: "newuser@gmail.com",
-        full_name: "New Google User",
-        access_token: "google-auth-token-new",
-      };
+      // Try real Google OAuth first, fallback to simulation
+      if (
+        process.env.NEXT_PUBLIC_SUPABASE_URL &&
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+      ) {
+        // Real Supabase Google OAuth (same as login)
+        await signInWithGoogle();
+        // Redirect will be handled by Supabase callback
+      } else {
+        // Fallback simulation for development
+        const simulatedUser = {
+          id: "google-user-new-123",
+          email: "newuser@gmail.com",
+          full_name: "New Google User",
+          access_token: "google-auth-token-new",
+        };
 
-      setSuccess("Account created successfully! Redirecting to dashboard...");
+        setSuccess("Account created successfully! Redirecting to dashboard...");
 
-      // Store simulated authentication data
-      localStorage.setItem("token", simulatedUser.access_token);
-      localStorage.setItem("user", JSON.stringify(simulatedUser));
+        // Store simulated authentication data
+        localStorage.setItem("token", simulatedUser.access_token);
+        localStorage.setItem("user", JSON.stringify(simulatedUser));
 
-      // Redirect to dashboard after a short delay
-      setTimeout(() => {
-        router.push("/dashboard");
-      }, 1500);
-    } catch (err) {
-      setError("Google sign-up failed. Please try again.");
+        // Redirect to dashboard after a short delay
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 1500);
+      }
+    } catch (err: any) {
+      console.error("Google sign-up error:", err);
+      setError(err.message || "Google sign-up failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
