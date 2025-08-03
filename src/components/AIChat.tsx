@@ -68,20 +68,22 @@ export default function AIChat() {
         content: msg.content,
       }));
 
-      // Call your backend Gemini API
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/ai/chat`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          body: JSON.stringify({
-            message: userMessage,
-            context: context,
-            session_type: "quran_coaching",
-            system_prompt: `You are an AI Quran Coach helping users track their practice sessions. 
+      // Call our Next.js AI chat API
+      const response = await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${
+            (
+              await (await import("@/lib/supabase")).supabase.auth.getSession()
+            ).data.session?.access_token || ""
+          }`,
+        },
+        body: JSON.stringify({
+          message: userMessage,
+          context: context,
+          session_type: "quran_coaching",
+          system_prompt: `You are an AI Quran Coach helping users track their practice sessions. 
           You should:
           1. Ask follow-up questions to gather session details (Surah, duration, mistakes, performance)
           2. Provide specific Tajweed and pronunciation guidance
@@ -90,9 +92,8 @@ export default function AIChat() {
           5. Use Islamic greetings and terminology appropriately
           
           When you have enough information, help extract: Surah name, practice duration, mistakes made, performance rating, and any specific areas to improve.`,
-          }),
-        }
-      );
+        }),
+      });
 
       if (!response.ok) {
         throw new Error(`API Error: ${response.status}`);
@@ -298,7 +299,13 @@ export default function AIChat() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+            Authorization: `Bearer ${
+              (
+                await (
+                  await import("@/lib/supabase")
+                ).supabase.auth.getSession()
+              ).data.session?.access_token || ""
+            }`,
           },
           body: JSON.stringify({
             duration: extractedSession.duration || 10,

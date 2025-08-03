@@ -1,207 +1,261 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import AIChat from "../../components/AIChat";
-import SessionForm from "../../components/SessionForm";
+import { SessionsApi, SessionData } from "@/lib/api-client";
+import { supabase, signOut } from "@/lib/supabase";
+import SessionsTableReal from "@/components/SessionsTableReal";
+import CreateSessionModal from "@/components/CreateSessionModal";
+import AIChat from "@/components/AIChat";
 
 interface User {
   id: string;
   email: string;
-  full_name?: string;
+  name?: string;
 }
 
-export default function DashboardPage() {
+interface Stats {
+  totalSessions: number;
+  averagePerformance: number;
+  totalMistakes: number;
+  improvementTrend: string;
+  recentSessions: number;
+  favoriteSupah: string;
+  totalDuration: number;
+}
+
+export default function RealDashboardPage() {
   const [user, setUser] = useState<User | null>(null);
-  const [stats, setStats] = useState({
+  const [stats, setStats] = useState<Stats>({
     totalSessions: 0,
     averagePerformance: 0,
     totalMistakes: 0,
     improvementTrend: "stable",
+    recentSessions: 0,
+    favoriteSupah: "None",
+    totalDuration: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"chat" | "stats" | "new-session">(
-    "chat"
-  );
-  const [isSubmittingSession, setIsSubmittingSession] = useState(false);
-  const [sessionSubmitMessage, setSessionSubmitMessage] = useState<{
-    type: "success" | "error";
-    text: string;
-  } | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [isCreating, setIsCreating] = useState(false);
+  const [createError, setCreateError] = useState<string | null>(null);
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user is logged in
-    const token = localStorage.getItem("token");
-    const userStr = localStorage.getItem("user");
+    const checkAuthAndLoadData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
 
-    if (!token || !userStr) {
-      router.push("/auth/login");
+        // Check authentication
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+
+        if (!session?.user) {
+          router.push("/auth/login");
+          return;
+        }
+
+        setUser({
+          id: session.user.id,
+          email: session.user.email || "",
+          name: session.user.user_metadata?.full_name,
+        });
+
+        // Fetch sessions and calculate stats
+        await fetchStats();
+      } catch (err) {
+        console.error("Dashboard load error:", err);
+        setError("Failed to load dashboard data");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuthAndLoadData();
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT" || !session) {
+        router.push("/auth/login");
+      } else if (event === "SIGNED_IN" && session?.user) {
+        setUser({
+          id: session.user.id,
+          email: session.user.email || "",
+          name: session.user.user_metadata?.full_name,
+        });
+        fetchStats();
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [router]);
+
+  const fetchStats = async () => {
+    try {
+      const result = await SessionsApi.getSessions();
+
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+
+      const sessions = result.data || [];
+      calculateStats(sessions);
+    } catch (err) {
+      console.error("Stats fetch error:", err);
+      setError("Failed to load statistics");
+    }
+  };
+
+  const calculateStats = (sessions: SessionData[]) => {
+    if (sessions.length === 0) {
+      setStats({
+        totalSessions: 0,
+        averagePerformance: 0,
+        totalMistakes: 0,
+        improvementTrend: "stable",
+        recentSessions: 0,
+        favoriteSupah: "None",
+        totalDuration: 0,
+      });
       return;
     }
 
-    const userData = JSON.parse(userStr);
-    setUser(userData);
+    // Calculate basic stats
+    const totalSessions = sessions.length;
+    const totalMistakes = sessions.reduce(
+      (sum, s) => sum + (s.mistakes?.length || 0),
+      0
+    );
+    const averagePerformance =
+      sessions.reduce((sum, s) => sum + s.performance_score, 0) / totalSessions;
+    const totalDuration = sessions.reduce(
+      (sum, s) => sum + s.duration_minutes,
+      0
+    );
 
-    // Fetch user statistics (simulated for now)
-    fetchStats(token);
-  }, [router]);
+    // Recent sessions (last 7 days)
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    const recentSessions = sessions.filter(
+      (s) => new Date(s.session_date) > weekAgo
+    ).length;
 
-  const fetchStats = async (token: string) => {
-    try {
-      // In a real app, this would fetch from your API
-      // For now, we'll simulate data
-      setTimeout(() => {
-        setStats({
-          totalSessions: 12,
-          averagePerformance: 0.85,
-          totalMistakes: 23,
-          improvementTrend: "improving",
-        });
-        setIsLoading(false);
-      }, 1000);
-    } catch (error) {
-      console.error("Failed to fetch stats:", error);
-      setIsLoading(false);
+    // Most frequent surah
+    const surahCounts = sessions.reduce((acc, s) => {
+      acc[s.surah_name] = (acc[s.surah_name] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const favoriteSupah =
+      Object.entries(surahCounts).sort(([, a], [, b]) => b - a)[0]?.[0] ||
+      "None";
+
+    // Improvement trend (compare recent vs older performance)
+    const halfIndex = Math.floor(sessions.length / 2);
+    const sortedByDate = [...sessions].sort(
+      (a, b) =>
+        new Date(a.session_date).getTime() - new Date(b.session_date).getTime()
+    );
+
+    let improvementTrend = "stable";
+    if (sessions.length > 4) {
+      const recentAvg =
+        sortedByDate
+          .slice(-halfIndex)
+          .reduce((sum, s) => sum + s.performance_score, 0) / halfIndex;
+      const olderAvg =
+        sortedByDate
+          .slice(0, halfIndex)
+          .reduce((sum, s) => sum + s.performance_score, 0) / halfIndex;
+
+      if (recentAvg > olderAvg + 0.5) improvementTrend = "improving";
+      else if (recentAvg < olderAvg - 0.5) improvementTrend = "declining";
     }
+
+    setStats({
+      totalSessions,
+      averagePerformance: Math.round(averagePerformance * 10) / 10,
+      totalMistakes,
+      improvementTrend,
+      recentSessions,
+      favoriteSupah,
+      totalDuration,
+    });
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    router.push("/");
-  };
-
-  const handleSessionSubmit = async (sessionData: any) => {
-    setIsSubmittingSession(true);
-    setSessionSubmitMessage(null);
-
+  const handleCreateSession = async (newSession: any) => {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        throw new Error("Not authenticated");
+      setIsCreating(true);
+      setCreateError(null);
+
+      // Transform the session data to match the API format
+      const sessionData = {
+        session_date: newSession.date,
+        session_type: newSession.sessionType,
+        duration_minutes: newSession.duration,
+        surah_name: newSession.portionDetails.surahName,
+        ayah_start: newSession.portionDetails.ayahStart,
+        ayah_end: newSession.portionDetails.ayahEnd,
+        juz_number: newSession.portionDetails.juzNumber,
+        pages_read: newSession.portionDetails.pagesRead,
+        recency_category: newSession.portionDetails.recencyCategory,
+        session_goal: newSession.sessionGoal,
+        performance_score: newSession.performanceScore,
+        additional_notes: newSession.additionalNotes,
+      };
+
+      // Transform mistakes data
+      const mistakes =
+        newSession.mistakes?.map((m: any) => ({
+          error_category: m.errorCategory,
+          error_subcategory: m.errorSubcategory,
+          severity_level: m.severityLevel,
+          location: m.location,
+          additional_notes: m.additionalNotes,
+        })) || [];
+
+      const result = await SessionsApi.createSession(sessionData, mistakes);
+
+      if (result.error) {
+        setCreateError(`Failed to create session: ${result.error}`);
+      } else {
+        // Success! Close modal and refresh data
+        setShowCreateModal(false);
+        // Refresh stats to reflect the new session
+        fetchStats();
       }
-
-      // Create session
-      const sessionResponse = await fetch(
-        "http://localhost:8000/api/sessions/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            session_type: sessionData.session_type,
-            timestamp: sessionData.timestamp, // Include the actual session timestamp
-            duration: sessionData.duration,
-            performance_score: sessionData.performance_score,
-            notes: sessionData.notes,
-            goal_description: sessionData.goal_description,
-          }),
-        }
-      );
-
-      if (!sessionResponse.ok) {
-        throw new Error("Failed to create session");
-      }
-
-      const session = await sessionResponse.json();
-
-      // Create portion details if provided
-      if (
-        sessionData.surah_name ||
-        sessionData.juz_number ||
-        sessionData.ayah_start
-      ) {
-        await fetch(
-          `http://localhost:8000/api/sessions/${session.id}/portions`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-              portion_type: sessionData.juz_number ? "juz" : "surah",
-              reference:
-                sessionData.surah_name || `Juz ${sessionData.juz_number}`,
-              surah_name: sessionData.surah_name,
-              juz_number: sessionData.juz_number,
-              ayah_start: sessionData.ayah_start,
-              ayah_end: sessionData.ayah_end,
-              pages_read: sessionData.pages_read,
-              recency_category: sessionData.recency_category,
-            }),
-          }
-        );
-      }
-
-      // Create mistakes if provided
-      if (sessionData.mistakes && sessionData.mistakes.length > 0) {
-        for (const mistake of sessionData.mistakes) {
-          await fetch(
-            `http://localhost:8000/api/sessions/${session.id}/mistakes`,
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-              },
-              body: JSON.stringify({
-                location: mistake.location,
-                error_category: mistake.error_category,
-                error_subcategory: mistake.error_subcategory || null,
-                details: mistake.details || null,
-                severity_level: mistake.severity_level,
-              }),
-            }
-          );
-        }
-      }
-
-      setSessionSubmitMessage({
-        type: "success",
-        text: `Session created successfully! 🎉 ${
-          sessionData.mistakes?.length > 0
-            ? `(with ${sessionData.mistakes.length} mistake${
-                sessionData.mistakes.length > 1 ? "s" : ""
-              })`
-            : ""
-        }`,
-      });
-
-      // Switch back to chat tab after a delay
-      setTimeout(() => {
-        setActiveTab("chat");
-        setSessionSubmitMessage(null);
-      }, 2000);
-    } catch (error) {
-      setSessionSubmitMessage({
-        type: "error",
-        text: `Failed to create session: ${
-          error instanceof Error ? error.message : "Unknown error"
-        }`,
-      });
+    } catch (err) {
+      setCreateError("Failed to create session. Please try again.");
+      console.error("Create session error:", err);
     } finally {
-      setIsSubmittingSession(false);
+      setIsCreating(false);
     }
   };
 
-  const handleSessionCancel = () => {
-    setActiveTab("chat");
-    setSessionSubmitMessage(null);
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      router.push("/");
+    } catch (err) {
+      console.error("Sign out error:", err);
+    }
   };
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-gray-600 dark:text-gray-300">
-            Loading dashboard...
-          </span>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 dark:text-gray-400">
+            Loading your dashboard...
+          </p>
         </div>
       </div>
     );
@@ -209,327 +263,260 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      {/* Navigation */}
-      <nav className="bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700">
+      {/* Header */}
+      <div className="bg-white dark:bg-gray-800 shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-2">
-              <span className="text-2xl">📖</span>
-              <span className="text-xl font-bold text-emerald-800 dark:text-emerald-200">
-                AI Quran Coach
-              </span>
+          <div className="flex justify-between items-center py-6">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+                Quranalysis: Dashboard
+              </h1>
+              <p className="text-gray-600 dark:text-gray-400">
+                Welcome back, {user?.name || user?.email}
+              </p>
             </div>
-
             <div className="flex items-center space-x-4">
-              <span className="text-gray-700 dark:text-gray-300">
-                Welcome, {user?.full_name || user?.email}
-              </span>
               <button
-                onClick={handleLogout}
-                className="px-4 py-2 text-sm text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                onClick={fetchStats}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
               >
-                Logout
+                🔄 Refresh
+              </button>
+              <button
+                onClick={handleSignOut}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                Sign Out
               </button>
             </div>
           </div>
         </div>
-      </nav>
+      </div>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-        {/* Header with Tabs */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            AI Quran Coach
-          </h1>
+      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        {error && (
+          <div className="mb-6 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            {error}
+          </div>
+        )}
 
-          {/* Tab Navigation */}
-          <div className="flex space-x-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-            <button
-              onClick={() => setActiveTab("chat")}
-              className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
-                activeTab === "chat"
-                  ? "bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-sm"
-                  : "text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
-              }`}
-            >
-              🤖 AI Chat Coach
-            </button>
-            <button
-              onClick={() => setActiveTab("stats")}
-              className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
-                activeTab === "stats"
-                  ? "bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-sm"
-                  : "text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
-              }`}
-            >
-              📊 Progress & Stats
-            </button>
-            <button
-              onClick={() => setActiveTab("new-session")}
-              className={`px-6 py-2 rounded-md text-sm font-medium transition-colors ${
-                activeTab === "new-session"
-                  ? "bg-white dark:bg-gray-700 text-emerald-600 dark:text-emerald-400 shadow-sm"
-                  : "text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
-              }`}
-            >
-              ➕ New Session
-            </button>
+        {/* Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {/* Total Sessions */}
+          <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="text-2xl">📚</div>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                      Total Sessions
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900 dark:text-white">
+                      {stats.totalSessions}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Average Performance */}
+          <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="text-2xl">⭐</div>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                      Avg Performance
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900 dark:text-white">
+                      {stats.averagePerformance}/10
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Total Duration */}
+          <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="text-2xl">⏱️</div>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                      Total Duration
+                    </dt>
+                    <dd className="text-lg font-medium text-gray-900 dark:text-white">
+                      {Math.round((stats.totalDuration / 60) * 10) / 10}h
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Improvement Trend */}
+          <div className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <div className="text-2xl">
+                    {stats.improvementTrend === "improving"
+                      ? "📈"
+                      : stats.improvementTrend === "declining"
+                      ? "📉"
+                      : "📊"}
+                  </div>
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
+                      Progress
+                    </dt>
+                    <dd
+                      className={`text-lg font-medium capitalize ${
+                        stats.improvementTrend === "improving"
+                          ? "text-green-600 dark:text-green-400"
+                          : stats.improvementTrend === "declining"
+                          ? "text-red-600 dark:text-red-400"
+                          : "text-gray-900 dark:text-white"
+                      }`}
+                    >
+                      {stats.improvementTrend}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Chat Tab */}
-        {activeTab === "chat" && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 h-[600px]">
-            {/* AI Chat - Main Feature */}
-            <div className="lg:col-span-2">
-              <AIChat />
-            </div>
-
-            {/* Quick Stats Sidebar */}
-            <div className="space-y-6">
-              {/* Today's Goal */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  🎯 Today's Goal
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">
-                      Practice Time
-                    </span>
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">
-                      30 min
-                    </span>
-                  </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                    <div className="bg-emerald-600 h-2 rounded-full w-3/4"></div>
-                  </div>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    22 minutes completed
-                  </p>
-                </div>
-              </div>
-
-              {/* Quick Stats */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  📈 Quick Stats
-                </h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <span className="text-xl mr-2">📚</span>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        Sessions
-                      </span>
-                    </div>
-                    <span className="font-bold text-gray-900 dark:text-white">
-                      {stats.totalSessions}
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <span className="text-xl mr-2">📊</span>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        Performance
-                      </span>
-                    </div>
-                    <span className="font-bold text-gray-900 dark:text-white">
-                      {Math.round(stats.averagePerformance * 100)}%
-                    </span>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center">
-                      <span className="text-xl mr-2">📈</span>
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
-                        Trend
-                      </span>
-                    </div>
-                    <span className="font-bold text-emerald-600 dark:text-emerald-400 capitalize">
-                      {stats.improvementTrend}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Recent Surahs */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  📖 Recent Practice
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-900 dark:text-white">
-                      Al-Fatiha
-                    </span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      2 hours ago
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-900 dark:text-white">
-                      Al-Ikhlas
-                    </span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      1 day ago
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-900 dark:text-white">
-                      An-Nas
-                    </span>
-                    <span className="text-xs text-gray-500 dark:text-gray-400">
-                      2 days ago
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
+        {/* Additional Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              Recent Activity
+            </h3>
+            <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+              {stats.recentSessions}
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              sessions this week
+            </p>
           </div>
-        )}
 
-        {/* Stats Tab */}
-        {activeTab === "stats" && (
-          <div className="space-y-8">
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* Total Sessions */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
-                <div className="flex items-center">
-                  <div className="text-2xl text-blue-600 dark:text-blue-400 mr-3">
-                    📚
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                      Total Sessions
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {stats.totalSessions}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Average Performance */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
-                <div className="flex items-center">
-                  <div className="text-2xl text-green-600 dark:text-green-400 mr-3">
-                    📊
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                      Avg Performance
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {Math.round(stats.averagePerformance * 100)}%
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Total Mistakes */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
-                <div className="flex items-center">
-                  <div className="text-2xl text-orange-600 dark:text-orange-400 mr-3">
-                    ⚠️
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                      Areas to Improve
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                      {stats.totalMistakes}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Improvement Trend */}
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
-                <div className="flex items-center">
-                  <div className="text-2xl text-emerald-600 dark:text-emerald-400 mr-3">
-                    📈
-                  </div>
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                      Trend
-                    </p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white capitalize">
-                      {stats.improvementTrend}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Detailed Charts Placeholder */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  Practice History
-                </h3>
-                <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
-                  📊 Chart will be integrated with real session data
-                </div>
-              </div>
-
-              <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                  Performance Trends
-                </h3>
-                <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
-                  📈 Performance analytics will be shown here
-                </div>
-              </div>
-            </div>
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              Total Mistakes
+            </h3>
+            <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">
+              {stats.totalMistakes}
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              areas for improvement
+            </p>
           </div>
-        )}
 
-        {/* New Session Tab */}
-        {activeTab === "new-session" && (
-          <div className="max-w-4xl mx-auto">
-            {sessionSubmitMessage && (
-              <div
-                className={`mb-6 p-4 rounded-lg ${
-                  sessionSubmitMessage.type === "success"
-                    ? "bg-green-50 border border-green-200 text-green-800 dark:bg-green-900/20 dark:border-green-800 dark:text-green-200"
-                    : "bg-red-50 border border-red-200 text-red-800 dark:bg-red-900/20 dark:border-red-800 dark:text-red-200"
-                }`}
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              Favorite Surah
+            </h3>
+            <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">
+              {stats.favoriteSupah}
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              most practiced
+            </p>
+          </div>
+        </div>
+
+        {/* Sessions Section with Create Button */}
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+          <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Your Quran Sessions ({stats?.totalSessions || 0})
+            </h2>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowAIAssistant(true)}
+                className="flex items-center px-4 py-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-800 transition-colors shadow-sm"
               >
-                {sessionSubmitMessage.text}
+                <span className="text-lg mr-2">🤖</span>
+                AI Assistant
+              </button>
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+              >
+                <span className="text-lg mr-2">+</span>
+                Manual Entry
+              </button>
+            </div>
+          </div>
+
+          <div className="p-6">
+            {createError && (
+              <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                <p className="text-red-700 dark:text-red-400 text-sm">
+                  {createError}
+                </p>
               </div>
             )}
-
-            <SessionForm
-              onSubmit={handleSessionSubmit}
-              onCancel={handleSessionCancel}
-              isLoading={isSubmittingSession}
-            />
+            <SessionsTableReal />
           </div>
-        )}
+        </div>
+      </div>
 
-        {/* Instructions Banner */}
-        <div className="mt-8 bg-emerald-50 dark:bg-emerald-900/20 rounded-xl p-6 border border-emerald-200 dark:border-emerald-800">
-          <div className="flex items-start space-x-3">
-            <div className="text-2xl">💡</div>
-            <div>
-              <h3 className="font-semibold text-emerald-800 dark:text-emerald-200 mb-2">
-                How to use your AI Quran Coach
-              </h3>
-              <p className="text-emerald-700 dark:text-emerald-300 text-sm">
-                Simply chat with the AI about your practice sessions! Tell it
-                which Surah you practiced, how long you spent, any mistakes you
-                noticed, and how you felt about your performance. The AI will
-                automatically log your session and provide personalized
-                insights.
-              </p>
+      {/* Create Session Modal */}
+      {showCreateModal && (
+        <CreateSessionModal
+          onSave={handleCreateSession}
+          onClose={() => {
+            setShowCreateModal(false);
+            setCreateError(null);
+          }}
+          isLoading={isCreating}
+        />
+      )}
+
+      {/* AI Assistant Modal */}
+      {showAIAssistant && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl mx-4 h-[80vh] overflow-hidden">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center">
+                <div className="text-2xl mr-3">🤖</div>
+                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+                  AI Session Assistant
+                </h2>
+              </div>
+              <button
+                onClick={() => setShowAIAssistant(false)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* AI Chat Content */}
+            <div className="h-full">
+              <AIChat />
             </div>
           </div>
         </div>
-      </main>
+      )}
     </div>
   );
 }
