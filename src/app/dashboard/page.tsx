@@ -6,7 +6,7 @@ import { SessionsApi, SessionData } from "@/lib/api-client";
 import { supabase, signOut } from "@/lib/supabase";
 import SessionsTableReal from "@/components/SessionsTableReal";
 import CreateSessionModal from "@/components/CreateSessionModal";
-import AIChat from "@/components/AIChat";
+import FloatingChat, { ChatToggleButton } from "@/components/FloatingChat";
 
 interface User {
   id: string;
@@ -40,7 +40,7 @@ export default function RealDashboardPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
-  const [showAIAssistant, setShowAIAssistant] = useState(false);
+  const [showFloatingChat, setShowFloatingChat] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -447,22 +447,13 @@ export default function RealDashboardPage() {
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Your Quran Sessions ({stats?.totalSessions || 0})
             </h2>
-            <div className="flex space-x-3">
-              <button
-                onClick={() => setShowAIAssistant(true)}
-                className="flex items-center px-4 py-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-lg hover:from-emerald-700 hover:to-emerald-800 transition-colors shadow-sm"
-              >
-                <span className="text-lg mr-2">🤖</span>
-                AI Assistant
-              </button>
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
-              >
-                <span className="text-lg mr-2">+</span>
-                Manual Entry
-              </button>
-            </div>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+            >
+              <span className="text-lg mr-2">+</span>
+              Create Session
+            </button>
           </div>
 
           <div className="p-6">
@@ -490,32 +481,18 @@ export default function RealDashboardPage() {
         />
       )}
 
-      {/* AI Assistant Modal */}
-      {showAIAssistant && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-4xl mx-4 h-[80vh] overflow-hidden">
-            {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-              <div className="flex items-center">
-                <div className="text-2xl mr-3">🤖</div>
-                <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                  AI Session Assistant
-                </h2>
-              </div>
-              <button
-                onClick={() => setShowAIAssistant(false)}
-                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2"
-              >
-                ✕
-              </button>
-            </div>
+      {/* Floating Chat */}
+      <FloatingChat
+        isOpen={showFloatingChat}
+        onToggle={() => setShowFloatingChat(false)}
+      />
 
-            {/* AI Chat Content */}
-            <div className="h-full">
-              <AIChat />
-            </div>
-          </div>
-        </div>
+      {/* Chat Toggle Button */}
+      {!showFloatingChat && (
+        <ChatToggleButton
+          onClick={() => setShowFloatingChat(true)}
+          isOpen={showFloatingChat}
+        />
       )}
     </div>
   );
