@@ -1,78 +1,130 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { v4 as uuidv4 } from "uuid";
+import SurahSelector from "./SurahSelector";
 import MistakesEditor from "./MistakesEditor";
-
-// Reusing interfaces from SessionDetail for consistency
-interface Mistake {
-  id: string;
-  errorCategory: string;
-  errorSubcategory?: string;
-  severityLevel: number; // 1-5
-  location: string;
-  additionalNotes?: string;
-}
-
-interface PortionDetails {
-  surahName: string;
-  ayahStart?: number;
-  ayahEnd?: number;
-  juzNumber?: number;
-  pagesRead?: number;
-  recencyCategory: "new" | "recent" | "reviewing" | "maintenance";
-}
-
-interface DetailedSession {
-  id: string;
-  date: string;
-  sessionType: string;
-  duration: number;
-  performanceScore: number;
-  portionDetails: PortionDetails;
-  sessionGoal?: string;
-  additionalNotes?: string;
-  mistakes: Mistake[];
-}
+import {
+  FullSessionData,
+  SessionData,
+  SessionPortion,
+  MistakeData,
+  MistakeFormData,
+  PortionFormData,
+  UpdateSessionRequest,
+  SESSION_TYPES,
+  RECENCY_CATEGORIES,
+} from "@/types/session";
 
 interface EditSessionModalProps {
-  session: DetailedSession | null;
+  session: any | null; // Using any for now to handle the transformed data
   onClose: () => void;
-  onSave: (updatedSession: DetailedSession) => void;
+  onSave: (updateRequest: UpdateSessionRequest) => void;
+  isLoading?: boolean;
 }
 
 export default function EditSessionModal({
   session,
   onClose,
   onSave,
+  isLoading = false,
 }: EditSessionModalProps) {
-  const [formData, setFormData] = useState<DetailedSession | null>(null);
+  const [sessionData, setSessionData] = useState<
+    Omit<SessionData, "id" | "user_id" | "created_at" | "updated_at">
+  >({
+    session_date: "",
+    session_type: "reading_practice",
+    duration_minutes: 0,
+    performance_score: 0,
+    session_goal: "",
+    additional_notes: "",
+  });
+
+  const [sessionPortions, setSessionPortions] = useState<PortionFormData[]>([]);
+  const [mistakes, setMistakes] = useState<MistakeFormData[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Initialize form data when session changes
   useEffect(() => {
     if (session) {
-      setFormData({ ...session });
+      // Handle the transformed session data structure
+      setSessionData({
+        session_date: session.date
+          ? session.date.slice(0, 16)
+          : new Date().toISOString().slice(0, 16),
+        session_type: session.sessionType || "reading_practice",
+        duration_minutes: session.duration || 0,
+        performance_score: session.performanceScore || 0,
+        session_goal: session.sessionGoal || "",
+        additional_notes: session.additionalNotes || "",
+      });
+
+      // For now, create a single portion from the portionDetails
+      const singlePortion = session.portionDetails
+        ? [
+            {
+              tempId: uuidv4(),
+              surah_name: session.portionDetails.surahName || "",
+              ayah_start: session.portionDetails.ayahStart || undefined,
+              ayah_end: session.portionDetails.ayahEnd || undefined,
+              juz_number: session.portionDetails.juzNumber || 1,
+              pages_read: session.portionDetails.pagesRead || 1,
+              repetition_count: 1, // Default value
+              recency_category:
+                session.portionDetails.recencyCategory || "recent",
+            },
+          ]
+        : [];
+      setSessionPortions(singlePortion);
+
+      // Map mistakes from the transformed format
+      const mistakesWithTempIds = (session.mistakes || []).map(
+        (mistake: any) => ({
+          tempId: uuidv4(),
+          portionTempId: singlePortion[0]?.tempId || "",
+          error_category: mistake.errorCategory || "pronunciation",
+          error_subcategory: mistake.errorSubcategory || undefined,
+          severity_level: mistake.severityLevel || 1,
+          ayah_number: parseInt(mistake.location) || 1, // location contains just ayah number
+          additional_notes: mistake.additionalNotes || "",
+        })
+      );
+      setMistakes(mistakesWithTempIds);
       setErrors({});
     }
   }, [session]);
 
-  if (!session || !formData) return null;
+  if (!session) return null;
 
   // Validation helper
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.sessionType.trim()) {
-      newErrors.sessionType = "Session type is required";
+    if (!sessionData.session_type.trim()) {
+      newErrors.session_type = "Session type is required";
     }
-    if (formData.duration <= 0) {
-      newErrors.duration = "Duration must be greater than 0";
+    if (sessionData.duration_minutes <= 0) {
+      newErrors.duration_minutes = "Duration must be greater than 0";
     }
-    if (formData.performanceScore < 1 || formData.performanceScore > 10) {
-      newErrors.performanceScore = "Performance score must be between 1.0-10.0";
+    if (
+      sessionData.performance_score < 1 ||
+      sessionData.performance_score > 10
+    ) {
+      newErrors.performance_score =
+        "Performance score must be between 1.0-10.0";
     }
-    if (!formData.portionDetails.surahName.trim()) {
-      newErrors.surahName = "Surah name is required";
+
+    // Validate at least one portion with a surah selected
+    if (sessionPortions.length === 0) {
+      newErrors.portions = "At least one surah portion is required";
+    } else {
+      sessionPortions.forEach((portion, index) => {
+        if (!portion.surah_name.trim()) {
+          newErrors[
+            `portion_${index}_surah`
+          ] = `Surah name is required for portion ${index + 1}`;
+        }
+      });
     }
 
     setErrors(newErrors);
@@ -83,26 +135,67 @@ export default function EditSessionModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      onSave(formData);
-      onClose();
+      const updateRequest: UpdateSessionRequest = {
+        session: sessionData,
+        session_portions: sessionPortions.map(({ tempId, ...portion }) => ({
+          ...portion,
+          id: uuidv4(), // Temporary ID - backend will ignore and generate new ones
+          ayah_start: portion.ayah_start || 1,
+          ayah_end: portion.ayah_end || 1,
+          juz_number: portion.juz_number || 1,
+          pages_read: portion.pages_read || 1,
+        })) as any, // Type assertion because we're replacing all portions
+        mistakes: mistakes.map(({ tempId, portionTempId, ...mistake }) => ({
+          ...mistake,
+          id: uuidv4(), // Temporary ID - backend will ignore and generate new ones
+          session_portion_id: "", // Will be linked by backend
+        })),
+      };
+      onSave(updateRequest);
     }
   };
 
-  // Update basic form fields
-  const updateField = (field: keyof DetailedSession, value: any) => {
-    setFormData((prev) => (prev ? { ...prev, [field]: value } : null));
+  // Update basic session fields
+  const updateSessionField = (field: keyof typeof sessionData, value: any) => {
+    setSessionData((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Update portion details
-  const updatePortionField = (field: keyof PortionDetails, value: any) => {
-    setFormData((prev) =>
-      prev
-        ? {
-            ...prev,
-            portionDetails: { ...prev.portionDetails, [field]: value },
-          }
-        : null
+  // Add new portion
+  const addPortion = () => {
+    setSessionPortions([
+      ...sessionPortions,
+      {
+        tempId: uuidv4(),
+        surah_name: "",
+        ayah_start: undefined,
+        ayah_end: undefined,
+        juz_number: 1,
+        pages_read: 1,
+        repetition_count: 1,
+        recency_category: "new",
+      },
+    ]);
+  };
+
+  // Remove portion
+  const removePortion = (tempId: string) => {
+    if (sessionPortions.length > 1) {
+      setSessionPortions(sessionPortions.filter((p) => p.tempId !== tempId));
+    }
+  };
+
+  // Update portion data
+  const updatePortion = (tempId: string, updates: Partial<PortionFormData>) => {
+    setSessionPortions(
+      sessionPortions.map((portion) =>
+        portion.tempId === tempId ? { ...portion, ...updates } : portion
+      )
     );
+  };
+
+  // Update mistakes
+  const updateMistakes = (newMistakes: MistakeFormData[]) => {
+    setMistakes(newMistakes);
   };
 
   return (
@@ -132,8 +225,10 @@ export default function EditSessionModal({
               </label>
               <input
                 type="datetime-local"
-                value={formData.date.slice(0, 16)} // Format for datetime-local
-                onChange={(e) => updateField("date", e.target.value)}
+                value={sessionData.session_date}
+                onChange={(e) =>
+                  updateSessionField("session_date", e.target.value)
+                }
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               />
             </div>
@@ -144,33 +239,24 @@ export default function EditSessionModal({
                 Session Type
               </label>
               <select
-                value={formData.sessionType}
-                onChange={(e) => updateField("sessionType", e.target.value)}
+                value={sessionData.session_type}
+                onChange={(e) =>
+                  updateSessionField("session_type", e.target.value)
+                }
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               >
                 <option value="">Select session type...</option>
-                <option value="reading_practice">
-                  Reading Practice (from book)
-                </option>
-                <option value="memorization">
-                  Memorization (reciting from memory)
-                </option>
-                <option value="audit">
-                  Audit (memory test without review)
-                </option>
-                <option value="mistake_session">
-                  Mistake Session (focused error correction)
-                </option>
-                <option value="practice_test">
-                  Practice Test (formal recitation)
-                </option>
-                <option value="study_session">
-                  Study Session (meaning, tafseer)
-                </option>
+                {SESSION_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {type
+                      .replace("_", " ")
+                      .replace(/\b\w/g, (l) => l.toUpperCase())}
+                  </option>
+                ))}
               </select>
-              {errors.sessionType && (
+              {errors.session_type && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.sessionType}
+                  {errors.session_type}
                 </p>
               )}
             </div>
@@ -183,14 +269,19 @@ export default function EditSessionModal({
               <input
                 type="number"
                 min="1"
-                value={formData.duration}
+                value={sessionData.duration_minutes}
                 onChange={(e) =>
-                  updateField("duration", parseInt(e.target.value) || 0)
+                  updateSessionField(
+                    "duration_minutes",
+                    parseInt(e.target.value) || 0
+                  )
                 }
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               />
-              {errors.duration && (
-                <p className="text-red-500 text-sm mt-1">{errors.duration}</p>
+              {errors.duration_minutes && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.duration_minutes}
+                </p>
               )}
             </div>
 
@@ -204,203 +295,206 @@ export default function EditSessionModal({
                 min="1"
                 max="10"
                 step="0.1"
-                value={formData.performanceScore}
+                value={sessionData.performance_score}
                 onChange={(e) =>
-                  updateField(
-                    "performanceScore",
+                  updateSessionField(
+                    "performance_score",
                     parseFloat(e.target.value) || 1
                   )
                 }
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
               />
-              {errors.performanceScore && (
+              {errors.performance_score && (
                 <p className="text-red-500 text-sm mt-1">
-                  {errors.performanceScore}
+                  {errors.performance_score}
                 </p>
               )}
             </div>
           </div>
 
-          {/* Portion Details Section */}
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
-              Portion Details
-            </h3>
+          {/* Surah Portions */}
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                Surah Portions ({sessionPortions.length})
+              </h3>
+              <button
+                type="button"
+                onClick={addPortion}
+                className="px-3 py-1 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors text-sm"
+              >
+                + Add Surah
+              </button>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {/* Surah Name */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Surah Name
-                </label>
-                <input
-                  type="text"
-                  value={formData.portionDetails.surahName}
-                  onChange={(e) =>
-                    updatePortionField("surahName", e.target.value)
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                />
-                {errors.surahName && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.surahName}
-                  </p>
-                )}
-              </div>
+            {errors.portions && (
+              <p className="text-red-500 text-sm mb-4">{errors.portions}</p>
+            )}
 
-              {/* Ayah Start */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Ayah Start
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  value={formData.portionDetails.ayahStart || ""}
-                  onChange={(e) =>
-                    updatePortionField(
-                      "ayahStart",
-                      parseInt(e.target.value) || undefined
-                    )
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                />
-              </div>
-
-              {/* Ayah End */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Ayah End
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  value={formData.portionDetails.ayahEnd || ""}
-                  onChange={(e) =>
-                    updatePortionField(
-                      "ayahEnd",
-                      parseInt(e.target.value) || undefined
-                    )
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                />
-              </div>
-
-              {/* Juz Number */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Juz Number
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  max="30"
-                  value={formData.portionDetails.juzNumber || ""}
-                  onChange={(e) =>
-                    updatePortionField(
-                      "juzNumber",
-                      parseInt(e.target.value) || undefined
-                    )
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                />
-              </div>
-
-              {/* Pages Read */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Pages Read
-                </label>
-                <input
-                  type="number"
-                  min="1"
-                  value={formData.portionDetails.pagesRead || ""}
-                  onChange={(e) =>
-                    updatePortionField(
-                      "pagesRead",
-                      parseInt(e.target.value) || undefined
-                    )
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                />
-              </div>
-
-              {/* Recency Category */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Recency Category
-                </label>
-                <select
-                  value={formData.portionDetails.recencyCategory}
-                  onChange={(e) =>
-                    updatePortionField("recencyCategory", e.target.value)
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            <div className="space-y-6">
+              {sessionPortions.map((portion, index) => (
+                <div
+                  key={portion.tempId}
+                  className="bg-gray-50 dark:bg-gray-700 p-4 rounded-lg"
                 >
-                  <option value="new">New</option>
-                  <option value="recent">Recent</option>
-                  <option value="reviewing">Reviewing</option>
-                  <option value="maintenance">Maintenance</option>
-                </select>
-              </div>
+                  <div className="flex justify-between items-center mb-4">
+                    <h4 className="font-medium text-gray-900 dark:text-white">
+                      Portion {index + 1}
+                    </h4>
+                    {sessionPortions.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removePortion(portion.tempId)}
+                        className="text-red-600 hover:text-red-700 text-sm"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+
+                  <SurahSelector
+                    surahName={portion.surah_name}
+                    ayahStart={portion.ayah_start}
+                    ayahEnd={portion.ayah_end}
+                    onSurahChange={(surahName) => {
+                      // When surah changes, just update the surah name
+                      updatePortion(portion.tempId, {
+                        surah_name: surahName,
+                      });
+                    }}
+                    onAyahStartChange={(ayahStart) => {
+                      // Only update if we have a valid value (not undefined from automatic reset)
+                      if (ayahStart !== undefined) {
+                        updatePortion(portion.tempId, {
+                          ayah_start: ayahStart,
+                        });
+                      }
+                    }}
+                    onAyahEndChange={(ayahEnd) => {
+                      // Only update if we have a valid value (not undefined from automatic reset)
+                      if (ayahEnd !== undefined) {
+                        updatePortion(portion.tempId, {
+                          ayah_end: ayahEnd,
+                        });
+                      }
+                    }}
+                    onJuzChange={(juzNumber) =>
+                      updatePortion(portion.tempId, {
+                        juz_number: juzNumber || 1,
+                      })
+                    }
+                    onPagesChange={(pagesRead) =>
+                      updatePortion(portion.tempId, {
+                        pages_read: pagesRead || 1,
+                      })
+                    }
+                    error={errors[`portion_${index}_surah`]}
+                  />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    {/* Repetition Count */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Repetition Count
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={portion.repetition_count}
+                        onChange={(e) =>
+                          updatePortion(portion.tempId, {
+                            repetition_count: parseInt(e.target.value) || 1,
+                          })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      />
+                    </div>
+
+                    {/* Recency Category */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                        Recency Category
+                      </label>
+                      <select
+                        value={portion.recency_category}
+                        onChange={(e) =>
+                          updatePortion(portion.tempId, {
+                            recency_category: e.target.value as any,
+                          })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+                      >
+                        {RECENCY_CATEGORIES.map((category) => (
+                          <option key={category} value={category}>
+                            {category.charAt(0).toUpperCase() +
+                              category.slice(1)}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Goals & Notes Section */}
-          <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Session Goal */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Session Goal
-                </label>
-                <textarea
-                  value={formData.sessionGoal || ""}
-                  onChange={(e) => updateField("sessionGoal", e.target.value)}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  placeholder="What was the goal for this session?"
-                />
-              </div>
+          {/* Session Goal */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Session Goal
+            </label>
+            <textarea
+              value={sessionData.session_goal || ""}
+              onChange={(e) =>
+                updateSessionField("session_goal", e.target.value)
+              }
+              rows={2}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"
+              placeholder="What was the goal for this session?"
+            />
+          </div>
 
-              {/* Additional Notes */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Additional Notes
-                </label>
-                <textarea
-                  value={formData.additionalNotes || ""}
-                  onChange={(e) =>
-                    updateField("additionalNotes", e.target.value)
-                  }
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
-                  placeholder="Any additional notes about this session?"
-                />
-              </div>
-            </div>
+          {/* Additional Notes */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Additional Notes
+            </label>
+            <textarea
+              value={sessionData.additional_notes || ""}
+              onChange={(e) =>
+                updateSessionField("additional_notes", e.target.value)
+              }
+              rows={2}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 resize-none"
+              placeholder="Any additional notes about this session?"
+            />
           </div>
 
           {/* Mistakes Section */}
-          <MistakesEditor
-            mistakes={formData.mistakes}
-            onChange={(mistakes) => updateField("mistakes", mistakes)}
-          />
+          <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+            <MistakesEditor
+              mistakes={mistakes}
+              sessionPortions={sessionPortions}
+              onChange={updateMistakes}
+            />
+          </div>
 
           {/* Action Buttons */}
           <div className="flex justify-end space-x-3 pt-6 border-t border-gray-200 dark:border-gray-700">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+              disabled={isLoading}
+              className="px-6 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:bg-gray-100 dark:disabled:bg-gray-600 disabled:cursor-not-allowed"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 transition-colors"
+              disabled={isLoading}
+              className="px-6 py-2 bg-emerald-600 text-white rounded-md hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:bg-emerald-400 disabled:cursor-not-allowed"
             >
-              Save Changes
+              {isLoading ? "Saving..." : "Save Changes"}
             </button>
           </div>
         </form>

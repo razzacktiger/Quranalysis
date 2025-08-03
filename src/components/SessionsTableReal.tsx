@@ -114,8 +114,12 @@ export default function SessionsTableReal() {
     const searchLower = searchTerm.toLowerCase();
     const mistakeCount = session.mistakes?.length || 0;
 
+    // Get surah names from session portions
+    const surahNames =
+      session.session_portions?.map((p) => p.surah_name).join(" ") || "";
+
     return (
-      session.surah_name.toLowerCase().includes(searchLower) ||
+      surahNames.toLowerCase().includes(searchLower) ||
       session.session_type.toLowerCase().includes(searchLower) ||
       formatSessionType(session.session_type)
         .toLowerCase()
@@ -179,37 +183,42 @@ export default function SessionsTableReal() {
   };
 
   // Transform API data to DetailedSession format
-  const transformToDetailedSession = (session: SessionData) => ({
-    id: session.id,
-    date: session.session_date,
-    sessionType: session.session_type,
-    duration: session.duration_minutes,
-    performanceScore: session.performance_score,
-    portionDetails: {
-      surahName: session.surah_name,
-      ayahStart: session.ayah_start,
-      ayahEnd: session.ayah_end,
-      juzNumber: session.juz_number,
-      pagesRead: session.pages_read,
-      recencyCategory:
-        (session.recency_category as
-          | "new"
-          | "recent"
-          | "reviewing"
-          | "maintenance") || "recent",
-    },
-    sessionGoal: session.session_goal,
-    additionalNotes: session.additional_notes,
-    mistakes:
-      session.mistakes?.map((m) => ({
-        id: m.id || "",
-        errorCategory: m.error_category,
-        errorSubcategory: m.error_subcategory || "",
-        severityLevel: m.severity_level,
-        location: m.location,
-        additionalNotes: m.additional_notes || "",
-      })) || [],
-  });
+  const transformToDetailedSession = (session: SessionData) => {
+    // Get the first portion for display (or create a default)
+    const firstPortion = session.session_portions?.[0];
+
+    return {
+      id: session.id,
+      date: session.session_date,
+      sessionType: session.session_type,
+      duration: session.duration_minutes,
+      performanceScore: session.performance_score,
+      portionDetails: {
+        surahName: firstPortion?.surah_name || "Multiple Surahs",
+        ayahStart: firstPortion?.ayah_start || 0,
+        ayahEnd: firstPortion?.ayah_end || 0,
+        juzNumber: firstPortion?.juz_number || 0,
+        pagesRead: firstPortion?.pages_read || 0,
+        recencyCategory:
+          (firstPortion?.recency_category as
+            | "new"
+            | "recent"
+            | "reviewing"
+            | "maintenance") || "recent",
+      },
+      sessionGoal: session.session_goal,
+      additionalNotes: session.additional_notes,
+      mistakes:
+        session.mistakes?.map((m) => ({
+          id: m.id || "",
+          errorCategory: m.error_category,
+          errorSubcategory: m.error_subcategory || "",
+          severityLevel: m.severity_level,
+          location: `${m.ayah_number}`, // Just ayah number now
+          additionalNotes: m.additional_notes || "",
+        })) || [],
+    };
+  };
 
   // Transform DetailedSession back to API format
   const transformToSessionData = (session: any) => ({
@@ -461,13 +470,16 @@ export default function SessionsTableReal() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900 dark:text-white">
-                      {session.surah_name}
+                      {session.session_portions
+                        ?.map((p) => p.surah_name)
+                        .join(", ") || "No surahs"}
                     </div>
-                    {session.ayah_start && session.ayah_end && (
-                      <div className="text-sm text-gray-500 dark:text-gray-400">
-                        Verses {session.ayah_start}-{session.ayah_end}
-                      </div>
-                    )}
+                    {session.session_portions &&
+                      session.session_portions.length > 0 && (
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          {session.session_portions.length} portion(s)
+                        </div>
+                      )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     {formatSessionType(session.session_type)}
@@ -588,8 +600,10 @@ export default function SessionsTableReal() {
               <div className="bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">
                 <div className="text-sm">
                   <div className="font-medium text-gray-900 dark:text-white">
-                    {deletingSession.surah_name} -{" "}
-                    {formatSessionType(deletingSession.session_type)}
+                    {deletingSession.session_portions
+                      ?.map((p) => p.surah_name)
+                      .join(", ") || "No surahs"}{" "}
+                    - {formatSessionType(deletingSession.session_type)}
                   </div>
                   <div className="text-gray-500 dark:text-gray-400">
                     {formatDate(deletingSession.session_date)} •{" "}

@@ -1,0 +1,15 @@
+{
+  "metadata": {
+    "source": "QUL QPC Uthmani Tajweed Layout",
+    "format": "QPC Uthmani Tajweed",
+    "sourceTable": "pages",
+    "totalRows": 9046,
+    "totalPages": 0,
+    "totalSurahs": 0,
+    "description": "Authoritative page mapping from QUL with tajweed information",
+    "generatedAt": "2025-08-03T03:47:47.583Z"
+  },
+  "ayahToPage": {},
+  "pageToAyah": {},
+  "juzBoundaries": {}
+}

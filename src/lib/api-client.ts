@@ -10,27 +10,37 @@ export interface SessionData {
   session_date: string; // timestamp with time zone
   session_type: string;
   duration_minutes: number;
-  surah_name: string;
-  ayah_start?: number;
-  ayah_end?: number;
-  juz_number?: number;
-  pages_read?: number;
-  recency_category?: string;
+  performance_score: number; // 0-10, allows decimals
   session_goal?: string;
-  performance_score: number; // Fixed field name
   additional_notes?: string;
-  mistakes?: MistakeData[];
   created_at: string;
   updated_at: string;
+  // New multi-surah fields
+  session_portions?: SessionPortion[];
+  mistakes?: MistakeData[];
+}
+
+export interface SessionPortion {
+  id: string;
+  session_id: string;
+  surah_name: string;
+  ayah_start: number;
+  ayah_end: number;
+  juz_number: number;
+  pages_read: number;
+  repetition_count: number;
+  recency_category: string;
+  created_at: string;
 }
 
 export interface MistakeData {
   id?: string;
   session_id?: string;
+  session_portion_id?: string;
   error_category: string;
   error_subcategory?: string;
   severity_level: number;
-  location: string;
+  ayah_number: number; // Just the ayah number (surah known from portion)
   additional_notes?: string;
 }
 
@@ -103,18 +113,14 @@ export class SessionsApi {
 
   // Create new session
   static async createSession(
-    session: Omit<SessionData, "id" | "user_id" | "created_at" | "updated_at">,
-    mistakes: Omit<MistakeData, "id" | "session_id">[] = []
+    createRequest: any // CreateSessionRequest with session, session_portions, mistakes
   ): Promise<ApiResponse<SessionData>> {
     try {
       const headers = await getAuthHeaders();
       const response = await fetch("/api/sessions", {
         method: "POST",
         headers,
-        body: JSON.stringify({
-          session,
-          mistakes,
-        }),
+        body: JSON.stringify(createRequest),
       });
 
       const data = await response.json();

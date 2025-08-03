@@ -147,11 +147,14 @@ export default function RealDashboardPage() {
       (s) => new Date(s.session_date) > weekAgo
     ).length;
 
-    // Most frequent surah
-    const surahCounts = sessions.reduce((acc, s) => {
-      acc[s.surah_name] = (acc[s.surah_name] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+    // Most frequent surah (from session portions)
+    const surahCounts: Record<string, number> = {};
+    sessions.forEach((session) => {
+      session.session_portions?.forEach((portion) => {
+        surahCounts[portion.surah_name] =
+          (surahCounts[portion.surah_name] || 0) + 1;
+      });
+    });
 
     const favoriteSupah =
       Object.entries(surahCounts).sort(([, a], [, b]) => b - a)[0]?.[0] ||
@@ -190,38 +193,14 @@ export default function RealDashboardPage() {
     });
   };
 
-  const handleCreateSession = async (newSession: any) => {
+  const handleCreateSession = async (createRequest: any) => {
     try {
       setIsCreating(true);
       setCreateError(null);
 
-      // Transform the session data to match the API format
-      const sessionData = {
-        session_date: newSession.date,
-        session_type: newSession.sessionType,
-        duration_minutes: newSession.duration,
-        surah_name: newSession.portionDetails.surahName,
-        ayah_start: newSession.portionDetails.ayahStart,
-        ayah_end: newSession.portionDetails.ayahEnd,
-        juz_number: newSession.portionDetails.juzNumber,
-        pages_read: newSession.portionDetails.pagesRead,
-        recency_category: newSession.portionDetails.recencyCategory,
-        session_goal: newSession.sessionGoal,
-        performance_score: newSession.performanceScore,
-        additional_notes: newSession.additionalNotes,
-      };
-
-      // Transform mistakes data
-      const mistakes =
-        newSession.mistakes?.map((m: any) => ({
-          error_category: m.errorCategory,
-          error_subcategory: m.errorSubcategory,
-          severity_level: m.severityLevel,
-          location: m.location,
-          additional_notes: m.additionalNotes,
-        })) || [];
-
-      const result = await SessionsApi.createSession(sessionData, mistakes);
+      // The new CreateSessionModal passes a CreateSessionRequest object
+      // with session, session_portions, and mistakes already formatted
+      const result = await SessionsApi.createSession(createRequest);
 
       if (result.error) {
         setCreateError(`Failed to create session: ${result.error}`);
@@ -230,6 +209,8 @@ export default function RealDashboardPage() {
         setShowCreateModal(false);
         // Refresh stats to reflect the new session
         fetchStats();
+        // Show success feedback and refresh data
+        // Note: We're already on the dashboard, so just refresh the sessions list
       }
     } catch (err) {
       setCreateError("Failed to create session. Please try again.");
