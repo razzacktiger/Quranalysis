@@ -115,7 +115,7 @@ async function generateAIResponse(
                 surah_name: {
                   type: "string",
                   description:
-                    "Name of the Surah practiced (e.g., 'Al-Baqarah', 'Ali Imran')",
+                    "EXACT Surah name from database (e.g., 'Al-Baqarah', 'Ali Imran', 'Al-Falaq', 'Al-Ikhlas'). NEVER use shortened forms like 'Fatiha', 'Falaq', 'Ikhlas'.",
                 },
                 ayah_start: {
                   type: "number",
@@ -226,7 +226,8 @@ async function generateAIResponse(
               properties: {
                 surah_name: {
                   type: "string",
-                  description: "Name of the Surah where the mistake occurred",
+                  description:
+                    "EXACT Surah name from database (e.g., 'Al-Falaq', not 'Falaq'). Use full names with proper prefixes.",
                 },
                 ayah_number: {
                   type: "number",
@@ -349,6 +350,8 @@ WHEN TO SAVE SESSIONS:
 
 PRIMARY INFORMATION TO EXTRACT:
 - Multiple Quran portions: Each portion needs surah name and specific ayah numbers (e.g., "Al-Baqarah ayahs 1-111, Ali Imran ayahs 1-50")
+- **CRITICAL**: Use EXACT surah names from database: "Al-Fatiha", "Al-Baqarah", "Ali Imran", "An-Nisa", "Al-Maidah", "Al-Anam", "Al-Araf", "Al-Anfal", "At-Tawbah", "Yunus", "Hud", "Yusuf", "Ar-Rad", "Ibrahim", "Al-Hijr", "An-Nahl", "Al-Isra", "Al-Kahf", "Maryam", "Ta-Ha", "Al-Anbya", "Al-Hajj", "Al-Muminun", "An-Nur", "Al-Furqan", "Ash-Shuara", "An-Naml", "Al-Qasas", "Al-Ankabut", "Ar-Rum", "Luqman", "As-Sajdah", "Al-Ahzab", "Saba", "Fatir", "Ya-Sin", "As-Saffat", "Sad", "Az-Zumar", "Ghafir", "Fussilat", "Ash-Shura", "Az-Zukhruf", "Ad-Dukhan", "Al-Jathiyah", "Al-Ahqaf", "Muhammad", "Al-Fath", "Al-Hujurat", "Qaf", "Adh-Dhariyat", "At-Tur", "An-Najm", "Al-Qamar", "Ar-Rahman", "Al-Waqiah", "Al-Hadid", "Al-Mujadila", "Al-Hashr", "Al-Mumtahanah", "As-Saff", "Al-Jumuah", "Al-Munafiqun", "At-Taghabun", "At-Talaq", "At-Tahrim", "Al-Mulk", "Al-Qalam", "Al-Haqqah", "Al-Maarij", "Nuh", "Al-Jinn", "Al-Muzzammil", "Al-Muddaththir", "Al-Qiyamah", "Al-Insan", "Al-Mursalat", "An-Naba", "An-Naziat", "Abasa", "At-Takwir", "Al-Infitar", "Al-Mutaffifin", "Al-Inshiqaq", "Al-Buruj", "At-Tariq", "Al-Ala", "Al-Ghashiyah", "Al-Fajr", "Al-Balad", "Ash-Shams", "Al-Layl", "Ad-Duha", "Ash-Sharh", "At-Tin", "Al-Alaq", "Al-Qadr", "Al-Bayyinah", "Az-Zalzalah", "Al-Adiyat", "Al-Qariah", "At-Takathur", "Al-Asr", "Al-Humazah", "Al-Fil", "Quraysh", "Al-Maun", "Al-Kawthar", "Al-Kafirun", "An-Nasr", "Al-Masad", "Al-Ikhlas", "Al-Falaq", "An-Nas"
+- **NEVER use shortened names like "Fatiha", "Falaq", "Ikhlas" - ALWAYS use the full database name with proper prefixes**
 - Total practice duration in minutes (can ask for breakdown per portion if helpful)
 - Recency Category: 
   * "new" (within the last 1-2 days)

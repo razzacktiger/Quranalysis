@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { SessionsApi, SessionData } from "@/lib/api-client";
+import { UpdateSessionRequest } from "@/types/session";
 import { supabase } from "@/lib/supabase";
 import SessionDetail from "./SessionDetail";
 import EditSessionModal from "./EditSessionModal";
@@ -15,7 +16,13 @@ type SortField =
   | "mistakeCount";
 type SortDirection = "asc" | "desc";
 
-export default function SessionsTableReal() {
+interface SessionsTableRealProps {
+  showHeader?: boolean;
+}
+
+export default function SessionsTableReal({
+  showHeader = true,
+}: SessionsTableRealProps) {
   const [sessions, setSessions] = useState<SessionData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -114,9 +121,12 @@ export default function SessionsTableReal() {
     const searchLower = searchTerm.toLowerCase();
     const mistakeCount = session.mistakes?.length || 0;
 
-    // Get surah names from session portions
+    // Get unique surah names from session portions
     const surahNames =
-      session.session_portions?.map((p) => p.surah_name).join(" ") || "";
+      session.session_portions
+        ?.map((p) => p.surah_name)
+        .filter((name, index, array) => array.indexOf(name) === index) // Remove duplicates
+        .join(" ") || "";
 
     return (
       surahNames.toLowerCase().includes(searchLower) ||
@@ -220,57 +230,39 @@ export default function SessionsTableReal() {
     };
   };
 
-  // Transform DetailedSession back to API format
-  const transformToSessionData = (session: any) => ({
-    session_date: session.date,
-    session_type: session.sessionType,
-    duration_minutes: session.duration,
-    surah_name: session.portionDetails.surahName,
-    ayah_start: session.portionDetails.ayahStart,
-    ayah_end: session.portionDetails.ayahEnd,
-    juz_number: session.portionDetails.juzNumber,
-    pages_read: session.portionDetails.pagesRead,
-    recency_category: session.portionDetails.recencyCategory,
-    session_goal: session.sessionGoal,
-    performance_score: session.performanceScore,
-    additional_notes: session.additionalNotes,
-  });
-
   const handleEditClick = (session: SessionData) => {
     setEditingSession(session);
   };
 
-  const handleSaveEdit = async (updatedSession: any) => {
-    try {
-      const sessionData = transformToSessionData(updatedSession);
-      const mistakes =
-        updatedSession.mistakes?.map((m: any) => ({
-          error_category: m.errorCategory,
-          error_subcategory: m.errorSubcategory,
-          severity_level: m.severityLevel,
-          location: m.location,
-          additional_notes: m.additionalNotes,
-        })) || [];
+  const handleSaveEdit = async (updateRequest: UpdateSessionRequest) => {
+    if (!editingSession?.id) {
+      setError("No session selected for editing");
+      return;
+    }
 
-      const result = await SessionsApi.updateSession(
-        updatedSession.id,
-        sessionData,
-        mistakes
-      );
+    try {
+      // Use the editingSession ID since UpdateSessionRequest doesn't include it
+      const sessionId = editingSession.id;
+
+      console.log("🔍 About to call updateSession with:", updateRequest);
+
+      const result = await SessionsApi.updateSession(sessionId, updateRequest);
 
       if (result.error) {
         setError(`Failed to update session: ${result.error}`);
       } else {
-        // Update the session in our local state
-        setSessions((prev) =>
-          prev.map((s) => (s.id === updatedSession.id ? result.data! : s))
-        );
+        // Close the editing modal first
         setEditingSession(null);
-        if (selectedSession?.id === updatedSession.id) {
-          setSelectedSession(result.data!);
+
+        // Clear any selected session if it was the one being edited
+        if (selectedSession?.id === sessionId) {
+          setSelectedSession(null);
         }
-        // Refresh the list to get the latest data
+
+        // Refresh the list to get the latest data from the server
         await handleRefresh();
+
+        console.log("Session updated successfully, data refreshed");
       }
     } catch (err) {
       setError("Failed to save changes");
@@ -357,35 +349,68 @@ export default function SessionsTableReal() {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg">
+    <div
+      className={
+        showHeader ? "bg-white dark:bg-gray-800 rounded-lg shadow-lg" : ""
+      }
+    >
       {/* Header */}
-      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-            Your Quran Sessions ({sessions.length})
-          </h2>
-          <button
-            onClick={handleRefresh}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            🔄 Refresh
-          </button>
-        </div>
+      {showHeader && (
+        <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
+              Your Quran Sessions ({sessions.length})
+            </h2>
+            <button
+              onClick={handleRefresh}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              🔄 Refresh
+            </button>
+          </div>
 
-        {/* Search */}
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Search sessions... (surah, type, score, duration, mistakes, date)"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-          />
-          <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-            <span className="text-gray-400">🔍</span>
+          {/* Search */}
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search sessions... (surah, type, score, duration, mistakes, date)"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+              <span className="text-gray-400">🔍</span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Search section when header is hidden */}
+      {!showHeader && (
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-4">
+            <div className="flex-1 relative">
+              <input
+                type="text"
+                placeholder="Search sessions... (surah, type, score, duration, mistakes, date)"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                <span className="text-gray-400">🔍</span>
+              </div>
+            </div>
+            <button
+              onClick={handleRefresh}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+            >
+              <span className="mr-1">🔄</span>
+              Refresh
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Table */}
       <div className="overflow-x-auto">
@@ -472,6 +497,9 @@ export default function SessionsTableReal() {
                     <div className="text-sm font-medium text-gray-900 dark:text-white">
                       {session.session_portions
                         ?.map((p) => p.surah_name)
+                        .filter(
+                          (name, index, array) => array.indexOf(name) === index
+                        ) // Remove duplicates
                         .join(", ") || "No surahs"}
                     </div>
                     {session.session_portions &&
@@ -602,6 +630,9 @@ export default function SessionsTableReal() {
                   <div className="font-medium text-gray-900 dark:text-white">
                     {deletingSession.session_portions
                       ?.map((p) => p.surah_name)
+                      .filter(
+                        (name, index, array) => array.indexOf(name) === index
+                      ) // Remove duplicates
                       .join(", ") || "No surahs"}{" "}
                     - {formatSessionType(deletingSession.session_type)}
                   </div>

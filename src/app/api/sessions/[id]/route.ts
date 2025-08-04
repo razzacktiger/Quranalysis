@@ -127,6 +127,12 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     const body = await request.json();
     const { session, session_portions, mistakes }: UpdateSessionRequest = body;
+    console.log("🔍 PUT /api/sessions/[id] - Request data:", {
+      sessionId: id,
+      session: session,
+      portionsCount: session_portions?.length || 0,
+      mistakesCount: mistakes?.length || 0,
+    });
 
     // Update session (explicit user filter + RLS for double security)
     const { data: updatedSession, error: sessionError } = await supabase
@@ -151,99 +157,120 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
       );
     }
 
-    // Handle session_portions update (replace all)
+    // Handle session_portions update (UPSERT - insert or update)
     let createdPortions: any[] = [];
-    if (session_portions) {
-      // Delete existing session portions for this session (CASCADE will handle mistakes)
-      const { error: deletePortionsError } = await supabase
-        .from("session_portions")
-        .delete()
-        .eq("session_id", id);
+    if (session_portions !== undefined && session_portions.length > 0) {
+      // Use UPSERT logic - update existing, insert new
+      const portionsWithSessionId = session_portions.map((portion: any) => {
+        // Remove frontend-only fields before database insert
+        const { tempId, databaseId, ...cleanPortion } = portion;
 
-      if (deletePortionsError) {
-        console.error("Delete session portions error:", deletePortionsError);
+        return {
+          ...cleanPortion,
+          session_id: id,
+          // Keep existing ID if present, remove if it's a new UUID without matching DB record
+        };
+      });
+
+      console.log("🔍 About to upsert portions:", portionsWithSessionId);
+
+      const { data: upsertedPortions, error: upsertPortionsError } =
+        await supabase
+          .from("session_portions")
+          .upsert(portionsWithSessionId, {
+            onConflict: "id",
+            ignoreDuplicates: false,
+          })
+          .select();
+
+      if (upsertPortionsError) {
+        console.error("Upsert session portions error:", upsertPortionsError);
         return NextResponse.json(
           { error: "Failed to update session portions" },
           { status: 500 }
         );
       }
 
-      // Insert new session portions if provided
-      if (session_portions.length > 0) {
-        const portionsWithSessionId = session_portions.map((portion: any) => ({
-          ...portion,
-          session_id: id,
-          id: undefined, // Remove frontend ID, let DB generate new ones
-        }));
+      createdPortions = upsertedPortions || [];
+    }
 
-        const { data: newPortions, error: insertPortionsError } = await supabase
-          .from("session_portions")
-          .insert(portionsWithSessionId)
-          .select();
+    // Handle mistakes update (UPSERT - insert, update, and delete)
+    if (session_portions !== undefined && mistakes && mistakes.length >= 0) {
+      // First, get all existing mistakes for this session to handle deletions
+      const { data: existingMistakes } = await supabase
+        .from("mistakes")
+        .select("id")
+        .eq("session_id", id);
 
-        if (insertPortionsError) {
-          console.error("Insert session portions error:", insertPortionsError);
+      // Use UPSERT logic for mistakes - update/insert new ones
+      const mistakesWithIds = mistakes
+        .map((mistake: any) => {
+          // Find corresponding portion by session_portion_id
+          const correspondingPortion =
+            createdPortions.find(
+              (portion) => portion.id === mistake.session_portion_id
+            ) || createdPortions[0]; // Fallback to first portion
+
+          if (!correspondingPortion) {
+            console.warn(
+              "No corresponding portion found for mistake:",
+              mistake
+            );
+            return null;
+          }
+
+          // Remove frontend-only fields before database insert
+          const { tempId, portionTempId, ...cleanMistake } = mistake;
+
+          return {
+            ...cleanMistake,
+            session_id: id,
+            session_portion_id: correspondingPortion.id,
+          };
+        })
+        .filter((mistake) => mistake && mistake.session_portion_id);
+
+      if (mistakesWithIds.length > 0) {
+        console.log("🔍 About to upsert mistakes:", mistakesWithIds);
+
+        const { error: upsertMistakesError } = await supabase
+          .from("mistakes")
+          .upsert(mistakesWithIds, {
+            onConflict: "id",
+            ignoreDuplicates: false,
+          });
+
+        if (upsertMistakesError) {
+          console.error("Upsert mistakes error:", upsertMistakesError);
           return NextResponse.json(
-            { error: "Session updated but failed to update portions" },
+            {
+              error:
+                "Session and portions updated but failed to update mistakes",
+            },
             { status: 207 }
           );
         }
-
-        createdPortions = newPortions || [];
-      }
-    }
-
-    // Handle mistakes update (linked to new portions)
-    if (mistakes) {
-      // Delete existing mistakes for this session (if not already deleted by CASCADE)
-      const { error: deleteMistakesError } = await supabase
-        .from("mistakes")
-        .delete()
-        .eq("session_id", id);
-
-      if (deleteMistakesError) {
-        console.error("Delete mistakes error:", deleteMistakesError);
-        return NextResponse.json(
-          { error: "Failed to update mistakes" },
-          { status: 500 }
-        );
       }
 
-      // Insert new mistakes if provided (linked to new portions)
-      if (mistakes.length > 0) {
-        const mistakesWithIds = mistakes
-          .map((mistake: any) => {
-            // Find corresponding portion by matching portionIndex
-            const correspondingPortion = createdPortions.find(
-              (portion, index) => index === mistake.portionIndex
-            );
+      // Delete mistakes that are no longer in the frontend list
+      if (existingMistakes && existingMistakes.length > 0) {
+        const frontendMistakeIds = mistakes
+          .map((m: any) => m.id)
+          .filter((id: string) => id && !id.includes("uuid")); // Only real DB IDs, not generated UUIDs
 
-            return {
-              ...mistake,
-              session_id: id,
-              session_portion_id: correspondingPortion?.id,
-              // Remove frontend-only fields
-              portionIndex: undefined,
-              portionTempId: undefined,
-              tempId: undefined,
-            };
-          })
-          .filter((mistake) => mistake.session_portion_id); // Only include mistakes with valid portion IDs
+        const mistakesToDelete = existingMistakes
+          .filter((existing: any) => !frontendMistakeIds.includes(existing.id))
+          .map((m: any) => m.id);
 
-        if (mistakesWithIds.length > 0) {
-          const { error: insertMistakesError } = await supabase
+        if (mistakesToDelete.length > 0) {
+          console.log("🔍 Deleting removed mistakes:", mistakesToDelete);
+          const { error: deleteMistakesError } = await supabase
             .from("mistakes")
-            .insert(mistakesWithIds);
+            .delete()
+            .in("id", mistakesToDelete);
 
-          if (insertMistakesError) {
-            console.error("Insert mistakes error:", insertMistakesError);
-            return NextResponse.json(
-              {
-                error:
-                  "Session and portions updated but failed to update mistakes",
-              },
-              { status: 207 }
-            );
+          if (deleteMistakesError) {
+            console.error("Delete mistakes error:", deleteMistakesError);
           }
         }
       }

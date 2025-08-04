@@ -71,7 +71,9 @@ export class SessionsApi {
   static async getSessions(): Promise<ApiResponse<SessionData[]>> {
     try {
       const headers = await getAuthHeaders();
-      const response = await fetch("/api/sessions", {
+      // Add cache-busting timestamp to ensure fresh data
+      const url = `/api/sessions?t=${Date.now()}`;
+      const response = await fetch(url, {
         method: "GET",
         headers,
       });
@@ -136,23 +138,23 @@ export class SessionsApi {
     }
   }
 
-  // Update existing session
+  // Update existing session with full request
   static async updateSession(
     id: string,
-    session: Partial<
-      Omit<SessionData, "id" | "user_id" | "created_at" | "updated_at">
-    >,
-    mistakes?: Omit<MistakeData, "id" | "session_id">[]
+    updateRequest: {
+      session: Partial<
+        Omit<SessionData, "id" | "user_id" | "created_at" | "updated_at">
+      >;
+      session_portions?: any[];
+      mistakes?: any[];
+    }
   ): Promise<ApiResponse<SessionData>> {
     try {
       const headers = await getAuthHeaders();
       const response = await fetch(`/api/sessions/${id}`, {
         method: "PUT",
         headers,
-        body: JSON.stringify({
-          session,
-          mistakes,
-        }),
+        body: JSON.stringify(updateRequest),
       });
 
       const data = await response.json();

@@ -41,7 +41,7 @@ export const SURAHS: SurahInfo[] = [
   },
   {
     number: 3,
-    name: "Ali 'Imran",
+    name: "Ali Imran",
     arabicName: "آل عمران",
     totalAyahs: 200,
     juzStart: 3,
@@ -68,7 +68,7 @@ export const SURAHS: SurahInfo[] = [
   },
   {
     number: 5,
-    name: "Al-Ma'idah",
+    name: "Al-Maidah",
     arabicName: "المائدة",
     totalAyahs: 120,
     juzStart: 6,
@@ -81,7 +81,7 @@ export const SURAHS: SurahInfo[] = [
   },
   {
     number: 6,
-    name: "Al-An'am",
+    name: "Al-Anam",
     arabicName: "الأنعام",
     totalAyahs: 165,
     juzStart: 7,
@@ -94,7 +94,7 @@ export const SURAHS: SurahInfo[] = [
   },
   {
     number: 7,
-    name: "Al-A'raf",
+    name: "Al-Araf",
     arabicName: "الأعراف",
     totalAyahs: 206,
     juzStart: 8,
@@ -164,7 +164,7 @@ export const SURAHS: SurahInfo[] = [
   },
   {
     number: 13,
-    name: "Ar-Ra'd",
+    name: "Ar-Rad",
     arabicName: "الرعد",
     totalAyahs: 43,
     juzStart: 13,
@@ -249,7 +249,7 @@ export const SURAHS: SurahInfo[] = [
   },
   {
     number: 23,
-    name: "Al-Mu'minun",
+    name: "Al-Muminun",
     arabicName: "المؤمنون",
     totalAyahs: 118,
     juzStart: 18,
@@ -278,7 +278,7 @@ export const SURAHS: SurahInfo[] = [
   },
   {
     number: 26,
-    name: "Ash-Shu'ara",
+    name: "Ash-Shuara",
     arabicName: "الشعراء",
     totalAyahs: 227,
     juzStart: 19,
@@ -307,7 +307,7 @@ export const SURAHS: SurahInfo[] = [
   },
   {
     number: 29,
-    name: "Al-'Ankabut",
+    name: "Al-Ankabut",
     arabicName: "العنكبوت",
     totalAyahs: 69,
     juzStart: 20,
@@ -553,7 +553,7 @@ export const SURAHS: SurahInfo[] = [
   },
   {
     number: 56,
-    name: "Al-Waqi'ah",
+    name: "Al-Waqiah",
     arabicName: "الواقعة",
     totalAyahs: 96,
     juzStart: 27,
@@ -601,7 +601,7 @@ export const SURAHS: SurahInfo[] = [
   },
   {
     number: 62,
-    name: "Al-Jumu'ah",
+    name: "Al-Jumuah",
     arabicName: "الجمعة",
     totalAyahs: 11,
     juzStart: 28,
@@ -665,7 +665,7 @@ export const SURAHS: SurahInfo[] = [
   },
   {
     number: 70,
-    name: "Al-Ma'arij",
+    name: "Al-Maarij",
     arabicName: "المعارج",
     totalAyahs: 44,
     juzStart: 29,
@@ -737,7 +737,7 @@ export const SURAHS: SurahInfo[] = [
   },
   {
     number: 79,
-    name: "An-Nazi'at",
+    name: "An-Naziat",
     arabicName: "النازعات",
     totalAyahs: 46,
     juzStart: 30,
@@ -801,7 +801,7 @@ export const SURAHS: SurahInfo[] = [
   },
   {
     number: 87,
-    name: "Al-A'la",
+    name: "Al-Ala",
     arabicName: "الأعلى",
     totalAyahs: 19,
     juzStart: 30,
@@ -873,7 +873,7 @@ export const SURAHS: SurahInfo[] = [
   },
   {
     number: 96,
-    name: "Al-'Alaq",
+    name: "Al-Alaq",
     arabicName: "العلق",
     totalAyahs: 19,
     juzStart: 30,
@@ -905,7 +905,7 @@ export const SURAHS: SurahInfo[] = [
   },
   {
     number: 100,
-    name: "Al-'Adiyat",
+    name: "Al-Adiyat",
     arabicName: "العاديات",
     totalAyahs: 11,
     juzStart: 30,
@@ -913,7 +913,7 @@ export const SURAHS: SurahInfo[] = [
   },
   {
     number: 101,
-    name: "Al-Qari'ah",
+    name: "Al-Qariah",
     arabicName: "القارعة",
     totalAyahs: 11,
     juzStart: 30,
@@ -929,7 +929,7 @@ export const SURAHS: SurahInfo[] = [
   },
   {
     number: 103,
-    name: "Al-'Asr",
+    name: "Al-Asr",
     arabicName: "العصر",
     totalAyahs: 3,
     juzStart: 30,
@@ -961,7 +961,7 @@ export const SURAHS: SurahInfo[] = [
   },
   {
     number: 107,
-    name: "Al-Ma'un",
+    name: "Al-Maun",
     arabicName: "الماعون",
     totalAyahs: 7,
     juzStart: 30,

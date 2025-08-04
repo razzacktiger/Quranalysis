@@ -117,7 +117,7 @@ export const SURAHS_COMPLETE: SurahInfo[] = [
   },
   {
     number: 5,
-    name: "Al-Ma'idah",
+    name: "Al-Maidah",
     arabicName: "المائدة",
     totalAyahs: 120,
     juzStart: 6,
@@ -311,7 +311,7 @@ export const SURAHS_COMPLETE: SurahInfo[] = [
   },
   {
     number: 23,
-    name: "Al-Mu'minun",
+    name: "Al-Muminun",
     arabicName: "المؤمنون",
     totalAyahs: 118,
     juzStart: 18,
@@ -343,7 +343,7 @@ export const SURAHS_COMPLETE: SurahInfo[] = [
   // Continue with remaining surahs...
   {
     number: 26,
-    name: "Ash-Shu'ara",
+    name: "Ash-Shuara",
     arabicName: "الشعراء",
     totalAyahs: 227,
     juzStart: 19,
@@ -1064,7 +1064,7 @@ export const SURAHS_COMPLETE: SurahInfo[] = [
   },
   {
     number: 103,
-    name: "Al-'Asr",
+    name: "Al-Asr",
     arabicName: "العصر",
     totalAyahs: 3,
     juzStart: 30,

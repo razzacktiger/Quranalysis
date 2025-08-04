@@ -47,47 +47,90 @@ export default function EditSessionModal({
   // Initialize form data when session changes
   useEffect(() => {
     if (session) {
-      // Handle the transformed session data structure
+      // Handle both transformed and database session data structures
       setSessionData({
-        session_date: session.date
-          ? session.date.slice(0, 16)
-          : new Date().toISOString().slice(0, 16),
-        session_type: session.sessionType || "reading_practice",
-        duration_minutes: session.duration || 0,
-        performance_score: session.performanceScore || 0,
-        session_goal: session.sessionGoal || "",
-        additional_notes: session.additionalNotes || "",
+        session_date:
+          session.session_date || session.date
+            ? (session.session_date || session.date).slice(0, 16)
+            : new Date().toISOString().slice(0, 16),
+        session_type:
+          session.session_type || session.sessionType || "reading_practice",
+        duration_minutes: session.duration_minutes || session.duration || 0,
+        performance_score:
+          session.performance_score || session.performanceScore || 0,
+        session_goal: session.session_goal || session.sessionGoal || "",
+        additional_notes:
+          session.additional_notes || session.additionalNotes || "",
       });
 
-      // For now, create a single portion from the portionDetails
-      const singlePortion = session.portionDetails
-        ? [
-            {
-              tempId: uuidv4(),
-              surah_name: session.portionDetails.surahName || "",
-              ayah_start: session.portionDetails.ayahStart || undefined,
-              ayah_end: session.portionDetails.ayahEnd || undefined,
-              juz_number: session.portionDetails.juzNumber || 1,
-              pages_read: session.portionDetails.pagesRead || 1,
-              repetition_count: 1, // Default value
-              recency_category:
-                session.portionDetails.recencyCategory || "recent",
-            },
-          ]
-        : [];
-      setSessionPortions(singlePortion);
+      // Handle both old transformed format and new database format
+      let sessionPortionsData: PortionFormData[] = [];
 
-      // Map mistakes from the transformed format
+      if (session.session_portions && Array.isArray(session.session_portions)) {
+        // New multi-portion format from database
+        sessionPortionsData = session.session_portions.map((portion: any) => ({
+          tempId: portion.id || uuidv4(), // Use existing DB ID or generate new one
+          databaseId: portion.id, // Store the actual database ID
+          surah_name: portion.surah_name || "",
+          ayah_start: portion.ayah_start || undefined,
+          ayah_end: portion.ayah_end || undefined,
+          juz_number: portion.juz_number || 1,
+          pages_read: portion.pages_read || 1,
+          repetition_count: portion.repetition_count || 1,
+          recency_category: portion.recency_category || "recent",
+        }));
+      } else if (session.portionDetails) {
+        // Old transformed format (fallback)
+        sessionPortionsData = [
+          {
+            tempId: uuidv4(),
+            surah_name: session.portionDetails.surahName || "",
+            ayah_start: session.portionDetails.ayahStart || undefined,
+            ayah_end: session.portionDetails.ayahEnd || undefined,
+            juz_number: session.portionDetails.juzNumber || 1,
+            pages_read: session.portionDetails.pagesRead || 1,
+            repetition_count: 1,
+            recency_category:
+              session.portionDetails.recencyCategory || "recent",
+          },
+        ];
+      }
+      setSessionPortions(sessionPortionsData);
+
+      // Map mistakes from both old and new formats
       const mistakesWithTempIds = (session.mistakes || []).map(
-        (mistake: any) => ({
-          tempId: uuidv4(),
-          portionTempId: singlePortion[0]?.tempId || "",
-          error_category: mistake.errorCategory || "pronunciation",
-          error_subcategory: mistake.errorSubcategory || undefined,
-          severity_level: mistake.severityLevel || 1,
-          ayah_number: parseInt(mistake.location) || 1, // location contains just ayah number
-          additional_notes: mistake.additionalNotes || "",
-        })
+        (mistake: any) => {
+          // Find the matching portion for this mistake
+          const matchingPortion = sessionPortionsData.find((portion) => {
+            // For new format, find by session_portion_id
+            if (mistake.session_portion_id) {
+              return session.session_portions?.find(
+                (p: any) => p.id === mistake.session_portion_id
+              );
+            }
+            return sessionPortionsData[0]; // Fallback to first portion
+          });
+
+          return {
+            tempId: mistake.id || uuidv4(), // Use existing DB ID or generate new one
+            databaseId: mistake.id, // Store the actual database ID
+            portionTempId:
+              matchingPortion?.tempId || sessionPortionsData[0]?.tempId || "",
+            error_category:
+              mistake.error_category ||
+              mistake.errorCategory ||
+              "pronunciation",
+            error_subcategory:
+              mistake.error_subcategory ||
+              mistake.errorSubcategory ||
+              undefined,
+            severity_level:
+              mistake.severity_level || mistake.severityLevel || 1,
+            ayah_number: mistake.ayah_number || parseInt(mistake.location) || 1,
+            additional_notes:
+              mistake.additional_notes || mistake.additionalNotes || "",
+          };
+        }
       );
       setMistakes(mistakesWithTempIds);
       setErrors({});
@@ -135,21 +178,28 @@ export default function EditSessionModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
+      // Send actual data for editing - backend will handle updates properly
       const updateRequest: UpdateSessionRequest = {
         session: sessionData,
-        session_portions: sessionPortions.map(({ tempId, ...portion }) => ({
-          ...portion,
-          id: uuidv4(), // Temporary ID - backend will ignore and generate new ones
-          ayah_start: portion.ayah_start || 1,
-          ayah_end: portion.ayah_end || 1,
-          juz_number: portion.juz_number || 1,
-          pages_read: portion.pages_read || 1,
-        })) as any, // Type assertion because we're replacing all portions
-        mistakes: mistakes.map(({ tempId, portionTempId, ...mistake }) => ({
-          ...mistake,
-          id: uuidv4(), // Temporary ID - backend will ignore and generate new ones
-          session_portion_id: "", // Will be linked by backend
-        })),
+        session_portions: sessionPortions.map(
+          ({ tempId, databaseId, ...portion }) => ({
+            ...portion,
+            id: databaseId || uuidv4(), // Use existing DB ID or generate new one
+            ayah_start: portion.ayah_start || 1,
+            ayah_end: portion.ayah_end || 1,
+            juz_number: portion.juz_number || 1,
+            pages_read: portion.pages_read || 1,
+          })
+        ) as any,
+        mistakes: mistakes.map(
+          ({ tempId, databaseId, portionTempId, ...mistake }) => ({
+            ...mistake,
+            id: databaseId || uuidv4(), // Use existing DB ID or generate new one
+            session_portion_id:
+              sessionPortions.find((p) => p.tempId === portionTempId)
+                ?.databaseId || "", // Link to existing portion ID
+          })
+        ),
       };
       onSave(updateRequest);
     }

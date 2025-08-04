@@ -257,44 +257,95 @@ export default function SessionDetail({
           {/* Mistakes Section */}
           {session.mistakes.length > 0 && (
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                ⚠️ Mistakes ({session.mistakes.length})
-              </h3>
-              <div className="space-y-4">
+              <div className="flex items-center mb-6">
+                <div className="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center mr-4 shadow-lg">
+                  <span className="text-white text-xl">⚠️</span>
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                    Mistakes Found
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    {session.mistakes.length}{" "}
+                    {session.mistakes.length === 1 ? "area" : "areas"} for
+                    improvement
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-3">
                 {session.mistakes.map((mistake) => (
                   <div
                     key={mistake.id}
-                    className="border dark:border-gray-700 rounded-lg p-4"
+                    className="relative overflow-hidden bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 border border-orange-200 dark:border-orange-800 rounded-xl p-5 shadow-sm hover:shadow-md transition-all duration-200"
                   >
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <h4 className="font-medium text-gray-900 dark:text-white">
-                          {mistake.errorCategory}
-                          {mistake.errorSubcategory && (
-                            <span className="text-gray-500 dark:text-gray-400">
-                              • {mistake.errorSubcategory}
-                            </span>
-                          )}
-                        </h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">
-                          📍 {mistake.location}
-                        </p>
-                      </div>
+                    {/* Severity Level Badge - Top Right */}
+                    <div className="absolute top-3 right-3">
                       <span
-                        className={`px-2 py-1 rounded text-sm font-medium ${getSeverityColor(
+                        className={`inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold shadow-sm ${getSeverityColor(
                           mistake.severityLevel
                         )}`}
                       >
+                        <div className="w-2 h-2 rounded-full bg-current mr-1.5 animate-pulse"></div>
                         Level {mistake.severityLevel}
                       </span>
                     </div>
-                    {mistake.additionalNotes && (
-                      <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 p-3 rounded mt-2">
-                        <p className="text-sm text-gray-700 dark:text-gray-300 italic">
-                          💭 {mistake.additionalNotes}
-                        </p>
+
+                    {/* Main Content */}
+                    <div className="pr-20">
+                      {/* Error Category & Subcategory */}
+                      <div className="flex items-center mb-3">
+                        <div className="flex-shrink-0 w-10 h-10 bg-orange-100 dark:bg-orange-900/50 rounded-full flex items-center justify-center mr-3">
+                          <span className="text-lg">
+                            {mistake.errorCategory === "pronunciation"
+                              ? "🗣️"
+                              : mistake.errorCategory === "memorization"
+                              ? "🧠"
+                              : mistake.errorCategory === "tajweed"
+                              ? "📖"
+                              : mistake.errorCategory === "translation"
+                              ? "🌐"
+                              : "⚠️"}
+                          </span>
+                        </div>
+                        <div>
+                          <h4 className="text-lg font-semibold text-gray-900 dark:text-white capitalize">
+                            {mistake.errorCategory}
+                          </h4>
+                          {mistake.errorSubcategory && (
+                            <p className="text-sm text-orange-600 dark:text-orange-400 font-medium capitalize">
+                              {mistake.errorSubcategory}
+                            </p>
+                          )}
+                        </div>
                       </div>
-                    )}
+
+                      {/* Location */}
+                      <div className="flex items-center mb-3 bg-white/50 dark:bg-gray-800/50 rounded-lg px-3 py-2">
+                        <span className="text-orange-600 dark:text-orange-400 mr-2">
+                          📍
+                        </span>
+                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                          {mistake.location}
+                        </span>
+                      </div>
+
+                      {/* Additional Notes */}
+                      {mistake.additionalNotes && (
+                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 mt-3">
+                          <div className="flex items-start">
+                            <span className="text-blue-600 dark:text-blue-400 mr-2 flex-shrink-0 mt-0.5">
+                              💭
+                            </span>
+                            <p className="text-sm text-blue-800 dark:text-blue-200 italic leading-relaxed">
+                              {mistake.additionalNotes}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Decorative gradient line */}
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-orange-400 via-red-400 to-pink-400"></div>
                   </div>
                 ))}
               </div>

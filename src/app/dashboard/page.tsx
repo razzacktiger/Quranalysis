@@ -437,16 +437,14 @@ export default function RealDashboardPage() {
             </button>
           </div>
 
-          <div className="p-6">
-            {createError && (
-              <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                <p className="text-red-700 dark:text-red-400 text-sm">
-                  {createError}
-                </p>
-              </div>
-            )}
-            <SessionsTableReal />
-          </div>
+          {createError && (
+            <div className="mx-6 mt-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+              <p className="text-red-700 dark:text-red-400 text-sm">
+                {createError}
+              </p>
+            </div>
+          )}
+          <SessionsTableReal showHeader={false} />
         </div>
       </div>
 

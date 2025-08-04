@@ -121,6 +121,7 @@ export interface SessionFormData {
 // For creating new portions (frontend)
 export interface PortionFormData {
   tempId: string; // Temporary ID for frontend management
+  databaseId?: string; // Actual database ID for existing portions (used in editing)
   surah_name: string;
   ayah_start?: number; // Optional for form state
   ayah_end?: number; // Optional for form state
@@ -134,6 +135,7 @@ export interface PortionFormData {
 // For creating new mistakes (frontend)
 export interface MistakeFormData {
   tempId: string; // Temporary ID for frontend management
+  databaseId?: string; // Actual database ID for existing mistakes (used in editing)
   portionTempId: string; // Links to PortionFormData.tempId
   error_category: ErrorCategory;
   error_subcategory?: ErrorSubcategory;
