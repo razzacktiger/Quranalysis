@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "../../../lib/supabase";
 
-export default function AuthCallback() {
+function AuthCallbackContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [debugInfo, setDebugInfo] = useState("");
@@ -168,5 +168,27 @@ export default function AuthCallback() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function AuthCallback() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center px-4">
+        <div className="max-w-md w-full text-center">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+            <div className="text-emerald-600 dark:text-emerald-400 text-4xl mb-4">📖</div>
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Loading...
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              Please wait while we set up your authentication.
+            </p>
+          </div>
+        </div>
+      </div>
+    }>
+      <AuthCallbackContent />
+    </Suspense>
   );
 }

@@ -7,9 +7,9 @@ import { createClient } from "@supabase/supabase-js";
 import { UpdateSessionRequest, FullSessionData } from "@/types/session";
 
 interface RouteParams {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 // Helper function to create authenticated Supabase client

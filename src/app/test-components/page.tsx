@@ -1,6 +1,6 @@
 import SessionCard from "../../components/SessionCard";
 import SessionsTable from "../../components/SessionsTable";
-import ApiTest from "../../components/ApiTest";
+// import ApiTest from "../../components/ApiTest"; // Temporarily disabled for deployment
 
 export default function TestComponentsPage() {
   // Sample session data for testing
@@ -122,7 +122,10 @@ export default function TestComponentsPage() {
 
         {/* API Connection Test */}
         <div className="mb-12">
-          <ApiTest />
+          {/* <ApiTest /> */}
+          <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p className="text-yellow-800">ApiTest component temporarily disabled for deployment</p>
+          </div>
         </div>
 
         {/* Component Demo */}
