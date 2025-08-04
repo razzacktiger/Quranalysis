@@ -9,7 +9,6 @@ export const dynamic = "force-dynamic";
 function AuthCallbackContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-  const [debugInfo, setDebugInfo] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -24,9 +23,7 @@ function AuthCallbackContent() {
 
         if (error_code) {
           console.error("OAuth error from URL:", error_code, error_description);
-          setError(
-            `Authentication failed: ${error_description || error_description}`
-          );
+          setError(`Authentication failed: ${error_description || error_code}`);
           return;
         }
 
@@ -66,12 +63,8 @@ function AuthCallbackContent() {
           localStorage.setItem("token", data.session.access_token);
           localStorage.setItem("user", JSON.stringify(userData));
 
-          setDebugInfo("✅ Authentication successful! Redirecting...");
-
-          // Small delay to show success message
-          setTimeout(() => {
-            router.push("/dashboard");
-          }, 1000);
+          // Redirect to dashboard
+          router.push("/dashboard");
         } else {
           console.log("No session found, checking for auth hash...");
 
@@ -83,7 +76,6 @@ function AuthCallbackContent() {
 
           if (access_token) {
             console.log("Found access token in hash, setting session...");
-            setDebugInfo("🔄 Processing authentication...");
 
             // Wait a bit more for Supabase to process
             setTimeout(() => {
@@ -158,8 +150,7 @@ function AuthCallbackContent() {
             {isLoading ? "Completing Sign In..." : "Authentication Success!"}
           </h1>
           <p className="text-gray-600 dark:text-gray-400 mb-6">
-            {debugInfo ||
-              "Please wait while we set up your AI Quran Coach account."}
+            Please wait while we set up your AI Quran Coach account.
           </p>
           <div className="flex items-center justify-center space-x-2">
             <div className="w-2 h-2 bg-emerald-600 rounded-full animate-bounce"></div>
