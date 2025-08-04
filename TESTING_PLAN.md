@@ -47,7 +47,7 @@ _Priority: HIGH_
 
 ### Test Cases:
 
-- [ ] **Dashboard Loading**
+- [x] **Dashboard Loading**
 
   - Navigate to `/dashboard`
   - Verify stats cards load (sessions, avg performance, etc.)
@@ -70,7 +70,7 @@ _Priority: CRITICAL_
 
 ### Test Cases:
 
-- [ ] **Create New Session**
+- [x] **Create New Session**
 
   - Click "Create Session" button
   - Fill out session details:
@@ -82,14 +82,14 @@ _Priority: CRITICAL_
   - Add portion:
     - Surah: "Al-Fatiha"
     - Ayahs: 1-7
-    - Recency: "new"
+    - Recency: "new" 
   - Add mistake:
     - Portion: Al-Fatiha
     - Ayah: 3
     - Category: "pronunciation"
     - Subcategory: "makhraj"
     - Severity: 2
-  - Submit and verify success
+  - Submit and verify success (small bug that when i create session, redirects to dashboard screen but would need to click 'refresh' button to see the updated session)
 
 - [ ] **View Session Details**
 
