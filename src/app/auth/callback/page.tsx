@@ -2,10 +2,9 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { supabase } from "../../../lib/supabase";
 
 // Force dynamic rendering to avoid prerendering issues with auth
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 function AuthCallbackContent() {
   const [isLoading, setIsLoading] = useState(true);
@@ -25,9 +24,14 @@ function AuthCallbackContent() {
 
         if (error_code) {
           console.error("OAuth error from URL:", error_code, error_description);
-          setError(`Authentication failed: ${error_description || error_code}`);
+          setError(
+            `Authentication failed: ${error_description || error_description}`
+          );
           return;
         }
+
+        // Import Supabase only on client side to avoid build-time issues
+        const { supabase } = await import("../../../lib/supabase");
 
         // Get the session from the URL hash/fragment
         const { data, error } = await supabase.auth.getSession();
@@ -185,10 +189,10 @@ export default function AuthCallback() {
                 📖
               </div>
               <h1 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                Loading...
+                Loading Authentication...
               </h1>
               <p className="text-gray-600 dark:text-gray-400 mb-6">
-                Please wait while we set up your authentication.
+                Please wait while we process your authentication.
               </p>
             </div>
           </div>
