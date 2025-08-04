@@ -15,11 +15,11 @@ const eslintConfig = [
     rules: {
       // Temporarily relax rules for deployment - we'll fix these later
       "@typescript-eslint/no-explicit-any": "warn",
-      "@typescript-eslint/no-unused-vars": "warn", 
+      "@typescript-eslint/no-unused-vars": "warn",
       "react-hooks/exhaustive-deps": "warn",
-      "react/no-unescaped-entities": "warn"
-    }
-  }
+      "react/no-unescaped-entities": "warn",
+    },
+  },
 ];
 
 export default eslintConfig;

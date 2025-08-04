@@ -3,13 +3,31 @@
 
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+// Validate environment variables
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.warn(
+    "⚠️ Supabase environment variables missing. Auth features will be disabled."
+  );
+}
+
+// Create client with fallback values for build time
+export const supabase = createClient(
+  supabaseUrl || "https://placeholder.supabase.co",
+  supabaseAnonKey || "placeholder-key"
+);
 
 // Google OAuth Sign In Function
 export const signInWithGoogle = async () => {
+  // Check if Supabase is properly configured
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error(
+      "Supabase configuration missing. Please check environment variables."
+    );
+  }
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
