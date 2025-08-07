@@ -292,16 +292,29 @@ export default function AIChat() {
     if (!extractedSession) return;
 
     try {
+      // Get auth session with better error handling
+      const { supabase } = await import("@/lib/supabase");
+      const { data: { session: authSession }, error: authError } = await supabase.auth.getSession();
+      
+      console.log("🔍 Auth Debug:", {
+        hasSession: !!authSession,
+        hasAccessToken: !!authSession?.access_token,
+        authError: authError?.message,
+        tokenLength: authSession?.access_token?.length || 0
+      });
+
+      if (authError || !authSession?.access_token) {
+        throw new Error(`Authentication failed: ${authError?.message || 'No access token'}`);
+      }
+
+      console.log("📤 Sending session save request to production API");
+
       // Call your backend API to save the session
       const response = await fetch("/api/sessions", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${
-            (
-              await (await import("@/lib/supabase")).supabase.auth.getSession()
-            ).data.session?.access_token || ""
-          }`,
+          Authorization: `Bearer ${authSession.access_token}`,
         },
         body: JSON.stringify({
           session: {
@@ -359,22 +372,39 @@ export default function AIChat() {
         }),
       });
 
-      if (response.ok) {
-        // Add success message
-        const successMessage: Message = {
-          id: Date.now().toString(),
-          role: "assistant",
-          content: `Perfect! I've logged your session: ${extractedSession.surah} practice for ${extractedSession.duration} minutes with ${extractedSession.mistakes.length} areas to improve. Your progress is being tracked. Keep up the excellent work! 📈`,
-          timestamp: new Date(),
-        };
+      console.log("📥 Response received:", {
+        ok: response.ok,
+        status: response.status,
+        statusText: response.statusText,
+        url: response.url
+      });
 
-        setMessages((prev) => [...prev, successMessage]);
-        setExtractedSession(null);
-      } else {
-        throw new Error("Failed to save session");
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("❌ API Error Response:", errorText);
+        throw new Error(`API Error ${response.status}: ${errorText || response.statusText}`);
       }
+
+      // Success - response.ok is already checked above
+      const responseData = await response.json();
+      console.log("✅ Session saved successfully:", responseData);
+
+      const successMessage: Message = {
+        id: Date.now().toString(),
+        role: "assistant",
+        content: `Perfect! I've logged your session: ${extractedSession.surah} practice for ${extractedSession.duration} minutes with ${extractedSession.mistakes.length} areas to improve. Your progress is being tracked. Keep up the excellent work! 📈`,
+        timestamp: new Date(),
+      };
+
+      setMessages((prev) => [...prev, successMessage]);
+      setExtractedSession(null);
     } catch (error) {
-      console.error("Error saving session:", error);
+      console.error("❌ Full error details:", {
+        error: error,
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        extractedSession: extractedSession
+      });
 
       const errorMessage: Message = {
         id: Date.now().toString(),
@@ -395,7 +425,9 @@ I extracted your session details correctly but encountered an error saving to th
             : extractedSession.performance || 0.9) * 10
         )}/10
 
-**Error**: ${error instanceof Error ? error.message : "fetch failed"}`,
+**Error**: ${error instanceof Error ? error.message : "fetch failed"}
+
+*Check browser console for detailed error logs.*`,
         timestamp: new Date(),
       };
 
