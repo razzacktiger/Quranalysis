@@ -293,9 +293,7 @@ export default function AIChat() {
 
     try {
       // Call your backend API to save the session
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/sessions/`,
-        {
+      const response = await fetch("/api/sessions", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -307,22 +305,42 @@ export default function AIChat() {
               ).data.session?.access_token || ""
             }`,
           },
-          body: JSON.stringify({
-            duration: extractedSession.duration || 10,
-            performance_score: extractedSession.performance || 0.7,
-            notes: `${
-              extractedSession.surah
-                ? "Surah: " + extractedSession.surah + ". "
-                : ""
+                  body: JSON.stringify({
+          session: {
+            session_date: new Date().toISOString(),
+            session_type: "audit",
+            duration_minutes: extractedSession.duration || 15,
+            performance_score: extractedSession.performance > 1 ? extractedSession.performance / 10 : extractedSession.performance || 0.9,
+            session_goal: `AI Coaching: Practice ${extractedSession.surah || "Quran"}`,
+            additional_notes: `${
+              extractedSession.surah ? "Surah: " + extractedSession.surah + ". " : ""
             }${
               extractedSession.mistakes.length
-                ? "Mistakes: " + extractedSession.mistakes.join(", ") + ". "
+                ? "Areas to improve: " + extractedSession.mistakes.join(", ") + ". "
                 : ""
-            }${extractedSession.notes}`.trim(),
-            session_type: "practice",
-            goal_description: `Practice ${extractedSession.surah || "Quran"}`,
-          }),
-        }
+            }${extractedSession.notes || "Session tracked via AI Chat"}`.trim(),
+          },
+          session_portions: extractedSession.surah ? [{
+            surah_name: extractedSession.surah,
+            ayah_start: 1,
+            ayah_end: 7,
+            juz_number: 1,
+            pages_read: 1,
+            repetition_count: 1,
+            recency_category: "recent",
+            tempId: `ai-portion-${Date.now()}`
+          }] : [],
+          mistakes: extractedSession.mistakes.map((mistake, index) => ({
+            portionTempId: `ai-portion-${Date.now()}`,
+            error_category: mistake.toLowerCase().includes("pronunciation") ? "pronunciation" : 
+                           mistake.toLowerCase().includes("tajweed") ? "tajweed" : "other",
+            error_subcategory: mistake.toLowerCase().includes("saad") ? "makhraj" : undefined,
+            severity_level: 3,
+            ayah_number: 1,
+            additional_notes: mistake,
+            tempId: `ai-mistake-${Date.now()}-${index}`
+          }))
+        })
       );
 
       if (response.ok) {
@@ -345,8 +363,17 @@ export default function AIChat() {
       const errorMessage: Message = {
         id: Date.now().toString(),
         role: "assistant",
-        content:
-          "I encountered an issue saving your session to the database. Don't worry - I still have the details and you can try saving again.",
+        content: `❌ **Error Saving Session**
+
+I extracted your session details correctly but encountered an error saving to the database. Please try using the manual "Create Session" button in your dashboard.
+
+**Extracted Details:**
+**Portions**: ${extractedSession.surah || "Unknown"} ${extractedSession.verses ? `(${extractedSession.verses})` : ""}
+**Duration**: ${extractedSession.duration || 15} minutes  
+**Type**: audit
+**Performance**: ${Math.round((extractedSession.performance > 1 ? extractedSession.performance / 10 : extractedSession.performance || 0.9) * 10)}/10
+
+**Error**: ${error instanceof Error ? error.message : "fetch failed"}`,
         timestamp: new Date(),
       };
 

@@ -94,16 +94,6 @@ export default function Home() {
             </p>
           </div>
         </div>
-
-        {/* Status Section */}
-        <div className="mt-20 text-center">
-          <div className="inline-flex items-center px-6 py-3 bg-green-100 dark:bg-green-900 rounded-full">
-            <div className="w-3 h-3 bg-green-500 rounded-full mr-3 animate-pulse"></div>
-            <span className="text-green-800 dark:text-green-200 font-medium">
-              Backend API Running on Port 8000 ✅
-            </span>
-          </div>
-        </div>
       </main>
 
       {/* Footer */}
