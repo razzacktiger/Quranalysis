@@ -43,6 +43,7 @@ export async function POST(req: NextRequest) {
       message,
       token,
       user,
+      req,
       context,
       system_prompt
     );
@@ -65,10 +66,18 @@ async function generateAIResponse(
   message: string,
   token: string,
   user: User,
+  request: NextRequest,
   context?: string,
   systemPrompt?: string
 ): Promise<string> {
   try {
+    // Helper function to build API URLs
+    const buildApiUrl = (path: string) => {
+      const protocol = request.headers.get("x-forwarded-proto") || "http";
+      const host = request.headers.get("host") || "localhost:3000";
+      return `${protocol}://${host}${path}`;
+    };
+
     // Initialize Gemini AI with correct 2025 syntax
     const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
 
@@ -484,9 +493,7 @@ Current User Message: ${message}`,
           );
 
           // Use the internal sessions API to create the session with proper multi-portion support
-          const apiUrl = `${
-            process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-          }/api/sessions`;
+          const apiUrl = buildApiUrl("/api/sessions");
 
           const response = await fetch(apiUrl, {
             method: "POST",
@@ -560,9 +567,7 @@ I extracted your session details correctly but encountered an error saving to th
           const daysBack = findData.days_back || 7;
 
           // Fetch recent sessions
-          const getApiUrl = `${
-            process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-          }/api/sessions`;
+          const getApiUrl = buildApiUrl("/api/sessions");
 
           const getResponse = await fetch(getApiUrl, {
             method: "GET",
@@ -667,9 +672,7 @@ I need to know which session to edit. Let me show you your recent sessions so yo
           }
 
           // First, fetch recent sessions to get the session ID from the number
-          const getSessionsApiUrl = `${
-            process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-          }/api/sessions`;
+          const getSessionsApiUrl = buildApiUrl("/api/sessions");
 
           const getSessionsResponse = await fetch(getSessionsApiUrl, {
             method: "GET",
@@ -717,9 +720,7 @@ To see your sessions again, just ask me to "show my recent sessions".`;
           const sessionId = selectedSession.id;
 
           // Now fetch the full session details
-          const getApiUrl = `${
-            process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-          }/api/sessions/${sessionId}`;
+          const getApiUrl = buildApiUrl(`/api/sessions/${sessionId}`);
 
           const getResponse = await fetch(getApiUrl, {
             method: "GET",
