@@ -8,7 +8,7 @@ export default function Home() {
         <div className="flex items-center space-x-2">
           <div className="text-2xl">📖</div>
           <span className="text-xl font-bold text-emerald-800 dark:text-emerald-200">
-            AI Quran Coach
+            Quranalysis
           </span>
         </div>
         <div className="flex space-x-4">
