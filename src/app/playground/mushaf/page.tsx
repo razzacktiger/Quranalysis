@@ -7,11 +7,11 @@
  * See `docs/SOLO-WORKFLOW.md` and prompt for context.
  */
 
-import { Suspense, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { Amiri_Quran } from "next/font/google";
 import { useSearchParams } from "next/navigation";
 
-import { CATEGORIES, PASSAGES } from "./samples";
+import { CATEGORIES } from "./samples";
 import type {
   CategoryId,
   CountingMode,
@@ -20,6 +20,7 @@ import type {
   SessionType,
   SheetState,
 } from "./types";
+import { getPage, type PageData } from "./data/pageIndex";
 import { MushafView } from "./MushafView";
 import { BottomSheet } from "./BottomSheet";
 import { DebugPanel } from "./DebugPanel";
@@ -30,7 +31,10 @@ function MushafPlayground() {
   const searchParams = useSearchParams();
   const debugMode = searchParams.get("debug") === "1";
 
-  const [passageId, setPassageId] = useState<string>(PASSAGES[0].id);
+  const [pageNumber, setPageNumber] = useState<number>(1);
+  const [page, setPage] = useState<PageData | null>(null);
+  const [pageError, setPageError] = useState<string | null>(null);
+
   const [activeCategory, setActiveCategory] =
     useState<CategoryId>("tajweed");
   const [marks, setMarks] = useState<Mark[]>([]);
@@ -43,10 +47,21 @@ function MushafPlayground() {
   const [paletteSize, setPaletteSize] = useState<PaletteSize>(4);
   const [countingMode, setCountingMode] = useState<CountingMode>("per-mark");
 
-  const passage = useMemo(
-    () => PASSAGES.find((p) => p.id === passageId) ?? PASSAGES[0],
-    [passageId],
-  );
+  useEffect(() => {
+    let cancelled = false;
+    setPageError(null);
+    getPage(pageNumber)
+      .then((p) => {
+        if (!cancelled) setPage(p);
+      })
+      .catch((err) => {
+        if (!cancelled)
+          setPageError(err instanceof Error ? err.message : String(err));
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [pageNumber]);
 
   const visibleCategories = useMemo(() => {
     if (paletteSize === 2) {
@@ -57,9 +72,7 @@ function MushafPlayground() {
     return CATEGORIES;
   }, [paletteSize]);
 
-  // If palette shrinks and the active category is no longer visible, fall back.
   if (!visibleCategories.some((c) => c.id === activeCategory)) {
-    // Reason: keep render pure by deferring state change via microtask.
     queueMicrotask(() => setActiveCategory(visibleCategories[0].id));
   }
 
@@ -115,8 +128,7 @@ function MushafPlayground() {
 
   const confirmSession = () => {
     const payload = {
-      passageId: passage.id,
-      surahNumber: passage.surahNumber,
+      pageNumber,
       sessionType,
       selfRating,
       historicalMistakes,
@@ -133,7 +145,7 @@ function MushafPlayground() {
 
   return (
     <main
-      style={{ backgroundColor: "#FFFDF5" }}
+      style={{ backgroundColor: "#fafaf7" }}
       className="min-h-screen w-full pb-32"
     >
       <header className="mx-auto max-w-3xl px-6 pt-8 pb-4">
@@ -143,56 +155,34 @@ function MushafPlayground() {
         <p className="mt-1 text-sm text-stone-500">
           Throwaway prototype. Not connected to your account or database.
         </p>
-
-        <div
-          className="mt-4 inline-flex rounded-full border border-stone-200 bg-white p-1"
-          role="tablist"
-          aria-label="Passage switcher"
-        >
-          {PASSAGES.map((p) => {
-            const active = p.id === passage.id;
-            return (
-              <button
-                key={p.id}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => {
-                  setPassageId(p.id);
-                  // Reset state when switching passages — marks no longer apply.
-                  setMarks([]);
-                  setHistory([]);
-                  setSheetState("collapsed");
-                }}
-                className={`rounded-full px-4 py-1.5 text-sm transition ${
-                  active
-                    ? "bg-stone-900 text-white"
-                    : "text-stone-600 hover:bg-stone-50"
-                }`}
-              >
-                {p.surahNameEnglish}
-              </button>
-            );
-          })}
-        </div>
+        <p className="mt-2 text-xs text-stone-400">
+          Showing page {pageNumber}. Page navigation lands in the next
+          commit.
+        </p>
       </header>
 
-      <section className="mx-auto max-w-3xl px-6">
-        <div className="mb-2 text-center text-sm text-stone-500">
-          <span className="mr-2">سورة</span>
-          <span className={amiriQuran.className} style={{ fontSize: 22 }}>
-            {passage.surahNameArabic}
-          </span>
-        </div>
-        <MushafView
-          passage={passage}
-          marks={marks}
-          activeCategory={activeCategory}
-          categories={CATEGORIES}
-          fontClassName={amiriQuran.className}
-          onTapWord={toggleWord}
-          onCommitDrag={applyMarksToWordIds}
-        />
+      <section className="mx-auto max-w-3xl px-4">
+        {pageError && (
+          <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            Failed to load page: {pageError}
+          </div>
+        )}
+        {!page && !pageError && (
+          <div className="rounded-lg border border-stone-200 bg-white p-6 text-center text-sm text-stone-500">
+            Loading page {pageNumber}…
+          </div>
+        )}
+        {page && (
+          <MushafView
+            page={page}
+            marks={marks}
+            activeCategory={activeCategory}
+            categories={CATEGORIES}
+            fontClassName={amiriQuran.className}
+            onTapWord={toggleWord}
+            onCommitDrag={applyMarksToWordIds}
+          />
+        )}
       </section>
 
       <BottomSheet

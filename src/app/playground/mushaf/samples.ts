@@ -1,14 +1,13 @@
 /**
- * Hardcoded sample passages for the Mushaf prototype.
+ * Shared static config for the Mushaf prototype.
  *
- * Source: Uthmani-script word text copied from
- * `Quranalysis-Mobile/assets/quran/surah-001.json` and `surah-002.json`.
- *
- * Reason: keeping this as a static module avoids any network/Supabase calls
- * for a throwaway prototype.
+ * The "passage" concept is gone — words now come from the page-index loader
+ * in ./data/pageIndex.ts. This module keeps the small static config that
+ * isn't user-supplied or page-derived (category colors, mock historical
+ * mistakes, etc.).
  */
 
-import type { Category, Passage } from "./types";
+import type { Category, HistoricalMark } from "./types";
 
 export const CATEGORIES: Category[] = [
   { id: "tajweed", label: "Tajweed", color: "#EF4444" },
@@ -17,127 +16,34 @@ export const CATEGORIES: Category[] = [
   { id: "translation", label: "Translation", color: "#10B981" },
 ];
 
-const fatihaAyahs: Array<{ ayah: number; words: string[] }> = [
-  {
-    ayah: 1,
-    words: ["بِسْمِ", "ٱللَّهِ", "ٱلرَّحْمَـٰنِ", "ٱلرَّحِيمِ"],
-  },
-  {
-    ayah: 2,
-    words: ["ٱلْحَمْدُ", "لِلَّهِ", "رَبِّ", "ٱلْعَـٰلَمِينَ"],
-  },
-  {
-    ayah: 3,
-    words: ["ٱلرَّحْمَـٰنِ", "ٱلرَّحِيمِ"],
-  },
-  {
-    ayah: 4,
-    words: ["مَـٰلِكِ", "يَوْمِ", "ٱلدِّينِ"],
-  },
-  {
-    ayah: 5,
-    words: ["إِيَّاكَ", "نَعْبُدُ", "وَإِيَّاكَ", "نَسْتَعِينُ"],
-  },
-  {
-    ayah: 6,
-    words: ["ٱهْدِنَا", "ٱلصِّرَٰطَ", "ٱلْمُسْتَقِيمَ"],
-  },
-  {
-    ayah: 7,
-    words: [
-      "صِرَٰطَ",
-      "ٱلَّذِينَ",
-      "أَنْعَمْتَ",
-      "عَلَيْهِمْ",
-      "غَيْرِ",
-      "ٱلْمَغْضُوبِ",
-      "عَلَيْهِمْ",
-      "وَلَا",
-      "ٱلضَّآلِّينَ",
-    ],
-  },
+/**
+ * Fixed display order for stacked color stripes under marked words.
+ * Reason: keeping the order deterministic prevents the stripe stack from
+ * shifting visually as the user adds/removes categories.
+ */
+export const STRIPE_ORDER: Category["id"][] = [
+  "tajweed",
+  "memorization",
+  "pronunciation",
+  "translation",
 ];
 
-const ayatulKursiWords: string[] = [
-  "ٱللَّهُ",
-  "لَآ",
-  "إِلَـٰهَ",
-  "إِلَّا",
-  "هُوَ",
-  "ٱلْحَىُّ",
-  "ٱلْقَيُّومُ ۚ",
-  "لَا",
-  "تَأْخُذُهُۥ",
-  "سِنَةٌۭ",
-  "وَلَا",
-  "نَوْمٌۭ ۚ",
-  "لَّهُۥ",
-  "مَا",
-  "فِى",
-  "ٱلسَّمَـٰوَٰتِ",
-  "وَمَا",
-  "فِى",
-  "ٱلْأَرْضِ ۗ",
-  "مَن",
-  "ذَا",
-  "ٱلَّذِى",
-  "يَشْفَعُ",
-  "عِندَهُۥٓ",
-  "إِلَّا",
-  "بِإِذْنِهِۦ ۚ",
-  "يَعْلَمُ",
-  "مَا",
-  "بَيْنَ",
-  "أَيْدِيهِمْ",
-  "وَمَا",
-  "خَلْفَهُمْ ۖ",
-  "وَلَا",
-  "يُحِيطُونَ",
-  "بِشَىْءٍۢ",
-  "مِّنْ",
-  "عِلْمِهِۦٓ",
-  "إِلَّا",
-  "بِمَا",
-  "شَآءَ ۚ",
-  "وَسِعَ",
-  "كُرْسِيُّهُ",
-  "ٱلسَّمَـٰوَٰتِ",
-  "وَٱلْأَرْضَ ۖ",
-  "وَلَا",
-  "يَـُٔودُهُۥ",
-  "حِفْظُهُمَا ۚ",
-  "وَهُوَ",
-  "ٱلْعَلِىُّ",
-  "ٱلْعَظِيمُ",
-];
-
-function buildPassage(
-  id: string,
-  surahNumber: number,
-  surahNameArabic: string,
-  surahNameEnglish: string,
-  ayahs: Array<{ ayah: number; words: string[] }>,
-): Passage {
-  return {
-    id,
-    surahNumber,
-    surahNameArabic,
-    surahNameEnglish,
-    ayahs: ayahs.map((a) => ({
-      number: a.ayah,
-      words: a.words.map((text, idx) => ({
-        id: `${surahNumber}:${a.ayah}:${idx + 1}`,
-        text,
-        ayah: a.ayah,
-        position: idx + 1,
-      })),
-    })),
-  };
-}
-
-export const PASSAGES: Passage[] = [
-  buildPassage("fatiha", 1, "الفاتحة", "Al-Fatiha", fatihaAyahs),
-  buildPassage("ayatul-kursi", 2, "آية الكرسي", "Ayatul Kursi", [
-    { ayah: 255, words: ayatulKursiWords },
-  ]),
+/**
+ * Mock "previous session" marks for the Historical Mistakes overlay.
+ *
+ * Hand-picked deterministic words across familiar pages (Al-Fatiha on
+ * page 1, Ayatul Kursi on page 42) so the demo always shows something
+ * recognisable when the toggle flips on. Read-only in the prototype.
+ */
+export const MOCK_HISTORICAL_MARKS: HistoricalMark[] = [
+  { wordId: "1:1:2", category: "tajweed" },
+  { wordId: "1:1:3", category: "memorization" },
+  { wordId: "1:2:1", category: "pronunciation" },
+  { wordId: "1:5:2", category: "tajweed" },
+  { wordId: "1:7:6", category: "memorization" },
+  { wordId: "2:255:1", category: "tajweed" },
+  { wordId: "2:255:7", category: "memorization" },
+  { wordId: "2:255:24", category: "pronunciation" },
+  { wordId: "2:255:42", category: "translation" },
+  { wordId: "2:255:50", category: "tajweed" },
 ];

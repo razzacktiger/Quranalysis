@@ -17,29 +17,18 @@ export type Category = {
   color: string;
 };
 
-export type Word = {
-  /** "surah:ayah:position" e.g. "1:1:3". Matches the mobile app's convention. */
-  id: string;
-  text: string;
-  ayah: number;
-  position: number;
-};
-
-export type Ayah = {
-  number: number;
-  words: Word[];
-};
-
-export type Passage = {
-  id: string;
-  surahNumber: number;
-  surahNameArabic: string;
-  surahNameEnglish: string;
-  ayahs: Ayah[];
-};
+export type SubCategory = "misread" | "forgot" | "slipped_corrected";
 
 export type Mark = {
-  /** Word id this mark applies to. */
+  /** Word id, format "surah:ayah:position" (matches PageWord.location). */
+  wordId: string;
+  category: CategoryId;
+  subCategory?: SubCategory;
+  note?: string;
+};
+
+/** A read-only marker drawn from the mock previous-session dataset. */
+export type HistoricalMark = {
   wordId: string;
   category: CategoryId;
 };
@@ -50,8 +39,13 @@ export type SessionType =
   | "pronunciation"
   | "translation";
 
+export type RecencyCategory = "new" | "near" | "far";
+
 export type SheetState = "collapsed" | "expanded" | "full";
 
 export type CountingMode = "per-mark" | "per-range";
 
 export type PaletteSize = 4 | 2;
+
+/** Filter for which categories are visible on the page. "all" shows every category. */
+export type CategoryFilter = CategoryId | "all";

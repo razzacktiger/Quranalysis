@@ -1,20 +1,28 @@
 "use client";
 
 /**
- * Renders a passage as RTL Arabic word spans. Handles:
- *   - Tap-to-mark (via onClick on word spans)
- *   - Drag-select across words (via pointer events on the wrapper)
+ * Renders the current Mushaf page with structurally-correct Madani layout:
+ * words grouped by `line`, lines flex-justified RTL.
  *
- * Reason: We use `document.elementFromPoint` + `data-word-id` rather than
- * computing geometry ourselves. Cheaper to implement and good enough for a
- * prototype.
+ * PROTOTYPE LIMITATION: This uses CSS flex-justified text to approximate the
+ * Madani Mushaf layout. The lines/pages are structurally correct (right words
+ * on right lines on right pages) but kerning, ligatures, and glyph spacing
+ * are browser-controlled, NOT pixel-perfect to a printed Mushaf. Production
+ * build (Epic 2) will swap to CDN page images + bbox overlay for true pixel
+ * fidelity. See docs/SOLO-WORKFLOW.md §11 and the mobile repo's
+ * components/mushaf/MushafPageImage.tsx + lib/data/ayahInfoDb.ts.
+ *
+ * Pointer behavior is identical to v1 — tap a word, or drag across multiple
+ * words. We use document.elementFromPoint + data-word-id so we never have to
+ * compute geometry ourselves.
  */
 
 import { useMemo, useRef, useState } from "react";
-import type { Category, CategoryId, Mark, Passage } from "./types";
+import { toArabicNumerals, type PageData } from "./data/pageIndex";
+import type { Category, CategoryId, Mark } from "./types";
 
 type Props = {
-  passage: Passage;
+  page: PageData;
   marks: Mark[];
   activeCategory: CategoryId;
   categories: Category[];
@@ -23,7 +31,6 @@ type Props = {
   onCommitDrag: (wordIds: string[]) => void;
 };
 
-/** "rgba(R,G,B,a)" from a hex color. Tolerates only #RRGGBB. */
 function hexToRgba(hex: string, alpha: number): string {
   const v = hex.replace("#", "");
   const r = parseInt(v.slice(0, 2), 16);
@@ -33,7 +40,7 @@ function hexToRgba(hex: string, alpha: number): string {
 }
 
 export function MushafView({
-  passage,
+  page,
   marks,
   activeCategory,
   categories,
@@ -41,7 +48,6 @@ export function MushafView({
   onTapWord,
   onCommitDrag,
 }: Props) {
-  const containerRef = useRef<HTMLDivElement | null>(null);
   const isDraggingRef = useRef<boolean>(false);
   const pendingRef = useRef<Set<string>>(new Set());
   const dragStartWordRef = useRef<string | null>(null);
@@ -71,14 +77,13 @@ export function MushafView({
   };
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    // Reason: only handle primary pointer (mouse left button or touch).
     if (e.button !== 0 && e.pointerType === "mouse") return;
     const wid = wordIdAtPoint(e.clientX, e.clientY);
     if (!wid) return;
     try {
       e.currentTarget.setPointerCapture(e.pointerId);
     } catch {
-      // ignore — some browsers throw if already captured
+      // ignore
     }
     isDraggingRef.current = true;
     dragStartWordRef.current = wid;
@@ -120,7 +125,6 @@ export function MushafView({
     forcePendingRender((n) => n + 1);
 
     if (!moved && ids.length === 1) {
-      // Treat as a tap — let the parent toggle behavior fire.
       onTapWord(ids[0]);
       return;
     }
@@ -129,7 +133,6 @@ export function MushafView({
 
   return (
     <div
-      ref={containerRef}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={finishDrag}
@@ -138,68 +141,94 @@ export function MushafView({
         touchAction: "none",
         WebkitUserSelect: "none",
         userSelect: "none",
+        backgroundColor: "#FFFDF5",
+        border: "1px solid #d4c9a8",
+        borderRadius: 8,
+        boxShadow: "0 4px 16px rgba(0,0,0,0.06)",
+        aspectRatio: "1260 / 2048",
+        maxWidth: 720,
+        width: "100%",
+        margin: "0 auto",
+        padding: "32px 28px 12px",
+        display: "flex",
+        flexDirection: "column",
       }}
-      className="rounded-2xl bg-white/60 px-6 py-8 shadow-sm ring-1 ring-stone-200"
     >
       <div
         dir="rtl"
         lang="ar"
-        className={`${fontClassName} text-right leading-[2.6]`}
-        style={{ fontSize: 30, color: "#1c1917" }}
+        className={fontClassName}
+        style={{
+          flex: 1,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          color: "#1c1917",
+          fontSize: "clamp(18px, 2.6vw, 28px)",
+          lineHeight: 1.15,
+        }}
       >
-        {passage.ayahs.map((ayah) => (
-          <span key={`ayah-${ayah.number}`}>
-            {ayah.words.map((w) => {
-              const mark = markByWordId.get(w.id);
-              const isPending = pendingRef.current.has(w.id);
-              let bg: string | undefined;
-              if (mark) {
-                const c = categoryById[mark.category]?.color ?? activeColor;
-                bg = hexToRgba(c, 0.4);
-              } else if (isPending) {
-                bg = hexToRgba(activeColor, 0.25);
-              }
-              return (
-                <span
-                  key={w.id}
-                  data-word-id={w.id}
-                  style={{
-                    backgroundColor: bg,
-                    padding: bg ? "2px 4px" : 0,
-                    borderRadius: 6,
-                    margin: "0 2px",
-                    display: "inline-block",
-                    cursor: "pointer",
-                    WebkitUserSelect: "none",
-                    userSelect: "none",
-                  }}
-                >
-                  {w.text}
-                </span>
-              );
-            })}
-            <span
-              aria-label={`end of ayah ${ayah.number}`}
+        {page.lines.length === 0 ? (
+          <p className="text-center text-sm text-stone-400">
+            No words on this page.
+          </p>
+        ) : (
+          page.lines.map((line) => (
+            <div
+              key={`line-${line.lineNumber}`}
               style={{
-                display: "inline-block",
-                margin: "0 6px",
-                fontSize: 22,
-                color: "#a8a29e",
+                display: "flex",
+                flexDirection: "row",
+                direction: "rtl",
+                justifyContent: "space-between",
+                alignItems: "baseline",
+                gap: 4,
               }}
             >
-              ﴿{toArabicDigits(ayah.number)}﴾
-            </span>
-          </span>
-        ))}
+              {line.words.map((w) => {
+                const mark = markByWordId.get(w.location);
+                const isPending = pendingRef.current.has(w.location);
+                let bg: string | undefined;
+                if (mark) {
+                  const c = categoryById[mark.category]?.color ?? activeColor;
+                  bg = hexToRgba(c, 0.4);
+                } else if (isPending) {
+                  bg = hexToRgba(activeColor, 0.25);
+                }
+                return (
+                  <span
+                    key={w.location}
+                    data-word-id={w.location}
+                    style={{
+                      backgroundColor: bg,
+                      padding: bg ? "1px 3px" : 0,
+                      borderRadius: 4,
+                      cursor: "pointer",
+                      WebkitUserSelect: "none",
+                      userSelect: "none",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {w.text}
+                  </span>
+                );
+              })}
+            </div>
+          ))
+        )}
+      </div>
+
+      <div
+        style={{
+          marginTop: 12,
+          textAlign: "center",
+          fontSize: 14,
+          color: "#a8a29e",
+          letterSpacing: 1,
+        }}
+      >
+        {toArabicNumerals(page.pageNumber)}
       </div>
     </div>
   );
-}
-
-function toArabicDigits(n: number): string {
-  const map = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
-  return String(n)
-    .split("")
-    .map((d) => map[Number(d)] ?? d)
-    .join("");
 }
