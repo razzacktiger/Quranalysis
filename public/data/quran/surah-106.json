@@ -1,0 +1,162 @@
+{
+  "number": 106,
+  "name": "Quraysh",
+  "ayahCount": 4,
+  "ayahs": [
+    {
+      "key": "106:1",
+      "surah": 106,
+      "ayah": 1,
+      "words": [
+        {
+          "position": 1,
+          "text": "لِإِيلَـٰفِ",
+          "location": "106:1:1",
+          "page": 602,
+          "line": 3
+        },
+        {
+          "position": 2,
+          "text": "قُرَيْشٍ",
+          "location": "106:1:2",
+          "page": 602,
+          "line": 3
+        }
+      ],
+      "page": 602,
+      "juz": 30
+    },
+    {
+      "key": "106:2",
+      "surah": 106,
+      "ayah": 2,
+      "words": [
+        {
+          "position": 1,
+          "text": "إِۦلَـٰفِهِمْ",
+          "location": "106:2:1",
+          "page": 602,
+          "line": 3
+        },
+        {
+          "position": 2,
+          "text": "رِحْلَةَ",
+          "location": "106:2:2",
+          "page": 602,
+          "line": 3
+        },
+        {
+          "position": 3,
+          "text": "ٱلشِّتَآءِ",
+          "location": "106:2:3",
+          "page": 602,
+          "line": 3
+        },
+        {
+          "position": 4,
+          "text": "وَٱلصَّيْفِ",
+          "location": "106:2:4",
+          "page": 602,
+          "line": 3
+        }
+      ],
+      "page": 602,
+      "juz": 30
+    },
+    {
+      "key": "106:3",
+      "surah": 106,
+      "ayah": 3,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَلْيَعْبُدُوا۟",
+          "location": "106:3:1",
+          "page": 602,
+          "line": 4
+        },
+        {
+          "position": 2,
+          "text": "رَبَّ",
+          "location": "106:3:2",
+          "page": 602,
+          "line": 4
+        },
+        {
+          "position": 3,
+          "text": "هَـٰذَا",
+          "location": "106:3:3",
+          "page": 602,
+          "line": 4
+        },
+        {
+          "position": 4,
+          "text": "ٱلْبَيْتِ",
+          "location": "106:3:4",
+          "page": 602,
+          "line": 4
+        }
+      ],
+      "page": 602,
+      "juz": 30
+    },
+    {
+      "key": "106:4",
+      "surah": 106,
+      "ayah": 4,
+      "words": [
+        {
+          "position": 1,
+          "text": "ٱلَّذِىٓ",
+          "location": "106:4:1",
+          "page": 602,
+          "line": 4
+        },
+        {
+          "position": 2,
+          "text": "أَطْعَمَهُم",
+          "location": "106:4:2",
+          "page": 602,
+          "line": 4
+        },
+        {
+          "position": 3,
+          "text": "مِّن",
+          "location": "106:4:3",
+          "page": 602,
+          "line": 5
+        },
+        {
+          "position": 4,
+          "text": "جُوعٍۢ",
+          "location": "106:4:4",
+          "page": 602,
+          "line": 5
+        },
+        {
+          "position": 5,
+          "text": "وَءَامَنَهُم",
+          "location": "106:4:5",
+          "page": 602,
+          "line": 5
+        },
+        {
+          "position": 6,
+          "text": "مِّنْ",
+          "location": "106:4:6",
+          "page": 602,
+          "line": 5
+        },
+        {
+          "position": 7,
+          "text": "خَوْفٍۭ",
+          "location": "106:4:7",
+          "page": 602,
+          "line": 5
+        }
+      ],
+      "page": 602,
+      "juz": 30
+    }
+  ]
+}

@@ -1,0 +1,275 @@
+{
+  "number": 102,
+  "name": "At-Takathur",
+  "ayahCount": 8,
+  "ayahs": [
+    {
+      "key": "102:1",
+      "surah": 102,
+      "ayah": 1,
+      "words": [
+        {
+          "position": 1,
+          "text": "أَلْهَىٰكُمُ",
+          "location": "102:1:1",
+          "page": 600,
+          "line": 12
+        },
+        {
+          "position": 2,
+          "text": "ٱلتَّكَاثُرُ",
+          "location": "102:1:2",
+          "page": 600,
+          "line": 12
+        }
+      ],
+      "page": 600,
+      "juz": 30
+    },
+    {
+      "key": "102:2",
+      "surah": 102,
+      "ayah": 2,
+      "words": [
+        {
+          "position": 1,
+          "text": "حَتَّىٰ",
+          "location": "102:2:1",
+          "page": 600,
+          "line": 12
+        },
+        {
+          "position": 2,
+          "text": "زُرْتُمُ",
+          "location": "102:2:2",
+          "page": 600,
+          "line": 12
+        },
+        {
+          "position": 3,
+          "text": "ٱلْمَقَابِرَ",
+          "location": "102:2:3",
+          "page": 600,
+          "line": 12
+        }
+      ],
+      "page": 600,
+      "juz": 30
+    },
+    {
+      "key": "102:3",
+      "surah": 102,
+      "ayah": 3,
+      "words": [
+        {
+          "position": 1,
+          "text": "كَلَّا",
+          "location": "102:3:1",
+          "page": 600,
+          "line": 12
+        },
+        {
+          "position": 2,
+          "text": "سَوْفَ",
+          "location": "102:3:2",
+          "page": 600,
+          "line": 12
+        },
+        {
+          "position": 3,
+          "text": "تَعْلَمُونَ",
+          "location": "102:3:3",
+          "page": 600,
+          "line": 13
+        }
+      ],
+      "page": 600,
+      "juz": 30
+    },
+    {
+      "key": "102:4",
+      "surah": 102,
+      "ayah": 4,
+      "words": [
+        {
+          "position": 1,
+          "text": "ثُمَّ",
+          "location": "102:4:1",
+          "page": 600,
+          "line": 13
+        },
+        {
+          "position": 2,
+          "text": "كَلَّا",
+          "location": "102:4:2",
+          "page": 600,
+          "line": 13
+        },
+        {
+          "position": 3,
+          "text": "سَوْفَ",
+          "location": "102:4:3",
+          "page": 600,
+          "line": 13
+        },
+        {
+          "position": 4,
+          "text": "تَعْلَمُونَ",
+          "location": "102:4:4",
+          "page": 600,
+          "line": 13
+        }
+      ],
+      "page": 600,
+      "juz": 30
+    },
+    {
+      "key": "102:5",
+      "surah": 102,
+      "ayah": 5,
+      "words": [
+        {
+          "position": 1,
+          "text": "كَلَّا",
+          "location": "102:5:1",
+          "page": 600,
+          "line": 13
+        },
+        {
+          "position": 2,
+          "text": "لَوْ",
+          "location": "102:5:2",
+          "page": 600,
+          "line": 13
+        },
+        {
+          "position": 3,
+          "text": "تَعْلَمُونَ",
+          "location": "102:5:3",
+          "page": 600,
+          "line": 13
+        },
+        {
+          "position": 4,
+          "text": "عِلْمَ",
+          "location": "102:5:4",
+          "page": 600,
+          "line": 14
+        },
+        {
+          "position": 5,
+          "text": "ٱلْيَقِينِ",
+          "location": "102:5:5",
+          "page": 600,
+          "line": 14
+        }
+      ],
+      "page": 600,
+      "juz": 30
+    },
+    {
+      "key": "102:6",
+      "surah": 102,
+      "ayah": 6,
+      "words": [
+        {
+          "position": 1,
+          "text": "لَتَرَوُنَّ",
+          "location": "102:6:1",
+          "page": 600,
+          "line": 14
+        },
+        {
+          "position": 2,
+          "text": "ٱلْجَحِيمَ",
+          "location": "102:6:2",
+          "page": 600,
+          "line": 14
+        }
+      ],
+      "page": 600,
+      "juz": 30
+    },
+    {
+      "key": "102:7",
+      "surah": 102,
+      "ayah": 7,
+      "words": [
+        {
+          "position": 1,
+          "text": "ثُمَّ",
+          "location": "102:7:1",
+          "page": 600,
+          "line": 14
+        },
+        {
+          "position": 2,
+          "text": "لَتَرَوُنَّهَا",
+          "location": "102:7:2",
+          "page": 600,
+          "line": 14
+        },
+        {
+          "position": 3,
+          "text": "عَيْنَ",
+          "location": "102:7:3",
+          "page": 600,
+          "line": 15
+        },
+        {
+          "position": 4,
+          "text": "ٱلْيَقِينِ",
+          "location": "102:7:4",
+          "page": 600,
+          "line": 15
+        }
+      ],
+      "page": 600,
+      "juz": 30
+    },
+    {
+      "key": "102:8",
+      "surah": 102,
+      "ayah": 8,
+      "words": [
+        {
+          "position": 1,
+          "text": "ثُمَّ",
+          "location": "102:8:1",
+          "page": 600,
+          "line": 15
+        },
+        {
+          "position": 2,
+          "text": "لَتُسْـَٔلُنَّ",
+          "location": "102:8:2",
+          "page": 600,
+          "line": 15
+        },
+        {
+          "position": 3,
+          "text": "يَوْمَئِذٍ",
+          "location": "102:8:3",
+          "page": 600,
+          "line": 15
+        },
+        {
+          "position": 4,
+          "text": "عَنِ",
+          "location": "102:8:4",
+          "page": 600,
+          "line": 15
+        },
+        {
+          "position": 5,
+          "text": "ٱلنَّعِيمِ",
+          "location": "102:8:5",
+          "page": 600,
+          "line": 15
+        }
+      ],
+      "page": 600,
+      "juz": 30
+    }
+  ]
+}

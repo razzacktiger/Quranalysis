@@ -1,0 +1,386 @@
+{
+  "number": 93,
+  "name": "Ad-Duhaa",
+  "ayahCount": 11,
+  "ayahs": [
+    {
+      "key": "93:1",
+      "surah": 93,
+      "ayah": 1,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَٱلضُّحَىٰ",
+          "location": "93:1:1",
+          "page": 596,
+          "line": 6
+        }
+      ],
+      "page": 596,
+      "juz": 30
+    },
+    {
+      "key": "93:2",
+      "surah": 93,
+      "ayah": 2,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَٱلَّيْلِ",
+          "location": "93:2:1",
+          "page": 596,
+          "line": 6
+        },
+        {
+          "position": 2,
+          "text": "إِذَا",
+          "location": "93:2:2",
+          "page": 596,
+          "line": 6
+        },
+        {
+          "position": 3,
+          "text": "سَجَىٰ",
+          "location": "93:2:3",
+          "page": 596,
+          "line": 6
+        }
+      ],
+      "page": 596,
+      "juz": 30
+    },
+    {
+      "key": "93:3",
+      "surah": 93,
+      "ayah": 3,
+      "words": [
+        {
+          "position": 1,
+          "text": "مَا",
+          "location": "93:3:1",
+          "page": 596,
+          "line": 6
+        },
+        {
+          "position": 2,
+          "text": "وَدَّعَكَ",
+          "location": "93:3:2",
+          "page": 596,
+          "line": 6
+        },
+        {
+          "position": 3,
+          "text": "رَبُّكَ",
+          "location": "93:3:3",
+          "page": 596,
+          "line": 6
+        },
+        {
+          "position": 4,
+          "text": "وَمَا",
+          "location": "93:3:4",
+          "page": 596,
+          "line": 6
+        },
+        {
+          "position": 5,
+          "text": "قَلَىٰ",
+          "location": "93:3:5",
+          "page": 596,
+          "line": 6
+        }
+      ],
+      "page": 596,
+      "juz": 30
+    },
+    {
+      "key": "93:4",
+      "surah": 93,
+      "ayah": 4,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَلَلْـَٔاخِرَةُ",
+          "location": "93:4:1",
+          "page": 596,
+          "line": 7
+        },
+        {
+          "position": 2,
+          "text": "خَيْرٌۭ",
+          "location": "93:4:2",
+          "page": 596,
+          "line": 7
+        },
+        {
+          "position": 3,
+          "text": "لَّكَ",
+          "location": "93:4:3",
+          "page": 596,
+          "line": 7
+        },
+        {
+          "position": 4,
+          "text": "مِنَ",
+          "location": "93:4:4",
+          "page": 596,
+          "line": 7
+        },
+        {
+          "position": 5,
+          "text": "ٱلْأُولَىٰ",
+          "location": "93:4:5",
+          "page": 596,
+          "line": 7
+        }
+      ],
+      "page": 596,
+      "juz": 30
+    },
+    {
+      "key": "93:5",
+      "surah": 93,
+      "ayah": 5,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَلَسَوْفَ",
+          "location": "93:5:1",
+          "page": 596,
+          "line": 7
+        },
+        {
+          "position": 2,
+          "text": "يُعْطِيكَ",
+          "location": "93:5:2",
+          "page": 596,
+          "line": 7
+        },
+        {
+          "position": 3,
+          "text": "رَبُّكَ",
+          "location": "93:5:3",
+          "page": 596,
+          "line": 7
+        },
+        {
+          "position": 4,
+          "text": "فَتَرْضَىٰٓ",
+          "location": "93:5:4",
+          "page": 596,
+          "line": 8
+        }
+      ],
+      "page": 596,
+      "juz": 30
+    },
+    {
+      "key": "93:6",
+      "surah": 93,
+      "ayah": 6,
+      "words": [
+        {
+          "position": 1,
+          "text": "أَلَمْ",
+          "location": "93:6:1",
+          "page": 596,
+          "line": 8
+        },
+        {
+          "position": 2,
+          "text": "يَجِدْكَ",
+          "location": "93:6:2",
+          "page": 596,
+          "line": 8
+        },
+        {
+          "position": 3,
+          "text": "يَتِيمًۭا",
+          "location": "93:6:3",
+          "page": 596,
+          "line": 8
+        },
+        {
+          "position": 4,
+          "text": "فَـَٔاوَىٰ",
+          "location": "93:6:4",
+          "page": 596,
+          "line": 8
+        }
+      ],
+      "page": 596,
+      "juz": 30
+    },
+    {
+      "key": "93:7",
+      "surah": 93,
+      "ayah": 7,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَوَجَدَكَ",
+          "location": "93:7:1",
+          "page": 596,
+          "line": 8
+        },
+        {
+          "position": 2,
+          "text": "ضَآلًّۭا",
+          "location": "93:7:2",
+          "page": 596,
+          "line": 8
+        },
+        {
+          "position": 3,
+          "text": "فَهَدَىٰ",
+          "location": "93:7:3",
+          "page": 596,
+          "line": 9
+        }
+      ],
+      "page": 596,
+      "juz": 30
+    },
+    {
+      "key": "93:8",
+      "surah": 93,
+      "ayah": 8,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَوَجَدَكَ",
+          "location": "93:8:1",
+          "page": 596,
+          "line": 9
+        },
+        {
+          "position": 2,
+          "text": "عَآئِلًۭا",
+          "location": "93:8:2",
+          "page": 596,
+          "line": 9
+        },
+        {
+          "position": 3,
+          "text": "فَأَغْنَىٰ",
+          "location": "93:8:3",
+          "page": 596,
+          "line": 9
+        }
+      ],
+      "page": 596,
+      "juz": 30
+    },
+    {
+      "key": "93:9",
+      "surah": 93,
+      "ayah": 9,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَأَمَّا",
+          "location": "93:9:1",
+          "page": 596,
+          "line": 9
+        },
+        {
+          "position": 2,
+          "text": "ٱلْيَتِيمَ",
+          "location": "93:9:2",
+          "page": 596,
+          "line": 9
+        },
+        {
+          "position": 3,
+          "text": "فَلَا",
+          "location": "93:9:3",
+          "page": 596,
+          "line": 9
+        },
+        {
+          "position": 4,
+          "text": "تَقْهَرْ",
+          "location": "93:9:4",
+          "page": 596,
+          "line": 9
+        }
+      ],
+      "page": 596,
+      "juz": 30
+    },
+    {
+      "key": "93:10",
+      "surah": 93,
+      "ayah": 10,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَأَمَّا",
+          "location": "93:10:1",
+          "page": 596,
+          "line": 10
+        },
+        {
+          "position": 2,
+          "text": "ٱلسَّآئِلَ",
+          "location": "93:10:2",
+          "page": 596,
+          "line": 10
+        },
+        {
+          "position": 3,
+          "text": "فَلَا",
+          "location": "93:10:3",
+          "page": 596,
+          "line": 10
+        },
+        {
+          "position": 4,
+          "text": "تَنْهَرْ",
+          "location": "93:10:4",
+          "page": 596,
+          "line": 10
+        }
+      ],
+      "page": 596,
+      "juz": 30
+    },
+    {
+      "key": "93:11",
+      "surah": 93,
+      "ayah": 11,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَأَمَّا",
+          "location": "93:11:1",
+          "page": 596,
+          "line": 10
+        },
+        {
+          "position": 2,
+          "text": "بِنِعْمَةِ",
+          "location": "93:11:2",
+          "page": 596,
+          "line": 10
+        },
+        {
+          "position": 3,
+          "text": "رَبِّكَ",
+          "location": "93:11:3",
+          "page": 596,
+          "line": 10
+        },
+        {
+          "position": 4,
+          "text": "فَحَدِّثْ",
+          "location": "93:11:4",
+          "page": 596,
+          "line": 10
+        }
+      ],
+      "page": 596,
+      "juz": 30
+    }
+  ]
+}

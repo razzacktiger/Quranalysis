@@ -1,0 +1,132 @@
+{
+  "number": 103,
+  "name": "Al-'Asr",
+  "ayahCount": 3,
+  "ayahs": [
+    {
+      "key": "103:1",
+      "surah": 103,
+      "ayah": 1,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَٱلْعَصْرِ",
+          "location": "103:1:1",
+          "page": 601,
+          "line": 3
+        }
+      ],
+      "page": 601,
+      "juz": 30
+    },
+    {
+      "key": "103:2",
+      "surah": 103,
+      "ayah": 2,
+      "words": [
+        {
+          "position": 1,
+          "text": "إِنَّ",
+          "location": "103:2:1",
+          "page": 601,
+          "line": 3
+        },
+        {
+          "position": 2,
+          "text": "ٱلْإِنسَـٰنَ",
+          "location": "103:2:2",
+          "page": 601,
+          "line": 3
+        },
+        {
+          "position": 3,
+          "text": "لَفِى",
+          "location": "103:2:3",
+          "page": 601,
+          "line": 3
+        },
+        {
+          "position": 4,
+          "text": "خُسْرٍ",
+          "location": "103:2:4",
+          "page": 601,
+          "line": 3
+        }
+      ],
+      "page": 601,
+      "juz": 30
+    },
+    {
+      "key": "103:3",
+      "surah": 103,
+      "ayah": 3,
+      "words": [
+        {
+          "position": 1,
+          "text": "إِلَّا",
+          "location": "103:3:1",
+          "page": 601,
+          "line": 3
+        },
+        {
+          "position": 2,
+          "text": "ٱلَّذِينَ",
+          "location": "103:3:2",
+          "page": 601,
+          "line": 3
+        },
+        {
+          "position": 3,
+          "text": "ءَامَنُوا۟",
+          "location": "103:3:3",
+          "page": 601,
+          "line": 3
+        },
+        {
+          "position": 4,
+          "text": "وَعَمِلُوا۟",
+          "location": "103:3:4",
+          "page": 601,
+          "line": 4
+        },
+        {
+          "position": 5,
+          "text": "ٱلصَّـٰلِحَـٰتِ",
+          "location": "103:3:5",
+          "page": 601,
+          "line": 4
+        },
+        {
+          "position": 6,
+          "text": "وَتَوَاصَوْا۟",
+          "location": "103:3:6",
+          "page": 601,
+          "line": 4
+        },
+        {
+          "position": 7,
+          "text": "بِٱلْحَقِّ",
+          "location": "103:3:7",
+          "page": 601,
+          "line": 4
+        },
+        {
+          "position": 8,
+          "text": "وَتَوَاصَوْا۟",
+          "location": "103:3:8",
+          "page": 601,
+          "line": 4
+        },
+        {
+          "position": 9,
+          "text": "بِٱلصَّبْرِ",
+          "location": "103:3:9",
+          "page": 601,
+          "line": 4
+        }
+      ],
+      "page": 601,
+      "juz": 30
+    }
+  ]
+}

@@ -1,0 +1,981 @@
+{
+  "number": 84,
+  "name": "Al-Inshiqaq",
+  "ayahCount": 25,
+  "ayahs": [
+    {
+      "key": "84:1",
+      "surah": 84,
+      "ayah": 1,
+      "words": [
+        {
+          "position": 1,
+          "text": "إِذَا",
+          "location": "84:1:1",
+          "page": 589,
+          "line": 4
+        },
+        {
+          "position": 2,
+          "text": "ٱلسَّمَآءُ",
+          "location": "84:1:2",
+          "page": 589,
+          "line": 4
+        },
+        {
+          "position": 3,
+          "text": "ٱنشَقَّتْ",
+          "location": "84:1:3",
+          "page": 589,
+          "line": 4
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:2",
+      "surah": 84,
+      "ayah": 2,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَأَذِنَتْ",
+          "location": "84:2:1",
+          "page": 589,
+          "line": 4
+        },
+        {
+          "position": 2,
+          "text": "لِرَبِّهَا",
+          "location": "84:2:2",
+          "page": 589,
+          "line": 4
+        },
+        {
+          "position": 3,
+          "text": "وَحُقَّتْ",
+          "location": "84:2:3",
+          "page": 589,
+          "line": 4
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:3",
+      "surah": 84,
+      "ayah": 3,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَإِذَا",
+          "location": "84:3:1",
+          "page": 589,
+          "line": 4
+        },
+        {
+          "position": 2,
+          "text": "ٱلْأَرْضُ",
+          "location": "84:3:2",
+          "page": 589,
+          "line": 4
+        },
+        {
+          "position": 3,
+          "text": "مُدَّتْ",
+          "location": "84:3:3",
+          "page": 589,
+          "line": 4
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:4",
+      "surah": 84,
+      "ayah": 4,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَأَلْقَتْ",
+          "location": "84:4:1",
+          "page": 589,
+          "line": 5
+        },
+        {
+          "position": 2,
+          "text": "مَا",
+          "location": "84:4:2",
+          "page": 589,
+          "line": 5
+        },
+        {
+          "position": 3,
+          "text": "فِيهَا",
+          "location": "84:4:3",
+          "page": 589,
+          "line": 5
+        },
+        {
+          "position": 4,
+          "text": "وَتَخَلَّتْ",
+          "location": "84:4:4",
+          "page": 589,
+          "line": 5
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:5",
+      "surah": 84,
+      "ayah": 5,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَأَذِنَتْ",
+          "location": "84:5:1",
+          "page": 589,
+          "line": 5
+        },
+        {
+          "position": 2,
+          "text": "لِرَبِّهَا",
+          "location": "84:5:2",
+          "page": 589,
+          "line": 5
+        },
+        {
+          "position": 3,
+          "text": "وَحُقَّتْ",
+          "location": "84:5:3",
+          "page": 589,
+          "line": 5
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:6",
+      "surah": 84,
+      "ayah": 6,
+      "words": [
+        {
+          "position": 1,
+          "text": "يَـٰٓأَيُّهَا",
+          "location": "84:6:1",
+          "page": 589,
+          "line": 5
+        },
+        {
+          "position": 2,
+          "text": "ٱلْإِنسَـٰنُ",
+          "location": "84:6:2",
+          "page": 589,
+          "line": 6
+        },
+        {
+          "position": 3,
+          "text": "إِنَّكَ",
+          "location": "84:6:3",
+          "page": 589,
+          "line": 6
+        },
+        {
+          "position": 4,
+          "text": "كَادِحٌ",
+          "location": "84:6:4",
+          "page": 589,
+          "line": 6
+        },
+        {
+          "position": 5,
+          "text": "إِلَىٰ",
+          "location": "84:6:5",
+          "page": 589,
+          "line": 6
+        },
+        {
+          "position": 6,
+          "text": "رَبِّكَ",
+          "location": "84:6:6",
+          "page": 589,
+          "line": 6
+        },
+        {
+          "position": 7,
+          "text": "كَدْحًۭا",
+          "location": "84:6:7",
+          "page": 589,
+          "line": 6
+        },
+        {
+          "position": 8,
+          "text": "فَمُلَـٰقِيهِ",
+          "location": "84:6:8",
+          "page": 589,
+          "line": 6
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:7",
+      "surah": 84,
+      "ayah": 7,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَأَمَّا",
+          "location": "84:7:1",
+          "page": 589,
+          "line": 6
+        },
+        {
+          "position": 2,
+          "text": "مَنْ",
+          "location": "84:7:2",
+          "page": 589,
+          "line": 6
+        },
+        {
+          "position": 3,
+          "text": "أُوتِىَ",
+          "location": "84:7:3",
+          "page": 589,
+          "line": 6
+        },
+        {
+          "position": 4,
+          "text": "كِتَـٰبَهُۥ",
+          "location": "84:7:4",
+          "page": 589,
+          "line": 7
+        },
+        {
+          "position": 5,
+          "text": "بِيَمِينِهِۦ",
+          "location": "84:7:5",
+          "page": 589,
+          "line": 7
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:8",
+      "surah": 84,
+      "ayah": 8,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَسَوْفَ",
+          "location": "84:8:1",
+          "page": 589,
+          "line": 7
+        },
+        {
+          "position": 2,
+          "text": "يُحَاسَبُ",
+          "location": "84:8:2",
+          "page": 589,
+          "line": 7
+        },
+        {
+          "position": 3,
+          "text": "حِسَابًۭا",
+          "location": "84:8:3",
+          "page": 589,
+          "line": 7
+        },
+        {
+          "position": 4,
+          "text": "يَسِيرًۭا",
+          "location": "84:8:4",
+          "page": 589,
+          "line": 7
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:9",
+      "surah": 84,
+      "ayah": 9,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَيَنقَلِبُ",
+          "location": "84:9:1",
+          "page": 589,
+          "line": 7
+        },
+        {
+          "position": 2,
+          "text": "إِلَىٰٓ",
+          "location": "84:9:2",
+          "page": 589,
+          "line": 8
+        },
+        {
+          "position": 3,
+          "text": "أَهْلِهِۦ",
+          "location": "84:9:3",
+          "page": 589,
+          "line": 8
+        },
+        {
+          "position": 4,
+          "text": "مَسْرُورًۭا",
+          "location": "84:9:4",
+          "page": 589,
+          "line": 8
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:10",
+      "surah": 84,
+      "ayah": 10,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَأَمَّا",
+          "location": "84:10:1",
+          "page": 589,
+          "line": 8
+        },
+        {
+          "position": 2,
+          "text": "مَنْ",
+          "location": "84:10:2",
+          "page": 589,
+          "line": 8
+        },
+        {
+          "position": 3,
+          "text": "أُوتِىَ",
+          "location": "84:10:3",
+          "page": 589,
+          "line": 8
+        },
+        {
+          "position": 4,
+          "text": "كِتَـٰبَهُۥ",
+          "location": "84:10:4",
+          "page": 589,
+          "line": 8
+        },
+        {
+          "position": 5,
+          "text": "وَرَآءَ",
+          "location": "84:10:5",
+          "page": 589,
+          "line": 8
+        },
+        {
+          "position": 6,
+          "text": "ظَهْرِهِۦ",
+          "location": "84:10:6",
+          "page": 589,
+          "line": 8
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:11",
+      "surah": 84,
+      "ayah": 11,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَسَوْفَ",
+          "location": "84:11:1",
+          "page": 589,
+          "line": 8
+        },
+        {
+          "position": 2,
+          "text": "يَدْعُوا۟",
+          "location": "84:11:2",
+          "page": 589,
+          "line": 9
+        },
+        {
+          "position": 3,
+          "text": "ثُبُورًۭا",
+          "location": "84:11:3",
+          "page": 589,
+          "line": 9
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:12",
+      "surah": 84,
+      "ayah": 12,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَيَصْلَىٰ",
+          "location": "84:12:1",
+          "page": 589,
+          "line": 9
+        },
+        {
+          "position": 2,
+          "text": "سَعِيرًا",
+          "location": "84:12:2",
+          "page": 589,
+          "line": 9
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:13",
+      "surah": 84,
+      "ayah": 13,
+      "words": [
+        {
+          "position": 1,
+          "text": "إِنَّهُۥ",
+          "location": "84:13:1",
+          "page": 589,
+          "line": 9
+        },
+        {
+          "position": 2,
+          "text": "كَانَ",
+          "location": "84:13:2",
+          "page": 589,
+          "line": 9
+        },
+        {
+          "position": 3,
+          "text": "فِىٓ",
+          "location": "84:13:3",
+          "page": 589,
+          "line": 9
+        },
+        {
+          "position": 4,
+          "text": "أَهْلِهِۦ",
+          "location": "84:13:4",
+          "page": 589,
+          "line": 9
+        },
+        {
+          "position": 5,
+          "text": "مَسْرُورًا",
+          "location": "84:13:5",
+          "page": 589,
+          "line": 9
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:14",
+      "surah": 84,
+      "ayah": 14,
+      "words": [
+        {
+          "position": 1,
+          "text": "إِنَّهُۥ",
+          "location": "84:14:1",
+          "page": 589,
+          "line": 10
+        },
+        {
+          "position": 2,
+          "text": "ظَنَّ",
+          "location": "84:14:2",
+          "page": 589,
+          "line": 10
+        },
+        {
+          "position": 3,
+          "text": "أَن",
+          "location": "84:14:3",
+          "page": 589,
+          "line": 10
+        },
+        {
+          "position": 4,
+          "text": "لَّن",
+          "location": "84:14:4",
+          "page": 589,
+          "line": 10
+        },
+        {
+          "position": 5,
+          "text": "يَحُورَ",
+          "location": "84:14:5",
+          "page": 589,
+          "line": 10
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:15",
+      "surah": 84,
+      "ayah": 15,
+      "words": [
+        {
+          "position": 1,
+          "text": "بَلَىٰٓ",
+          "location": "84:15:1",
+          "page": 589,
+          "line": 10
+        },
+        {
+          "position": 2,
+          "text": "إِنَّ",
+          "location": "84:15:2",
+          "page": 589,
+          "line": 10
+        },
+        {
+          "position": 3,
+          "text": "رَبَّهُۥ",
+          "location": "84:15:3",
+          "page": 589,
+          "line": 10
+        },
+        {
+          "position": 4,
+          "text": "كَانَ",
+          "location": "84:15:4",
+          "page": 589,
+          "line": 10
+        },
+        {
+          "position": 5,
+          "text": "بِهِۦ",
+          "location": "84:15:5",
+          "page": 589,
+          "line": 10
+        },
+        {
+          "position": 6,
+          "text": "بَصِيرًۭا",
+          "location": "84:15:6",
+          "page": 589,
+          "line": 10
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:16",
+      "surah": 84,
+      "ayah": 16,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَلَآ",
+          "location": "84:16:1",
+          "page": 589,
+          "line": 10
+        },
+        {
+          "position": 2,
+          "text": "أُقْسِمُ",
+          "location": "84:16:2",
+          "page": 589,
+          "line": 10
+        },
+        {
+          "position": 3,
+          "text": "بِٱلشَّفَقِ",
+          "location": "84:16:3",
+          "page": 589,
+          "line": 11
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:17",
+      "surah": 84,
+      "ayah": 17,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَٱلَّيْلِ",
+          "location": "84:17:1",
+          "page": 589,
+          "line": 11
+        },
+        {
+          "position": 2,
+          "text": "وَمَا",
+          "location": "84:17:2",
+          "page": 589,
+          "line": 11
+        },
+        {
+          "position": 3,
+          "text": "وَسَقَ",
+          "location": "84:17:3",
+          "page": 589,
+          "line": 11
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:18",
+      "surah": 84,
+      "ayah": 18,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَٱلْقَمَرِ",
+          "location": "84:18:1",
+          "page": 589,
+          "line": 11
+        },
+        {
+          "position": 2,
+          "text": "إِذَا",
+          "location": "84:18:2",
+          "page": 589,
+          "line": 11
+        },
+        {
+          "position": 3,
+          "text": "ٱتَّسَقَ",
+          "location": "84:18:3",
+          "page": 589,
+          "line": 11
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:19",
+      "surah": 84,
+      "ayah": 19,
+      "words": [
+        {
+          "position": 1,
+          "text": "لَتَرْكَبُنَّ",
+          "location": "84:19:1",
+          "page": 589,
+          "line": 12
+        },
+        {
+          "position": 2,
+          "text": "طَبَقًا",
+          "location": "84:19:2",
+          "page": 589,
+          "line": 12
+        },
+        {
+          "position": 3,
+          "text": "عَن",
+          "location": "84:19:3",
+          "page": 589,
+          "line": 12
+        },
+        {
+          "position": 4,
+          "text": "طَبَقٍۢ",
+          "location": "84:19:4",
+          "page": 589,
+          "line": 12
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:20",
+      "surah": 84,
+      "ayah": 20,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَمَا",
+          "location": "84:20:1",
+          "page": 589,
+          "line": 12
+        },
+        {
+          "position": 2,
+          "text": "لَهُمْ",
+          "location": "84:20:2",
+          "page": 589,
+          "line": 12
+        },
+        {
+          "position": 3,
+          "text": "لَا",
+          "location": "84:20:3",
+          "page": 589,
+          "line": 12
+        },
+        {
+          "position": 4,
+          "text": "يُؤْمِنُونَ",
+          "location": "84:20:4",
+          "page": 589,
+          "line": 12
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:21",
+      "surah": 84,
+      "ayah": 21,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَإِذَا",
+          "location": "84:21:1",
+          "page": 589,
+          "line": 12
+        },
+        {
+          "position": 2,
+          "text": "قُرِئَ",
+          "location": "84:21:2",
+          "page": 589,
+          "line": 12
+        },
+        {
+          "position": 3,
+          "text": "عَلَيْهِمُ",
+          "location": "84:21:3",
+          "page": 589,
+          "line": 13
+        },
+        {
+          "position": 4,
+          "text": "ٱلْقُرْءَانُ",
+          "location": "84:21:4",
+          "page": 589,
+          "line": 13
+        },
+        {
+          "position": 5,
+          "text": "لَا",
+          "location": "84:21:5",
+          "page": 589,
+          "line": 13
+        },
+        {
+          "position": 6,
+          "text": "يَسْجُدُونَ ۩",
+          "location": "84:21:6",
+          "page": 589,
+          "line": 13
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:22",
+      "surah": 84,
+      "ayah": 22,
+      "words": [
+        {
+          "position": 1,
+          "text": "بَلِ",
+          "location": "84:22:1",
+          "page": 589,
+          "line": 13
+        },
+        {
+          "position": 2,
+          "text": "ٱلَّذِينَ",
+          "location": "84:22:2",
+          "page": 589,
+          "line": 13
+        },
+        {
+          "position": 3,
+          "text": "كَفَرُوا۟",
+          "location": "84:22:3",
+          "page": 589,
+          "line": 13
+        },
+        {
+          "position": 4,
+          "text": "يُكَذِّبُونَ",
+          "location": "84:22:4",
+          "page": 589,
+          "line": 13
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:23",
+      "surah": 84,
+      "ayah": 23,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَٱللَّهُ",
+          "location": "84:23:1",
+          "page": 589,
+          "line": 14
+        },
+        {
+          "position": 2,
+          "text": "أَعْلَمُ",
+          "location": "84:23:2",
+          "page": 589,
+          "line": 14
+        },
+        {
+          "position": 3,
+          "text": "بِمَا",
+          "location": "84:23:3",
+          "page": 589,
+          "line": 14
+        },
+        {
+          "position": 4,
+          "text": "يُوعُونَ",
+          "location": "84:23:4",
+          "page": 589,
+          "line": 14
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:24",
+      "surah": 84,
+      "ayah": 24,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَبَشِّرْهُم",
+          "location": "84:24:1",
+          "page": 589,
+          "line": 14
+        },
+        {
+          "position": 2,
+          "text": "بِعَذَابٍ",
+          "location": "84:24:2",
+          "page": 589,
+          "line": 14
+        },
+        {
+          "position": 3,
+          "text": "أَلِيمٍ",
+          "location": "84:24:3",
+          "page": 589,
+          "line": 14
+        }
+      ],
+      "page": 589,
+      "juz": 30
+    },
+    {
+      "key": "84:25",
+      "surah": 84,
+      "ayah": 25,
+      "words": [
+        {
+          "position": 1,
+          "text": "إِلَّا",
+          "location": "84:25:1",
+          "page": 590,
+          "line": 15
+        },
+        {
+          "position": 2,
+          "text": "ٱلَّذِينَ",
+          "location": "84:25:2",
+          "page": 590,
+          "line": 15
+        },
+        {
+          "position": 3,
+          "text": "ءَامَنُوا۟",
+          "location": "84:25:3",
+          "page": 590,
+          "line": 15
+        },
+        {
+          "position": 4,
+          "text": "وَعَمِلُوا۟",
+          "location": "84:25:4",
+          "page": 590,
+          "line": 15
+        },
+        {
+          "position": 5,
+          "text": "ٱلصَّـٰلِحَـٰتِ",
+          "location": "84:25:5",
+          "page": 590,
+          "line": 15
+        },
+        {
+          "position": 6,
+          "text": "لَهُمْ",
+          "location": "84:25:6",
+          "page": 590,
+          "line": 15
+        },
+        {
+          "position": 7,
+          "text": "أَجْرٌ",
+          "location": "84:25:7",
+          "page": 590,
+          "line": 15
+        },
+        {
+          "position": 8,
+          "text": "غَيْرُ",
+          "location": "84:25:8",
+          "page": 590,
+          "line": 15
+        },
+        {
+          "position": 9,
+          "text": "مَمْنُونٍۭ",
+          "location": "84:25:9",
+          "page": 590,
+          "line": 15
+        }
+      ],
+      "page": 590,
+      "juz": 30
+    }
+  ]
+}

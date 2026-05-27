@@ -1,0 +1,520 @@
+{
+  "number": 91,
+  "name": "Ash-Shams",
+  "ayahCount": 15,
+  "ayahs": [
+    {
+      "key": "91:1",
+      "surah": 91,
+      "ayah": 1,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَٱلشَّمْسِ",
+          "location": "91:1:1",
+          "page": 595,
+          "line": 2
+        },
+        {
+          "position": 2,
+          "text": "وَضُحَىٰهَا",
+          "location": "91:1:2",
+          "page": 595,
+          "line": 2
+        }
+      ],
+      "page": 595,
+      "juz": 30
+    },
+    {
+      "key": "91:2",
+      "surah": 91,
+      "ayah": 2,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَٱلْقَمَرِ",
+          "location": "91:2:1",
+          "page": 595,
+          "line": 2
+        },
+        {
+          "position": 2,
+          "text": "إِذَا",
+          "location": "91:2:2",
+          "page": 595,
+          "line": 2
+        },
+        {
+          "position": 3,
+          "text": "تَلَىٰهَا",
+          "location": "91:2:3",
+          "page": 595,
+          "line": 2
+        }
+      ],
+      "page": 595,
+      "juz": 30
+    },
+    {
+      "key": "91:3",
+      "surah": 91,
+      "ayah": 3,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَٱلنَّهَارِ",
+          "location": "91:3:1",
+          "page": 595,
+          "line": 2
+        },
+        {
+          "position": 2,
+          "text": "إِذَا",
+          "location": "91:3:2",
+          "page": 595,
+          "line": 2
+        },
+        {
+          "position": 3,
+          "text": "جَلَّىٰهَا",
+          "location": "91:3:3",
+          "page": 595,
+          "line": 2
+        }
+      ],
+      "page": 595,
+      "juz": 30
+    },
+    {
+      "key": "91:4",
+      "surah": 91,
+      "ayah": 4,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَٱلَّيْلِ",
+          "location": "91:4:1",
+          "page": 595,
+          "line": 3
+        },
+        {
+          "position": 2,
+          "text": "إِذَا",
+          "location": "91:4:2",
+          "page": 595,
+          "line": 3
+        },
+        {
+          "position": 3,
+          "text": "يَغْشَىٰهَا",
+          "location": "91:4:3",
+          "page": 595,
+          "line": 3
+        }
+      ],
+      "page": 595,
+      "juz": 30
+    },
+    {
+      "key": "91:5",
+      "surah": 91,
+      "ayah": 5,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَٱلسَّمَآءِ",
+          "location": "91:5:1",
+          "page": 595,
+          "line": 3
+        },
+        {
+          "position": 2,
+          "text": "وَمَا",
+          "location": "91:5:2",
+          "page": 595,
+          "line": 3
+        },
+        {
+          "position": 3,
+          "text": "بَنَىٰهَا",
+          "location": "91:5:3",
+          "page": 595,
+          "line": 3
+        }
+      ],
+      "page": 595,
+      "juz": 30
+    },
+    {
+      "key": "91:6",
+      "surah": 91,
+      "ayah": 6,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَٱلْأَرْضِ",
+          "location": "91:6:1",
+          "page": 595,
+          "line": 3
+        },
+        {
+          "position": 2,
+          "text": "وَمَا",
+          "location": "91:6:2",
+          "page": 595,
+          "line": 3
+        },
+        {
+          "position": 3,
+          "text": "طَحَىٰهَا",
+          "location": "91:6:3",
+          "page": 595,
+          "line": 3
+        }
+      ],
+      "page": 595,
+      "juz": 30
+    },
+    {
+      "key": "91:7",
+      "surah": 91,
+      "ayah": 7,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَنَفْسٍۢ",
+          "location": "91:7:1",
+          "page": 595,
+          "line": 4
+        },
+        {
+          "position": 2,
+          "text": "وَمَا",
+          "location": "91:7:2",
+          "page": 595,
+          "line": 4
+        },
+        {
+          "position": 3,
+          "text": "سَوَّىٰهَا",
+          "location": "91:7:3",
+          "page": 595,
+          "line": 4
+        }
+      ],
+      "page": 595,
+      "juz": 30
+    },
+    {
+      "key": "91:8",
+      "surah": 91,
+      "ayah": 8,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَأَلْهَمَهَا",
+          "location": "91:8:1",
+          "page": 595,
+          "line": 4
+        },
+        {
+          "position": 2,
+          "text": "فُجُورَهَا",
+          "location": "91:8:2",
+          "page": 595,
+          "line": 4
+        },
+        {
+          "position": 3,
+          "text": "وَتَقْوَىٰهَا",
+          "location": "91:8:3",
+          "page": 595,
+          "line": 4
+        }
+      ],
+      "page": 595,
+      "juz": 30
+    },
+    {
+      "key": "91:9",
+      "surah": 91,
+      "ayah": 9,
+      "words": [
+        {
+          "position": 1,
+          "text": "قَدْ",
+          "location": "91:9:1",
+          "page": 595,
+          "line": 4
+        },
+        {
+          "position": 2,
+          "text": "أَفْلَحَ",
+          "location": "91:9:2",
+          "page": 595,
+          "line": 5
+        },
+        {
+          "position": 3,
+          "text": "مَن",
+          "location": "91:9:3",
+          "page": 595,
+          "line": 5
+        },
+        {
+          "position": 4,
+          "text": "زَكَّىٰهَا",
+          "location": "91:9:4",
+          "page": 595,
+          "line": 5
+        }
+      ],
+      "page": 595,
+      "juz": 30
+    },
+    {
+      "key": "91:10",
+      "surah": 91,
+      "ayah": 10,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَقَدْ",
+          "location": "91:10:1",
+          "page": 595,
+          "line": 5
+        },
+        {
+          "position": 2,
+          "text": "خَابَ",
+          "location": "91:10:2",
+          "page": 595,
+          "line": 5
+        },
+        {
+          "position": 3,
+          "text": "مَن",
+          "location": "91:10:3",
+          "page": 595,
+          "line": 5
+        },
+        {
+          "position": 4,
+          "text": "دَسَّىٰهَا",
+          "location": "91:10:4",
+          "page": 595,
+          "line": 5
+        }
+      ],
+      "page": 595,
+      "juz": 30
+    },
+    {
+      "key": "91:11",
+      "surah": 91,
+      "ayah": 11,
+      "words": [
+        {
+          "position": 1,
+          "text": "كَذَّبَتْ",
+          "location": "91:11:1",
+          "page": 595,
+          "line": 5
+        },
+        {
+          "position": 2,
+          "text": "ثَمُودُ",
+          "location": "91:11:2",
+          "page": 595,
+          "line": 5
+        },
+        {
+          "position": 3,
+          "text": "بِطَغْوَىٰهَآ",
+          "location": "91:11:3",
+          "page": 595,
+          "line": 6
+        }
+      ],
+      "page": 595,
+      "juz": 30
+    },
+    {
+      "key": "91:12",
+      "surah": 91,
+      "ayah": 12,
+      "words": [
+        {
+          "position": 1,
+          "text": "إِذِ",
+          "location": "91:12:1",
+          "page": 595,
+          "line": 6
+        },
+        {
+          "position": 2,
+          "text": "ٱنۢبَعَثَ",
+          "location": "91:12:2",
+          "page": 595,
+          "line": 6
+        },
+        {
+          "position": 3,
+          "text": "أَشْقَىٰهَا",
+          "location": "91:12:3",
+          "page": 595,
+          "line": 6
+        }
+      ],
+      "page": 595,
+      "juz": 30
+    },
+    {
+      "key": "91:13",
+      "surah": 91,
+      "ayah": 13,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَقَالَ",
+          "location": "91:13:1",
+          "page": 595,
+          "line": 6
+        },
+        {
+          "position": 2,
+          "text": "لَهُمْ",
+          "location": "91:13:2",
+          "page": 595,
+          "line": 6
+        },
+        {
+          "position": 3,
+          "text": "رَسُولُ",
+          "location": "91:13:3",
+          "page": 595,
+          "line": 6
+        },
+        {
+          "position": 4,
+          "text": "ٱللَّهِ",
+          "location": "91:13:4",
+          "page": 595,
+          "line": 6
+        },
+        {
+          "position": 5,
+          "text": "نَاقَةَ",
+          "location": "91:13:5",
+          "page": 595,
+          "line": 7
+        },
+        {
+          "position": 6,
+          "text": "ٱللَّهِ",
+          "location": "91:13:6",
+          "page": 595,
+          "line": 7
+        },
+        {
+          "position": 7,
+          "text": "وَسُقْيَـٰهَا",
+          "location": "91:13:7",
+          "page": 595,
+          "line": 7
+        }
+      ],
+      "page": 595,
+      "juz": 30
+    },
+    {
+      "key": "91:14",
+      "surah": 91,
+      "ayah": 14,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَكَذَّبُوهُ",
+          "location": "91:14:1",
+          "page": 595,
+          "line": 7
+        },
+        {
+          "position": 2,
+          "text": "فَعَقَرُوهَا",
+          "location": "91:14:2",
+          "page": 595,
+          "line": 7
+        },
+        {
+          "position": 3,
+          "text": "فَدَمْدَمَ",
+          "location": "91:14:3",
+          "page": 595,
+          "line": 7
+        },
+        {
+          "position": 4,
+          "text": "عَلَيْهِمْ",
+          "location": "91:14:4",
+          "page": 595,
+          "line": 8
+        },
+        {
+          "position": 5,
+          "text": "رَبُّهُم",
+          "location": "91:14:5",
+          "page": 595,
+          "line": 8
+        },
+        {
+          "position": 6,
+          "text": "بِذَنۢبِهِمْ",
+          "location": "91:14:6",
+          "page": 595,
+          "line": 8
+        },
+        {
+          "position": 7,
+          "text": "فَسَوَّىٰهَا",
+          "location": "91:14:7",
+          "page": 595,
+          "line": 8
+        }
+      ],
+      "page": 595,
+      "juz": 30
+    },
+    {
+      "key": "91:15",
+      "surah": 91,
+      "ayah": 15,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَلَا",
+          "location": "91:15:1",
+          "page": 595,
+          "line": 8
+        },
+        {
+          "position": 2,
+          "text": "يَخَافُ",
+          "location": "91:15:2",
+          "page": 595,
+          "line": 8
+        },
+        {
+          "position": 3,
+          "text": "عُقْبَـٰهَا",
+          "location": "91:15:3",
+          "page": 595,
+          "line": 8
+        }
+      ],
+      "page": 595,
+      "juz": 30
+    }
+  ]
+}

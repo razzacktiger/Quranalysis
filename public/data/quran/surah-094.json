@@ -1,0 +1,268 @@
+{
+  "number": 94,
+  "name": "Ash-Sharh",
+  "ayahCount": 8,
+  "ayahs": [
+    {
+      "key": "94:1",
+      "surah": 94,
+      "ayah": 1,
+      "words": [
+        {
+          "position": 1,
+          "text": "أَلَمْ",
+          "location": "94:1:1",
+          "page": 596,
+          "line": 13
+        },
+        {
+          "position": 2,
+          "text": "نَشْرَحْ",
+          "location": "94:1:2",
+          "page": 596,
+          "line": 13
+        },
+        {
+          "position": 3,
+          "text": "لَكَ",
+          "location": "94:1:3",
+          "page": 596,
+          "line": 13
+        },
+        {
+          "position": 4,
+          "text": "صَدْرَكَ",
+          "location": "94:1:4",
+          "page": 596,
+          "line": 13
+        }
+      ],
+      "page": 596,
+      "juz": 30
+    },
+    {
+      "key": "94:2",
+      "surah": 94,
+      "ayah": 2,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَوَضَعْنَا",
+          "location": "94:2:1",
+          "page": 596,
+          "line": 13
+        },
+        {
+          "position": 2,
+          "text": "عَنكَ",
+          "location": "94:2:2",
+          "page": 596,
+          "line": 13
+        },
+        {
+          "position": 3,
+          "text": "وِزْرَكَ",
+          "location": "94:2:3",
+          "page": 596,
+          "line": 13
+        }
+      ],
+      "page": 596,
+      "juz": 30
+    },
+    {
+      "key": "94:3",
+      "surah": 94,
+      "ayah": 3,
+      "words": [
+        {
+          "position": 1,
+          "text": "ٱلَّذِىٓ",
+          "location": "94:3:1",
+          "page": 597,
+          "line": 13
+        },
+        {
+          "position": 2,
+          "text": "أَنقَضَ",
+          "location": "94:3:2",
+          "page": 597,
+          "line": 14
+        },
+        {
+          "position": 3,
+          "text": "ظَهْرَكَ",
+          "location": "94:3:3",
+          "page": 597,
+          "line": 14
+        }
+      ],
+      "page": 597,
+      "juz": 30
+    },
+    {
+      "key": "94:4",
+      "surah": 94,
+      "ayah": 4,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَرَفَعْنَا",
+          "location": "94:4:1",
+          "page": 597,
+          "line": 14
+        },
+        {
+          "position": 2,
+          "text": "لَكَ",
+          "location": "94:4:2",
+          "page": 597,
+          "line": 14
+        },
+        {
+          "position": 3,
+          "text": "ذِكْرَكَ",
+          "location": "94:4:3",
+          "page": 597,
+          "line": 14
+        }
+      ],
+      "page": 597,
+      "juz": 30
+    },
+    {
+      "key": "94:5",
+      "surah": 94,
+      "ayah": 5,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَإِنَّ",
+          "location": "94:5:1",
+          "page": 597,
+          "line": 14
+        },
+        {
+          "position": 2,
+          "text": "مَعَ",
+          "location": "94:5:2",
+          "page": 597,
+          "line": 14
+        },
+        {
+          "position": 3,
+          "text": "ٱلْعُسْرِ",
+          "location": "94:5:3",
+          "page": 597,
+          "line": 14
+        },
+        {
+          "position": 4,
+          "text": "يُسْرًا",
+          "location": "94:5:4",
+          "page": 597,
+          "line": 14
+        }
+      ],
+      "page": 597,
+      "juz": 30
+    },
+    {
+      "key": "94:6",
+      "surah": 94,
+      "ayah": 6,
+      "words": [
+        {
+          "position": 1,
+          "text": "إِنَّ",
+          "location": "94:6:1",
+          "page": 597,
+          "line": 14
+        },
+        {
+          "position": 2,
+          "text": "مَعَ",
+          "location": "94:6:2",
+          "page": 597,
+          "line": 15
+        },
+        {
+          "position": 3,
+          "text": "ٱلْعُسْرِ",
+          "location": "94:6:3",
+          "page": 597,
+          "line": 15
+        },
+        {
+          "position": 4,
+          "text": "يُسْرًۭا",
+          "location": "94:6:4",
+          "page": 597,
+          "line": 15
+        }
+      ],
+      "page": 597,
+      "juz": 30
+    },
+    {
+      "key": "94:7",
+      "surah": 94,
+      "ayah": 7,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَإِذَا",
+          "location": "94:7:1",
+          "page": 597,
+          "line": 15
+        },
+        {
+          "position": 2,
+          "text": "فَرَغْتَ",
+          "location": "94:7:2",
+          "page": 597,
+          "line": 15
+        },
+        {
+          "position": 3,
+          "text": "فَٱنصَبْ",
+          "location": "94:7:3",
+          "page": 597,
+          "line": 15
+        }
+      ],
+      "page": 597,
+      "juz": 30
+    },
+    {
+      "key": "94:8",
+      "surah": 94,
+      "ayah": 8,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَإِلَىٰ",
+          "location": "94:8:1",
+          "page": 597,
+          "line": 15
+        },
+        {
+          "position": 2,
+          "text": "رَبِّكَ",
+          "location": "94:8:2",
+          "page": 597,
+          "line": 15
+        },
+        {
+          "position": 3,
+          "text": "فَٱرْغَب",
+          "location": "94:8:3",
+          "page": 597,
+          "line": 15
+        }
+      ],
+      "page": 597,
+      "juz": 30
+    }
+  ]
+}

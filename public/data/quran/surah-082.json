@@ -1,0 +1,738 @@
+{
+  "number": 82,
+  "name": "Al-Infitar",
+  "ayahCount": 19,
+  "ayahs": [
+    {
+      "key": "82:1",
+      "surah": 82,
+      "ayah": 1,
+      "words": [
+        {
+          "position": 1,
+          "text": "إِذَا",
+          "location": "82:1:1",
+          "page": 587,
+          "line": 2
+        },
+        {
+          "position": 2,
+          "text": "ٱلسَّمَآءُ",
+          "location": "82:1:2",
+          "page": 587,
+          "line": 2
+        },
+        {
+          "position": 3,
+          "text": "ٱنفَطَرَتْ",
+          "location": "82:1:3",
+          "page": 587,
+          "line": 2
+        }
+      ],
+      "page": 587,
+      "juz": 30
+    },
+    {
+      "key": "82:2",
+      "surah": 82,
+      "ayah": 2,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَإِذَا",
+          "location": "82:2:1",
+          "page": 587,
+          "line": 2
+        },
+        {
+          "position": 2,
+          "text": "ٱلْكَوَاكِبُ",
+          "location": "82:2:2",
+          "page": 587,
+          "line": 2
+        },
+        {
+          "position": 3,
+          "text": "ٱنتَثَرَتْ",
+          "location": "82:2:3",
+          "page": 587,
+          "line": 2
+        }
+      ],
+      "page": 587,
+      "juz": 30
+    },
+    {
+      "key": "82:3",
+      "surah": 82,
+      "ayah": 3,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَإِذَا",
+          "location": "82:3:1",
+          "page": 587,
+          "line": 2
+        },
+        {
+          "position": 2,
+          "text": "ٱلْبِحَارُ",
+          "location": "82:3:2",
+          "page": 587,
+          "line": 2
+        },
+        {
+          "position": 3,
+          "text": "فُجِّرَتْ",
+          "location": "82:3:3",
+          "page": 587,
+          "line": 3
+        }
+      ],
+      "page": 587,
+      "juz": 30
+    },
+    {
+      "key": "82:4",
+      "surah": 82,
+      "ayah": 4,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَإِذَا",
+          "location": "82:4:1",
+          "page": 587,
+          "line": 3
+        },
+        {
+          "position": 2,
+          "text": "ٱلْقُبُورُ",
+          "location": "82:4:2",
+          "page": 587,
+          "line": 3
+        },
+        {
+          "position": 3,
+          "text": "بُعْثِرَتْ",
+          "location": "82:4:3",
+          "page": 587,
+          "line": 3
+        }
+      ],
+      "page": 587,
+      "juz": 30
+    },
+    {
+      "key": "82:5",
+      "surah": 82,
+      "ayah": 5,
+      "words": [
+        {
+          "position": 1,
+          "text": "عَلِمَتْ",
+          "location": "82:5:1",
+          "page": 587,
+          "line": 3
+        },
+        {
+          "position": 2,
+          "text": "نَفْسٌۭ",
+          "location": "82:5:2",
+          "page": 587,
+          "line": 3
+        },
+        {
+          "position": 3,
+          "text": "مَّا",
+          "location": "82:5:3",
+          "page": 587,
+          "line": 3
+        },
+        {
+          "position": 4,
+          "text": "قَدَّمَتْ",
+          "location": "82:5:4",
+          "page": 587,
+          "line": 3
+        },
+        {
+          "position": 5,
+          "text": "وَأَخَّرَتْ",
+          "location": "82:5:5",
+          "page": 587,
+          "line": 4
+        }
+      ],
+      "page": 587,
+      "juz": 30
+    },
+    {
+      "key": "82:6",
+      "surah": 82,
+      "ayah": 6,
+      "words": [
+        {
+          "position": 1,
+          "text": "يَـٰٓأَيُّهَا",
+          "location": "82:6:1",
+          "page": 587,
+          "line": 4
+        },
+        {
+          "position": 2,
+          "text": "ٱلْإِنسَـٰنُ",
+          "location": "82:6:2",
+          "page": 587,
+          "line": 4
+        },
+        {
+          "position": 3,
+          "text": "مَا",
+          "location": "82:6:3",
+          "page": 587,
+          "line": 4
+        },
+        {
+          "position": 4,
+          "text": "غَرَّكَ",
+          "location": "82:6:4",
+          "page": 587,
+          "line": 4
+        },
+        {
+          "position": 5,
+          "text": "بِرَبِّكَ",
+          "location": "82:6:5",
+          "page": 587,
+          "line": 4
+        },
+        {
+          "position": 6,
+          "text": "ٱلْكَرِيمِ",
+          "location": "82:6:6",
+          "page": 587,
+          "line": 4
+        }
+      ],
+      "page": 587,
+      "juz": 30
+    },
+    {
+      "key": "82:7",
+      "surah": 82,
+      "ayah": 7,
+      "words": [
+        {
+          "position": 1,
+          "text": "ٱلَّذِى",
+          "location": "82:7:1",
+          "page": 587,
+          "line": 4
+        },
+        {
+          "position": 2,
+          "text": "خَلَقَكَ",
+          "location": "82:7:2",
+          "page": 587,
+          "line": 5
+        },
+        {
+          "position": 3,
+          "text": "فَسَوَّىٰكَ",
+          "location": "82:7:3",
+          "page": 587,
+          "line": 5
+        },
+        {
+          "position": 4,
+          "text": "فَعَدَلَكَ",
+          "location": "82:7:4",
+          "page": 587,
+          "line": 5
+        }
+      ],
+      "page": 587,
+      "juz": 30
+    },
+    {
+      "key": "82:8",
+      "surah": 82,
+      "ayah": 8,
+      "words": [
+        {
+          "position": 1,
+          "text": "فِىٓ",
+          "location": "82:8:1",
+          "page": 587,
+          "line": 5
+        },
+        {
+          "position": 2,
+          "text": "أَىِّ",
+          "location": "82:8:2",
+          "page": 587,
+          "line": 5
+        },
+        {
+          "position": 3,
+          "text": "صُورَةٍۢ",
+          "location": "82:8:3",
+          "page": 587,
+          "line": 5
+        },
+        {
+          "position": 4,
+          "text": "مَّا",
+          "location": "82:8:4",
+          "page": 587,
+          "line": 5
+        },
+        {
+          "position": 5,
+          "text": "شَآءَ",
+          "location": "82:8:5",
+          "page": 587,
+          "line": 5
+        },
+        {
+          "position": 6,
+          "text": "رَكَّبَكَ",
+          "location": "82:8:6",
+          "page": 587,
+          "line": 5
+        }
+      ],
+      "page": 587,
+      "juz": 30
+    },
+    {
+      "key": "82:9",
+      "surah": 82,
+      "ayah": 9,
+      "words": [
+        {
+          "position": 1,
+          "text": "كَلَّا",
+          "location": "82:9:1",
+          "page": 587,
+          "line": 6
+        },
+        {
+          "position": 2,
+          "text": "بَلْ",
+          "location": "82:9:2",
+          "page": 587,
+          "line": 6
+        },
+        {
+          "position": 3,
+          "text": "تُكَذِّبُونَ",
+          "location": "82:9:3",
+          "page": 587,
+          "line": 6
+        },
+        {
+          "position": 4,
+          "text": "بِٱلدِّينِ",
+          "location": "82:9:4",
+          "page": 587,
+          "line": 6
+        }
+      ],
+      "page": 587,
+      "juz": 30
+    },
+    {
+      "key": "82:10",
+      "surah": 82,
+      "ayah": 10,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَإِنَّ",
+          "location": "82:10:1",
+          "page": 587,
+          "line": 6
+        },
+        {
+          "position": 2,
+          "text": "عَلَيْكُمْ",
+          "location": "82:10:2",
+          "page": 587,
+          "line": 6
+        },
+        {
+          "position": 3,
+          "text": "لَحَـٰفِظِينَ",
+          "location": "82:10:3",
+          "page": 587,
+          "line": 6
+        }
+      ],
+      "page": 587,
+      "juz": 30
+    },
+    {
+      "key": "82:11",
+      "surah": 82,
+      "ayah": 11,
+      "words": [
+        {
+          "position": 1,
+          "text": "كِرَامًۭا",
+          "location": "82:11:1",
+          "page": 587,
+          "line": 6
+        },
+        {
+          "position": 2,
+          "text": "كَـٰتِبِينَ",
+          "location": "82:11:2",
+          "page": 587,
+          "line": 7
+        }
+      ],
+      "page": 587,
+      "juz": 30
+    },
+    {
+      "key": "82:12",
+      "surah": 82,
+      "ayah": 12,
+      "words": [
+        {
+          "position": 1,
+          "text": "يَعْلَمُونَ",
+          "location": "82:12:1",
+          "page": 587,
+          "line": 7
+        },
+        {
+          "position": 2,
+          "text": "مَا",
+          "location": "82:12:2",
+          "page": 587,
+          "line": 7
+        },
+        {
+          "position": 3,
+          "text": "تَفْعَلُونَ",
+          "location": "82:12:3",
+          "page": 587,
+          "line": 7
+        }
+      ],
+      "page": 587,
+      "juz": 30
+    },
+    {
+      "key": "82:13",
+      "surah": 82,
+      "ayah": 13,
+      "words": [
+        {
+          "position": 1,
+          "text": "إِنَّ",
+          "location": "82:13:1",
+          "page": 587,
+          "line": 7
+        },
+        {
+          "position": 2,
+          "text": "ٱلْأَبْرَارَ",
+          "location": "82:13:2",
+          "page": 587,
+          "line": 7
+        },
+        {
+          "position": 3,
+          "text": "لَفِى",
+          "location": "82:13:3",
+          "page": 587,
+          "line": 7
+        },
+        {
+          "position": 4,
+          "text": "نَعِيمٍۢ",
+          "location": "82:13:4",
+          "page": 587,
+          "line": 7
+        }
+      ],
+      "page": 587,
+      "juz": 30
+    },
+    {
+      "key": "82:14",
+      "surah": 82,
+      "ayah": 14,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَإِنَّ",
+          "location": "82:14:1",
+          "page": 587,
+          "line": 7
+        },
+        {
+          "position": 2,
+          "text": "ٱلْفُجَّارَ",
+          "location": "82:14:2",
+          "page": 587,
+          "line": 8
+        },
+        {
+          "position": 3,
+          "text": "لَفِى",
+          "location": "82:14:3",
+          "page": 587,
+          "line": 8
+        },
+        {
+          "position": 4,
+          "text": "جَحِيمٍۢ",
+          "location": "82:14:4",
+          "page": 587,
+          "line": 8
+        }
+      ],
+      "page": 587,
+      "juz": 30
+    },
+    {
+      "key": "82:15",
+      "surah": 82,
+      "ayah": 15,
+      "words": [
+        {
+          "position": 1,
+          "text": "يَصْلَوْنَهَا",
+          "location": "82:15:1",
+          "page": 587,
+          "line": 8
+        },
+        {
+          "position": 2,
+          "text": "يَوْمَ",
+          "location": "82:15:2",
+          "page": 587,
+          "line": 8
+        },
+        {
+          "position": 3,
+          "text": "ٱلدِّينِ",
+          "location": "82:15:3",
+          "page": 587,
+          "line": 8
+        }
+      ],
+      "page": 587,
+      "juz": 30
+    },
+    {
+      "key": "82:16",
+      "surah": 82,
+      "ayah": 16,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَمَا",
+          "location": "82:16:1",
+          "page": 587,
+          "line": 8
+        },
+        {
+          "position": 2,
+          "text": "هُمْ",
+          "location": "82:16:2",
+          "page": 587,
+          "line": 8
+        },
+        {
+          "position": 3,
+          "text": "عَنْهَا",
+          "location": "82:16:3",
+          "page": 587,
+          "line": 8
+        },
+        {
+          "position": 4,
+          "text": "بِغَآئِبِينَ",
+          "location": "82:16:4",
+          "page": 587,
+          "line": 8
+        }
+      ],
+      "page": 587,
+      "juz": 30
+    },
+    {
+      "key": "82:17",
+      "surah": 82,
+      "ayah": 17,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَمَآ",
+          "location": "82:17:1",
+          "page": 587,
+          "line": 9
+        },
+        {
+          "position": 2,
+          "text": "أَدْرَىٰكَ",
+          "location": "82:17:2",
+          "page": 587,
+          "line": 9
+        },
+        {
+          "position": 3,
+          "text": "مَا",
+          "location": "82:17:3",
+          "page": 587,
+          "line": 9
+        },
+        {
+          "position": 4,
+          "text": "يَوْمُ",
+          "location": "82:17:4",
+          "page": 587,
+          "line": 9
+        },
+        {
+          "position": 5,
+          "text": "ٱلدِّينِ",
+          "location": "82:17:5",
+          "page": 587,
+          "line": 9
+        }
+      ],
+      "page": 587,
+      "juz": 30
+    },
+    {
+      "key": "82:18",
+      "surah": 82,
+      "ayah": 18,
+      "words": [
+        {
+          "position": 1,
+          "text": "ثُمَّ",
+          "location": "82:18:1",
+          "page": 587,
+          "line": 9
+        },
+        {
+          "position": 2,
+          "text": "مَآ",
+          "location": "82:18:2",
+          "page": 587,
+          "line": 9
+        },
+        {
+          "position": 3,
+          "text": "أَدْرَىٰكَ",
+          "location": "82:18:3",
+          "page": 587,
+          "line": 9
+        },
+        {
+          "position": 4,
+          "text": "مَا",
+          "location": "82:18:4",
+          "page": 587,
+          "line": 9
+        },
+        {
+          "position": 5,
+          "text": "يَوْمُ",
+          "location": "82:18:5",
+          "page": 587,
+          "line": 9
+        },
+        {
+          "position": 6,
+          "text": "ٱلدِّينِ",
+          "location": "82:18:6",
+          "page": 587,
+          "line": 9
+        }
+      ],
+      "page": 587,
+      "juz": 30
+    },
+    {
+      "key": "82:19",
+      "surah": 82,
+      "ayah": 19,
+      "words": [
+        {
+          "position": 1,
+          "text": "يَوْمَ",
+          "location": "82:19:1",
+          "page": 587,
+          "line": 10
+        },
+        {
+          "position": 2,
+          "text": "لَا",
+          "location": "82:19:2",
+          "page": 587,
+          "line": 10
+        },
+        {
+          "position": 3,
+          "text": "تَمْلِكُ",
+          "location": "82:19:3",
+          "page": 587,
+          "line": 10
+        },
+        {
+          "position": 4,
+          "text": "نَفْسٌۭ",
+          "location": "82:19:4",
+          "page": 587,
+          "line": 10
+        },
+        {
+          "position": 5,
+          "text": "لِّنَفْسٍۢ",
+          "location": "82:19:5",
+          "page": 587,
+          "line": 10
+        },
+        {
+          "position": 6,
+          "text": "شَيْـًۭٔا ۖ",
+          "location": "82:19:6",
+          "page": 587,
+          "line": 10
+        },
+        {
+          "position": 7,
+          "text": "وَٱلْأَمْرُ",
+          "location": "82:19:7",
+          "page": 587,
+          "line": 10
+        },
+        {
+          "position": 8,
+          "text": "يَوْمَئِذٍۢ",
+          "location": "82:19:8",
+          "page": 587,
+          "line": 10
+        },
+        {
+          "position": 9,
+          "text": "لِّلَّهِ",
+          "location": "82:19:9",
+          "page": 587,
+          "line": 10
+        }
+      ],
+      "page": 587,
+      "juz": 30
+    }
+  ]
+}

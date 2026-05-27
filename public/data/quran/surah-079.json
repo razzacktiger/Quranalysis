@@ -1,0 +1,1674 @@
+{
+  "number": 79,
+  "name": "An-Nazi'at",
+  "ayahCount": 46,
+  "ayahs": [
+    {
+      "key": "79:1",
+      "surah": 79,
+      "ayah": 1,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَٱلنَّـٰزِعَـٰتِ",
+          "location": "79:1:1",
+          "page": 583,
+          "line": 10
+        },
+        {
+          "position": 2,
+          "text": "غَرْقًۭا",
+          "location": "79:1:2",
+          "page": 583,
+          "line": 10
+        }
+      ],
+      "page": 583,
+      "juz": 30
+    },
+    {
+      "key": "79:2",
+      "surah": 79,
+      "ayah": 2,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَٱلنَّـٰشِطَـٰتِ",
+          "location": "79:2:1",
+          "page": 583,
+          "line": 10
+        },
+        {
+          "position": 2,
+          "text": "نَشْطًۭا",
+          "location": "79:2:2",
+          "page": 583,
+          "line": 10
+        }
+      ],
+      "page": 583,
+      "juz": 30
+    },
+    {
+      "key": "79:3",
+      "surah": 79,
+      "ayah": 3,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَٱلسَّـٰبِحَـٰتِ",
+          "location": "79:3:1",
+          "page": 583,
+          "line": 10
+        },
+        {
+          "position": 2,
+          "text": "سَبْحًۭا",
+          "location": "79:3:2",
+          "page": 583,
+          "line": 10
+        }
+      ],
+      "page": 583,
+      "juz": 30
+    },
+    {
+      "key": "79:4",
+      "surah": 79,
+      "ayah": 4,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَٱلسَّـٰبِقَـٰتِ",
+          "location": "79:4:1",
+          "page": 583,
+          "line": 11
+        },
+        {
+          "position": 2,
+          "text": "سَبْقًۭا",
+          "location": "79:4:2",
+          "page": 583,
+          "line": 11
+        }
+      ],
+      "page": 583,
+      "juz": 30
+    },
+    {
+      "key": "79:5",
+      "surah": 79,
+      "ayah": 5,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَٱلْمُدَبِّرَٰتِ",
+          "location": "79:5:1",
+          "page": 583,
+          "line": 11
+        },
+        {
+          "position": 2,
+          "text": "أَمْرًۭا",
+          "location": "79:5:2",
+          "page": 583,
+          "line": 11
+        }
+      ],
+      "page": 583,
+      "juz": 30
+    },
+    {
+      "key": "79:6",
+      "surah": 79,
+      "ayah": 6,
+      "words": [
+        {
+          "position": 1,
+          "text": "يَوْمَ",
+          "location": "79:6:1",
+          "page": 583,
+          "line": 11
+        },
+        {
+          "position": 2,
+          "text": "تَرْجُفُ",
+          "location": "79:6:2",
+          "page": 583,
+          "line": 11
+        },
+        {
+          "position": 3,
+          "text": "ٱلرَّاجِفَةُ",
+          "location": "79:6:3",
+          "page": 583,
+          "line": 11
+        }
+      ],
+      "page": 583,
+      "juz": 30
+    },
+    {
+      "key": "79:7",
+      "surah": 79,
+      "ayah": 7,
+      "words": [
+        {
+          "position": 1,
+          "text": "تَتْبَعُهَا",
+          "location": "79:7:1",
+          "page": 583,
+          "line": 12
+        },
+        {
+          "position": 2,
+          "text": "ٱلرَّادِفَةُ",
+          "location": "79:7:2",
+          "page": 583,
+          "line": 12
+        }
+      ],
+      "page": 583,
+      "juz": 30
+    },
+    {
+      "key": "79:8",
+      "surah": 79,
+      "ayah": 8,
+      "words": [
+        {
+          "position": 1,
+          "text": "قُلُوبٌۭ",
+          "location": "79:8:1",
+          "page": 583,
+          "line": 12
+        },
+        {
+          "position": 2,
+          "text": "يَوْمَئِذٍۢ",
+          "location": "79:8:2",
+          "page": 583,
+          "line": 12
+        },
+        {
+          "position": 3,
+          "text": "وَاجِفَةٌ",
+          "location": "79:8:3",
+          "page": 583,
+          "line": 12
+        }
+      ],
+      "page": 583,
+      "juz": 30
+    },
+    {
+      "key": "79:9",
+      "surah": 79,
+      "ayah": 9,
+      "words": [
+        {
+          "position": 1,
+          "text": "أَبْصَـٰرُهَا",
+          "location": "79:9:1",
+          "page": 583,
+          "line": 12
+        },
+        {
+          "position": 2,
+          "text": "خَـٰشِعَةٌۭ",
+          "location": "79:9:2",
+          "page": 583,
+          "line": 13
+        }
+      ],
+      "page": 583,
+      "juz": 30
+    },
+    {
+      "key": "79:10",
+      "surah": 79,
+      "ayah": 10,
+      "words": [
+        {
+          "position": 1,
+          "text": "يَقُولُونَ",
+          "location": "79:10:1",
+          "page": 583,
+          "line": 13
+        },
+        {
+          "position": 2,
+          "text": "أَءِنَّا",
+          "location": "79:10:2",
+          "page": 583,
+          "line": 13
+        },
+        {
+          "position": 3,
+          "text": "لَمَرْدُودُونَ",
+          "location": "79:10:3",
+          "page": 583,
+          "line": 13
+        },
+        {
+          "position": 4,
+          "text": "فِى",
+          "location": "79:10:4",
+          "page": 583,
+          "line": 13
+        },
+        {
+          "position": 5,
+          "text": "ٱلْحَافِرَةِ",
+          "location": "79:10:5",
+          "page": 583,
+          "line": 13
+        }
+      ],
+      "page": 583,
+      "juz": 30
+    },
+    {
+      "key": "79:11",
+      "surah": 79,
+      "ayah": 11,
+      "words": [
+        {
+          "position": 1,
+          "text": "أَءِذَا",
+          "location": "79:11:1",
+          "page": 583,
+          "line": 13
+        },
+        {
+          "position": 2,
+          "text": "كُنَّا",
+          "location": "79:11:2",
+          "page": 583,
+          "line": 13
+        },
+        {
+          "position": 3,
+          "text": "عِظَـٰمًۭا",
+          "location": "79:11:3",
+          "page": 583,
+          "line": 14
+        },
+        {
+          "position": 4,
+          "text": "نَّخِرَةًۭ",
+          "location": "79:11:4",
+          "page": 583,
+          "line": 14
+        }
+      ],
+      "page": 583,
+      "juz": 30
+    },
+    {
+      "key": "79:12",
+      "surah": 79,
+      "ayah": 12,
+      "words": [
+        {
+          "position": 1,
+          "text": "قَالُوا۟",
+          "location": "79:12:1",
+          "page": 583,
+          "line": 14
+        },
+        {
+          "position": 2,
+          "text": "تِلْكَ",
+          "location": "79:12:2",
+          "page": 583,
+          "line": 14
+        },
+        {
+          "position": 3,
+          "text": "إِذًۭا",
+          "location": "79:12:3",
+          "page": 583,
+          "line": 14
+        },
+        {
+          "position": 4,
+          "text": "كَرَّةٌ",
+          "location": "79:12:4",
+          "page": 583,
+          "line": 14
+        },
+        {
+          "position": 5,
+          "text": "خَاسِرَةٌۭ",
+          "location": "79:12:5",
+          "page": 583,
+          "line": 14
+        }
+      ],
+      "page": 583,
+      "juz": 30
+    },
+    {
+      "key": "79:13",
+      "surah": 79,
+      "ayah": 13,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَإِنَّمَا",
+          "location": "79:13:1",
+          "page": 583,
+          "line": 14
+        },
+        {
+          "position": 2,
+          "text": "هِىَ",
+          "location": "79:13:2",
+          "page": 583,
+          "line": 14
+        },
+        {
+          "position": 3,
+          "text": "زَجْرَةٌۭ",
+          "location": "79:13:3",
+          "page": 583,
+          "line": 14
+        },
+        {
+          "position": 4,
+          "text": "وَٰحِدَةٌۭ",
+          "location": "79:13:4",
+          "page": 583,
+          "line": 15
+        }
+      ],
+      "page": 583,
+      "juz": 30
+    },
+    {
+      "key": "79:14",
+      "surah": 79,
+      "ayah": 14,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَإِذَا",
+          "location": "79:14:1",
+          "page": 583,
+          "line": 15
+        },
+        {
+          "position": 2,
+          "text": "هُم",
+          "location": "79:14:2",
+          "page": 583,
+          "line": 15
+        },
+        {
+          "position": 3,
+          "text": "بِٱلسَّاهِرَةِ",
+          "location": "79:14:3",
+          "page": 583,
+          "line": 15
+        }
+      ],
+      "page": 583,
+      "juz": 30
+    },
+    {
+      "key": "79:15",
+      "surah": 79,
+      "ayah": 15,
+      "words": [
+        {
+          "position": 1,
+          "text": "هَلْ",
+          "location": "79:15:1",
+          "page": 583,
+          "line": 15
+        },
+        {
+          "position": 2,
+          "text": "أَتَىٰكَ",
+          "location": "79:15:2",
+          "page": 583,
+          "line": 15
+        },
+        {
+          "position": 3,
+          "text": "حَدِيثُ",
+          "location": "79:15:3",
+          "page": 583,
+          "line": 15
+        },
+        {
+          "position": 4,
+          "text": "مُوسَىٰٓ",
+          "location": "79:15:4",
+          "page": 583,
+          "line": 15
+        }
+      ],
+      "page": 583,
+      "juz": 30
+    },
+    {
+      "key": "79:16",
+      "surah": 79,
+      "ayah": 16,
+      "words": [
+        {
+          "position": 1,
+          "text": "إِذْ",
+          "location": "79:16:1",
+          "page": 583,
+          "line": 1
+        },
+        {
+          "position": 2,
+          "text": "نَادَىٰهُ",
+          "location": "79:16:2",
+          "page": 583,
+          "line": 1
+        },
+        {
+          "position": 3,
+          "text": "رَبُّهُۥ",
+          "location": "79:16:3",
+          "page": 583,
+          "line": 1
+        },
+        {
+          "position": 4,
+          "text": "بِٱلْوَادِ",
+          "location": "79:16:4",
+          "page": 583,
+          "line": 1
+        },
+        {
+          "position": 5,
+          "text": "ٱلْمُقَدَّسِ",
+          "location": "79:16:5",
+          "page": 583,
+          "line": 1
+        },
+        {
+          "position": 6,
+          "text": "طُوًى",
+          "location": "79:16:6",
+          "page": 583,
+          "line": 1
+        }
+      ],
+      "page": 583,
+      "juz": 30
+    },
+    {
+      "key": "79:17",
+      "surah": 79,
+      "ayah": 17,
+      "words": [
+        {
+          "position": 1,
+          "text": "ٱذْهَبْ",
+          "location": "79:17:1",
+          "page": 584,
+          "line": 1
+        },
+        {
+          "position": 2,
+          "text": "إِلَىٰ",
+          "location": "79:17:2",
+          "page": 584,
+          "line": 1
+        },
+        {
+          "position": 3,
+          "text": "فِرْعَوْنَ",
+          "location": "79:17:3",
+          "page": 584,
+          "line": 1
+        },
+        {
+          "position": 4,
+          "text": "إِنَّهُۥ",
+          "location": "79:17:4",
+          "page": 584,
+          "line": 1
+        },
+        {
+          "position": 5,
+          "text": "طَغَىٰ",
+          "location": "79:17:5",
+          "page": 584,
+          "line": 1
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:18",
+      "surah": 79,
+      "ayah": 18,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَقُلْ",
+          "location": "79:18:1",
+          "page": 584,
+          "line": 2
+        },
+        {
+          "position": 2,
+          "text": "هَل",
+          "location": "79:18:2",
+          "page": 584,
+          "line": 2
+        },
+        {
+          "position": 3,
+          "text": "لَّكَ",
+          "location": "79:18:3",
+          "page": 584,
+          "line": 2
+        },
+        {
+          "position": 4,
+          "text": "إِلَىٰٓ",
+          "location": "79:18:4",
+          "page": 584,
+          "line": 2
+        },
+        {
+          "position": 5,
+          "text": "أَن",
+          "location": "79:18:5",
+          "page": 584,
+          "line": 2
+        },
+        {
+          "position": 6,
+          "text": "تَزَكَّىٰ",
+          "location": "79:18:6",
+          "page": 584,
+          "line": 2
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:19",
+      "surah": 79,
+      "ayah": 19,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَأَهْدِيَكَ",
+          "location": "79:19:1",
+          "page": 584,
+          "line": 2
+        },
+        {
+          "position": 2,
+          "text": "إِلَىٰ",
+          "location": "79:19:2",
+          "page": 584,
+          "line": 2
+        },
+        {
+          "position": 3,
+          "text": "رَبِّكَ",
+          "location": "79:19:3",
+          "page": 584,
+          "line": 2
+        },
+        {
+          "position": 4,
+          "text": "فَتَخْشَىٰ",
+          "location": "79:19:4",
+          "page": 584,
+          "line": 2
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:20",
+      "surah": 79,
+      "ayah": 20,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَأَرَىٰهُ",
+          "location": "79:20:1",
+          "page": 584,
+          "line": 2
+        },
+        {
+          "position": 2,
+          "text": "ٱلْـَٔايَةَ",
+          "location": "79:20:2",
+          "page": 584,
+          "line": 3
+        },
+        {
+          "position": 3,
+          "text": "ٱلْكُبْرَىٰ",
+          "location": "79:20:3",
+          "page": 584,
+          "line": 3
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:21",
+      "surah": 79,
+      "ayah": 21,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَكَذَّبَ",
+          "location": "79:21:1",
+          "page": 584,
+          "line": 3
+        },
+        {
+          "position": 2,
+          "text": "وَعَصَىٰ",
+          "location": "79:21:2",
+          "page": 584,
+          "line": 3
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:22",
+      "surah": 79,
+      "ayah": 22,
+      "words": [
+        {
+          "position": 1,
+          "text": "ثُمَّ",
+          "location": "79:22:1",
+          "page": 584,
+          "line": 3
+        },
+        {
+          "position": 2,
+          "text": "أَدْبَرَ",
+          "location": "79:22:2",
+          "page": 584,
+          "line": 3
+        },
+        {
+          "position": 3,
+          "text": "يَسْعَىٰ",
+          "location": "79:22:3",
+          "page": 584,
+          "line": 3
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:23",
+      "surah": 79,
+      "ayah": 23,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَحَشَرَ",
+          "location": "79:23:1",
+          "page": 584,
+          "line": 3
+        },
+        {
+          "position": 2,
+          "text": "فَنَادَىٰ",
+          "location": "79:23:2",
+          "page": 584,
+          "line": 4
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:24",
+      "surah": 79,
+      "ayah": 24,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَقَالَ",
+          "location": "79:24:1",
+          "page": 584,
+          "line": 4
+        },
+        {
+          "position": 2,
+          "text": "أَنَا۠",
+          "location": "79:24:2",
+          "page": 584,
+          "line": 4
+        },
+        {
+          "position": 3,
+          "text": "رَبُّكُمُ",
+          "location": "79:24:3",
+          "page": 584,
+          "line": 4
+        },
+        {
+          "position": 4,
+          "text": "ٱلْأَعْلَىٰ",
+          "location": "79:24:4",
+          "page": 584,
+          "line": 4
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:25",
+      "surah": 79,
+      "ayah": 25,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَأَخَذَهُ",
+          "location": "79:25:1",
+          "page": 584,
+          "line": 4
+        },
+        {
+          "position": 2,
+          "text": "ٱللَّهُ",
+          "location": "79:25:2",
+          "page": 584,
+          "line": 4
+        },
+        {
+          "position": 3,
+          "text": "نَكَالَ",
+          "location": "79:25:3",
+          "page": 584,
+          "line": 4
+        },
+        {
+          "position": 4,
+          "text": "ٱلْـَٔاخِرَةِ",
+          "location": "79:25:4",
+          "page": 584,
+          "line": 4
+        },
+        {
+          "position": 5,
+          "text": "وَٱلْأُولَىٰٓ",
+          "location": "79:25:5",
+          "page": 584,
+          "line": 4
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:26",
+      "surah": 79,
+      "ayah": 26,
+      "words": [
+        {
+          "position": 1,
+          "text": "إِنَّ",
+          "location": "79:26:1",
+          "page": 584,
+          "line": 5
+        },
+        {
+          "position": 2,
+          "text": "فِى",
+          "location": "79:26:2",
+          "page": 584,
+          "line": 5
+        },
+        {
+          "position": 3,
+          "text": "ذَٰلِكَ",
+          "location": "79:26:3",
+          "page": 584,
+          "line": 5
+        },
+        {
+          "position": 4,
+          "text": "لَعِبْرَةًۭ",
+          "location": "79:26:4",
+          "page": 584,
+          "line": 5
+        },
+        {
+          "position": 5,
+          "text": "لِّمَن",
+          "location": "79:26:5",
+          "page": 584,
+          "line": 5
+        },
+        {
+          "position": 6,
+          "text": "يَخْشَىٰٓ",
+          "location": "79:26:6",
+          "page": 584,
+          "line": 5
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:27",
+      "surah": 79,
+      "ayah": 27,
+      "words": [
+        {
+          "position": 1,
+          "text": "ءَأَنتُمْ",
+          "location": "79:27:1",
+          "page": 584,
+          "line": 5
+        },
+        {
+          "position": 2,
+          "text": "أَشَدُّ",
+          "location": "79:27:2",
+          "page": 584,
+          "line": 5
+        },
+        {
+          "position": 3,
+          "text": "خَلْقًا",
+          "location": "79:27:3",
+          "page": 584,
+          "line": 5
+        },
+        {
+          "position": 4,
+          "text": "أَمِ",
+          "location": "79:27:4",
+          "page": 584,
+          "line": 5
+        },
+        {
+          "position": 5,
+          "text": "ٱلسَّمَآءُ ۚ",
+          "location": "79:27:5",
+          "page": 584,
+          "line": 5
+        },
+        {
+          "position": 6,
+          "text": "بَنَىٰهَا",
+          "location": "79:27:6",
+          "page": 584,
+          "line": 5
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:28",
+      "surah": 79,
+      "ayah": 28,
+      "words": [
+        {
+          "position": 1,
+          "text": "رَفَعَ",
+          "location": "79:28:1",
+          "page": 584,
+          "line": 6
+        },
+        {
+          "position": 2,
+          "text": "سَمْكَهَا",
+          "location": "79:28:2",
+          "page": 584,
+          "line": 6
+        },
+        {
+          "position": 3,
+          "text": "فَسَوَّىٰهَا",
+          "location": "79:28:3",
+          "page": 584,
+          "line": 6
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:29",
+      "surah": 79,
+      "ayah": 29,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَأَغْطَشَ",
+          "location": "79:29:1",
+          "page": 584,
+          "line": 6
+        },
+        {
+          "position": 2,
+          "text": "لَيْلَهَا",
+          "location": "79:29:2",
+          "page": 584,
+          "line": 6
+        },
+        {
+          "position": 3,
+          "text": "وَأَخْرَجَ",
+          "location": "79:29:3",
+          "page": 584,
+          "line": 6
+        },
+        {
+          "position": 4,
+          "text": "ضُحَىٰهَا",
+          "location": "79:29:4",
+          "page": 584,
+          "line": 6
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:30",
+      "surah": 79,
+      "ayah": 30,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَٱلْأَرْضَ",
+          "location": "79:30:1",
+          "page": 584,
+          "line": 7
+        },
+        {
+          "position": 2,
+          "text": "بَعْدَ",
+          "location": "79:30:2",
+          "page": 584,
+          "line": 7
+        },
+        {
+          "position": 3,
+          "text": "ذَٰلِكَ",
+          "location": "79:30:3",
+          "page": 584,
+          "line": 7
+        },
+        {
+          "position": 4,
+          "text": "دَحَىٰهَآ",
+          "location": "79:30:4",
+          "page": 584,
+          "line": 7
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:31",
+      "surah": 79,
+      "ayah": 31,
+      "words": [
+        {
+          "position": 1,
+          "text": "أَخْرَجَ",
+          "location": "79:31:1",
+          "page": 584,
+          "line": 7
+        },
+        {
+          "position": 2,
+          "text": "مِنْهَا",
+          "location": "79:31:2",
+          "page": 584,
+          "line": 7
+        },
+        {
+          "position": 3,
+          "text": "مَآءَهَا",
+          "location": "79:31:3",
+          "page": 584,
+          "line": 7
+        },
+        {
+          "position": 4,
+          "text": "وَمَرْعَىٰهَا",
+          "location": "79:31:4",
+          "page": 584,
+          "line": 7
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:32",
+      "surah": 79,
+      "ayah": 32,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَٱلْجِبَالَ",
+          "location": "79:32:1",
+          "page": 584,
+          "line": 8
+        },
+        {
+          "position": 2,
+          "text": "أَرْسَىٰهَا",
+          "location": "79:32:2",
+          "page": 584,
+          "line": 8
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:33",
+      "surah": 79,
+      "ayah": 33,
+      "words": [
+        {
+          "position": 1,
+          "text": "مَتَـٰعًۭا",
+          "location": "79:33:1",
+          "page": 584,
+          "line": 8
+        },
+        {
+          "position": 2,
+          "text": "لَّكُمْ",
+          "location": "79:33:2",
+          "page": 584,
+          "line": 8
+        },
+        {
+          "position": 3,
+          "text": "وَلِأَنْعَـٰمِكُمْ",
+          "location": "79:33:3",
+          "page": 584,
+          "line": 8
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:34",
+      "surah": 79,
+      "ayah": 34,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَإِذَا",
+          "location": "79:34:1",
+          "page": 584,
+          "line": 8
+        },
+        {
+          "position": 2,
+          "text": "جَآءَتِ",
+          "location": "79:34:2",
+          "page": 584,
+          "line": 8
+        },
+        {
+          "position": 3,
+          "text": "ٱلطَّآمَّةُ",
+          "location": "79:34:3",
+          "page": 584,
+          "line": 8
+        },
+        {
+          "position": 4,
+          "text": "ٱلْكُبْرَىٰ",
+          "location": "79:34:4",
+          "page": 584,
+          "line": 9
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:35",
+      "surah": 79,
+      "ayah": 35,
+      "words": [
+        {
+          "position": 1,
+          "text": "يَوْمَ",
+          "location": "79:35:1",
+          "page": 584,
+          "line": 9
+        },
+        {
+          "position": 2,
+          "text": "يَتَذَكَّرُ",
+          "location": "79:35:2",
+          "page": 584,
+          "line": 9
+        },
+        {
+          "position": 3,
+          "text": "ٱلْإِنسَـٰنُ",
+          "location": "79:35:3",
+          "page": 584,
+          "line": 9
+        },
+        {
+          "position": 4,
+          "text": "مَا",
+          "location": "79:35:4",
+          "page": 584,
+          "line": 9
+        },
+        {
+          "position": 5,
+          "text": "سَعَىٰ",
+          "location": "79:35:5",
+          "page": 584,
+          "line": 9
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:36",
+      "surah": 79,
+      "ayah": 36,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَبُرِّزَتِ",
+          "location": "79:36:1",
+          "page": 584,
+          "line": 9
+        },
+        {
+          "position": 2,
+          "text": "ٱلْجَحِيمُ",
+          "location": "79:36:2",
+          "page": 584,
+          "line": 9
+        },
+        {
+          "position": 3,
+          "text": "لِمَن",
+          "location": "79:36:3",
+          "page": 584,
+          "line": 10
+        },
+        {
+          "position": 4,
+          "text": "يَرَىٰ",
+          "location": "79:36:4",
+          "page": 584,
+          "line": 10
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:37",
+      "surah": 79,
+      "ayah": 37,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَأَمَّا",
+          "location": "79:37:1",
+          "page": 584,
+          "line": 10
+        },
+        {
+          "position": 2,
+          "text": "مَن",
+          "location": "79:37:2",
+          "page": 584,
+          "line": 10
+        },
+        {
+          "position": 3,
+          "text": "طَغَىٰ",
+          "location": "79:37:3",
+          "page": 584,
+          "line": 10
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:38",
+      "surah": 79,
+      "ayah": 38,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَءَاثَرَ",
+          "location": "79:38:1",
+          "page": 584,
+          "line": 10
+        },
+        {
+          "position": 2,
+          "text": "ٱلْحَيَوٰةَ",
+          "location": "79:38:2",
+          "page": 584,
+          "line": 10
+        },
+        {
+          "position": 3,
+          "text": "ٱلدُّنْيَا",
+          "location": "79:38:3",
+          "page": 584,
+          "line": 10
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:39",
+      "surah": 79,
+      "ayah": 39,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَإِنَّ",
+          "location": "79:39:1",
+          "page": 584,
+          "line": 10
+        },
+        {
+          "position": 2,
+          "text": "ٱلْجَحِيمَ",
+          "location": "79:39:2",
+          "page": 584,
+          "line": 10
+        },
+        {
+          "position": 3,
+          "text": "هِىَ",
+          "location": "79:39:3",
+          "page": 584,
+          "line": 11
+        },
+        {
+          "position": 4,
+          "text": "ٱلْمَأْوَىٰ",
+          "location": "79:39:4",
+          "page": 584,
+          "line": 11
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:40",
+      "surah": 79,
+      "ayah": 40,
+      "words": [
+        {
+          "position": 1,
+          "text": "وَأَمَّا",
+          "location": "79:40:1",
+          "page": 584,
+          "line": 11
+        },
+        {
+          "position": 2,
+          "text": "مَنْ",
+          "location": "79:40:2",
+          "page": 584,
+          "line": 11
+        },
+        {
+          "position": 3,
+          "text": "خَافَ",
+          "location": "79:40:3",
+          "page": 584,
+          "line": 11
+        },
+        {
+          "position": 4,
+          "text": "مَقَامَ",
+          "location": "79:40:4",
+          "page": 584,
+          "line": 11
+        },
+        {
+          "position": 5,
+          "text": "رَبِّهِۦ",
+          "location": "79:40:5",
+          "page": 584,
+          "line": 11
+        },
+        {
+          "position": 6,
+          "text": "وَنَهَى",
+          "location": "79:40:6",
+          "page": 584,
+          "line": 11
+        },
+        {
+          "position": 7,
+          "text": "ٱلنَّفْسَ",
+          "location": "79:40:7",
+          "page": 584,
+          "line": 11
+        },
+        {
+          "position": 8,
+          "text": "عَنِ",
+          "location": "79:40:8",
+          "page": 584,
+          "line": 11
+        },
+        {
+          "position": 9,
+          "text": "ٱلْهَوَىٰ",
+          "location": "79:40:9",
+          "page": 584,
+          "line": 11
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:41",
+      "surah": 79,
+      "ayah": 41,
+      "words": [
+        {
+          "position": 1,
+          "text": "فَإِنَّ",
+          "location": "79:41:1",
+          "page": 584,
+          "line": 12
+        },
+        {
+          "position": 2,
+          "text": "ٱلْجَنَّةَ",
+          "location": "79:41:2",
+          "page": 584,
+          "line": 12
+        },
+        {
+          "position": 3,
+          "text": "هِىَ",
+          "location": "79:41:3",
+          "page": 584,
+          "line": 12
+        },
+        {
+          "position": 4,
+          "text": "ٱلْمَأْوَىٰ",
+          "location": "79:41:4",
+          "page": 584,
+          "line": 12
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:42",
+      "surah": 79,
+      "ayah": 42,
+      "words": [
+        {
+          "position": 1,
+          "text": "يَسْـَٔلُونَكَ",
+          "location": "79:42:1",
+          "page": 584,
+          "line": 12
+        },
+        {
+          "position": 2,
+          "text": "عَنِ",
+          "location": "79:42:2",
+          "page": 584,
+          "line": 12
+        },
+        {
+          "position": 3,
+          "text": "ٱلسَّاعَةِ",
+          "location": "79:42:3",
+          "page": 584,
+          "line": 12
+        },
+        {
+          "position": 4,
+          "text": "أَيَّانَ",
+          "location": "79:42:4",
+          "page": 584,
+          "line": 12
+        },
+        {
+          "position": 5,
+          "text": "مُرْسَىٰهَا",
+          "location": "79:42:5",
+          "page": 584,
+          "line": 12
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:43",
+      "surah": 79,
+      "ayah": 43,
+      "words": [
+        {
+          "position": 1,
+          "text": "فِيمَ",
+          "location": "79:43:1",
+          "page": 584,
+          "line": 13
+        },
+        {
+          "position": 2,
+          "text": "أَنتَ",
+          "location": "79:43:2",
+          "page": 584,
+          "line": 13
+        },
+        {
+          "position": 3,
+          "text": "مِن",
+          "location": "79:43:3",
+          "page": 584,
+          "line": 13
+        },
+        {
+          "position": 4,
+          "text": "ذِكْرَىٰهَآ",
+          "location": "79:43:4",
+          "page": 584,
+          "line": 13
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:44",
+      "surah": 79,
+      "ayah": 44,
+      "words": [
+        {
+          "position": 1,
+          "text": "إِلَىٰ",
+          "location": "79:44:1",
+          "page": 584,
+          "line": 13
+        },
+        {
+          "position": 2,
+          "text": "رَبِّكَ",
+          "location": "79:44:2",
+          "page": 584,
+          "line": 13
+        },
+        {
+          "position": 3,
+          "text": "مُنتَهَىٰهَآ",
+          "location": "79:44:3",
+          "page": 584,
+          "line": 13
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:45",
+      "surah": 79,
+      "ayah": 45,
+      "words": [
+        {
+          "position": 1,
+          "text": "إِنَّمَآ",
+          "location": "79:45:1",
+          "page": 584,
+          "line": 13
+        },
+        {
+          "position": 2,
+          "text": "أَنتَ",
+          "location": "79:45:2",
+          "page": 584,
+          "line": 13
+        },
+        {
+          "position": 3,
+          "text": "مُنذِرُ",
+          "location": "79:45:3",
+          "page": 584,
+          "line": 13
+        },
+        {
+          "position": 4,
+          "text": "مَن",
+          "location": "79:45:4",
+          "page": 584,
+          "line": 14
+        },
+        {
+          "position": 5,
+          "text": "يَخْشَىٰهَا",
+          "location": "79:45:5",
+          "page": 584,
+          "line": 14
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    },
+    {
+      "key": "79:46",
+      "surah": 79,
+      "ayah": 46,
+      "words": [
+        {
+          "position": 1,
+          "text": "كَأَنَّهُمْ",
+          "location": "79:46:1",
+          "page": 584,
+          "line": 14
+        },
+        {
+          "position": 2,
+          "text": "يَوْمَ",
+          "location": "79:46:2",
+          "page": 584,
+          "line": 14
+        },
+        {
+          "position": 3,
+          "text": "يَرَوْنَهَا",
+          "location": "79:46:3",
+          "page": 584,
+          "line": 14
+        },
+        {
+          "position": 4,
+          "text": "لَمْ",
+          "location": "79:46:4",
+          "page": 584,
+          "line": 14
+        },
+        {
+          "position": 5,
+          "text": "يَلْبَثُوٓا۟",
+          "location": "79:46:5",
+          "page": 584,
+          "line": 14
+        },
+        {
+          "position": 6,
+          "text": "إِلَّا",
+          "location": "79:46:6",
+          "page": 584,
+          "line": 14
+        },
+        {
+          "position": 7,
+          "text": "عَشِيَّةً",
+          "location": "79:46:7",
+          "page": 584,
+          "line": 14
+        },
+        {
+          "position": 8,
+          "text": "أَوْ",
+          "location": "79:46:8",
+          "page": 584,
+          "line": 14
+        },
+        {
+          "position": 9,
+          "text": "ضُحَىٰهَا",
+          "location": "79:46:9",
+          "page": 584,
+          "line": 14
+        }
+      ],
+      "page": 584,
+      "juz": 30
+    }
+  ]
+}
