@@ -24,6 +24,7 @@ import { getPage, type PageData } from "./data/pageIndex";
 import { MushafView } from "./MushafView";
 import { BottomSheet } from "./BottomSheet";
 import { DebugPanel } from "./DebugPanel";
+import { PageNav } from "./PageNav";
 
 const amiriQuran = Amiri_Quran({ subsets: ["arabic"], weight: "400" });
 
@@ -148,7 +149,7 @@ function MushafPlayground() {
       style={{ backgroundColor: "#fafaf7" }}
       className="min-h-screen w-full pb-32"
     >
-      <header className="mx-auto max-w-3xl px-6 pt-8 pb-4">
+      <header className="mx-auto max-w-3xl px-6 pt-8 pb-3">
         <h1 className="text-2xl font-semibold text-stone-800">
           Mushaf Prototype — Playground
         </h1>
@@ -156,10 +157,11 @@ function MushafPlayground() {
           Throwaway prototype. Not connected to your account or database.
         </p>
         <p className="mt-2 text-xs text-stone-400">
-          Showing page {pageNumber}. Page navigation lands in the next
-          commit.
+          Arrow keys: ← next page (RTL), → previous page.
         </p>
       </header>
+
+      <PageNav pageNumber={pageNumber} setPageNumber={setPageNumber} />
 
       <section className="mx-auto max-w-3xl px-4">
         {pageError && (
