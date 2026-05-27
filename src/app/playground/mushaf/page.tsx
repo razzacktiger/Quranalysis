@@ -207,6 +207,8 @@ function MushafPlayground() {
         visibleCategories={visibleCategories}
         activeCategory={activeCategory}
         setActiveCategory={setActiveCategory}
+        categoryFilter={categoryFilter}
+        setCategoryFilter={setCategoryFilter}
         countingMode={countingMode}
         sessionType={sessionType}
         setSessionType={setSessionType}

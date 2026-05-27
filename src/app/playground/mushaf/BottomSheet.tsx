@@ -19,6 +19,7 @@ import { useMemo, useRef } from "react";
 import { CategoryPalette } from "./CategoryPalette";
 import type {
   Category,
+  CategoryFilter,
   CategoryId,
   CountingMode,
   Mark,
@@ -34,6 +35,8 @@ type Props = {
   visibleCategories: Category[];
   activeCategory: CategoryId;
   setActiveCategory: (id: CategoryId) => void;
+  categoryFilter: CategoryFilter;
+  setCategoryFilter: (f: CategoryFilter) => void;
   countingMode: CountingMode;
   sessionType: SessionType;
   setSessionType: (s: SessionType) => void;
@@ -62,6 +65,8 @@ export function BottomSheet({
   visibleCategories,
   activeCategory,
   setActiveCategory,
+  categoryFilter,
+  setCategoryFilter,
   countingMode,
   sessionType,
   setSessionType,
@@ -119,10 +124,16 @@ export function BottomSheet({
     return map;
   }, [marks]);
 
+  /** Marks visible after applying the active category filter. */
+  const filteredMarks = useMemo(() => {
+    if (categoryFilter === "all") return marks;
+    return marks.filter((m) => m.category === categoryFilter);
+  }, [marks, categoryFilter]);
+
   const displayCount = useMemo(() => {
-    if (countingMode === "per-mark") return marks.length;
-    return computePerRangeCount(marks);
-  }, [marks, countingMode]);
+    if (countingMode === "per-mark") return filteredMarks.length;
+    return computePerRangeCount(filteredMarks);
+  }, [filteredMarks, countingMode]);
 
   return (
     <div
@@ -150,7 +161,8 @@ export function BottomSheet({
           activeLabel={activeCat.label}
           count={displayCount}
           countingMode={countingMode}
-          markCount={marks.length}
+          markCount={filteredMarks.length}
+          filterActive={categoryFilter !== "all"}
           onSwatchClick={cycleUp}
           onUndo={onUndo}
           canUndo={canUndo}
@@ -162,8 +174,11 @@ export function BottomSheet({
       {state === "expanded" && (
         <ExpandedBody
           visibleCategories={visibleCategories}
+          categories={categories}
           activeCategory={activeCategory}
           setActiveCategory={setActiveCategory}
+          categoryFilter={categoryFilter}
+          setCategoryFilter={setCategoryFilter}
           sessionType={sessionType}
           setSessionType={setSessionType}
           selfRating={selfRating}
@@ -179,7 +194,7 @@ export function BottomSheet({
 
       {state === "full" && (
         <FullBody
-          marks={marks}
+          marks={filteredMarks}
           categories={categories}
           countByCategory={countByCategory}
           sessionType={sessionType}
@@ -187,6 +202,7 @@ export function BottomSheet({
           historicalMistakes={historicalMistakes}
           displayCount={displayCount}
           countingMode={countingMode}
+          categoryFilter={categoryFilter}
           onConfirm={onConfirm}
           onCancel={() => setState("expanded")}
         />
@@ -201,6 +217,7 @@ function CollapsedBody({
   count,
   countingMode,
   markCount,
+  filterActive,
   onSwatchClick,
   onUndo,
   canUndo,
@@ -212,6 +229,7 @@ function CollapsedBody({
   count: number;
   countingMode: CountingMode;
   markCount: number;
+  filterActive: boolean;
   onSwatchClick: () => void;
   onUndo: () => void;
   canUndo: boolean;
@@ -260,6 +278,9 @@ function CollapsedBody({
               ({markCount} words)
             </span>
           )}
+          {filterActive && (
+            <span className="ml-1 text-xs text-stone-400">(filtered)</span>
+          )}
         </span>
 
         {markCount > 0 && (
@@ -287,8 +308,11 @@ function CollapsedBody({
 
 function ExpandedBody({
   visibleCategories,
+  categories,
   activeCategory,
   setActiveCategory,
+  categoryFilter,
+  setCategoryFilter,
   sessionType,
   setSessionType,
   selfRating,
@@ -301,8 +325,11 @@ function ExpandedBody({
   onSave,
 }: {
   visibleCategories: Category[];
+  categories: Category[];
   activeCategory: CategoryId;
   setActiveCategory: (id: CategoryId) => void;
+  categoryFilter: CategoryFilter;
+  setCategoryFilter: (f: CategoryFilter) => void;
   sessionType: SessionType;
   setSessionType: (s: SessionType) => void;
   selfRating: number;
@@ -337,6 +364,29 @@ function ExpandedBody({
           activeCategory={activeCategory}
           onSelect={setActiveCategory}
         />
+      </div>
+
+      <div>
+        <p className="mb-2 text-xs uppercase tracking-wide text-stone-400">
+          View
+        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          <FilterChip
+            label="All"
+            active={categoryFilter === "all"}
+            color="#1c1917"
+            onClick={() => setCategoryFilter("all")}
+          />
+          {categories.map((c) => (
+            <FilterChip
+              key={c.id}
+              label={c.label}
+              active={categoryFilter === c.id}
+              color={c.color}
+              onClick={() => setCategoryFilter(c.id)}
+            />
+          ))}
+        </div>
       </div>
 
       <div>
@@ -418,6 +468,43 @@ function ExpandedBody({
   );
 }
 
+function FilterChip({
+  label,
+  active,
+  color,
+  onClick,
+}: {
+  label: string;
+  active: boolean;
+  color: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition ${
+        active
+          ? "border-stone-900 bg-stone-900 text-white"
+          : "border-stone-200 text-stone-600 hover:bg-stone-50"
+      }`}
+    >
+      <span
+        aria-hidden
+        style={{
+          width: 8,
+          height: 8,
+          borderRadius: "50%",
+          backgroundColor: color,
+          border: active ? "1px solid #fff" : "1px solid transparent",
+        }}
+      />
+      {label}
+    </button>
+  );
+}
+
 function FullBody({
   marks,
   categories,
@@ -427,6 +514,7 @@ function FullBody({
   historicalMistakes,
   displayCount,
   countingMode,
+  categoryFilter,
   onConfirm,
   onCancel,
 }: {
@@ -438,6 +526,7 @@ function FullBody({
   historicalMistakes: boolean;
   displayCount: number;
   countingMode: CountingMode;
+  categoryFilter: CategoryFilter;
   onConfirm: () => void;
   onCancel: () => void;
 }) {
@@ -500,6 +589,11 @@ function FullBody({
       <div className="mt-4">
         <p className="text-xs uppercase tracking-wide text-stone-400">
           Marked words ({displayCount} {countingMode === "per-range" ? "ranges" : "marks"})
+          {categoryFilter !== "all" && (
+            <span className="ml-1 normal-case text-stone-500">
+              · filtered to {categoryFilter}
+            </span>
+          )}
         </p>
         <div className="mt-2 max-h-48 overflow-y-auto rounded-lg border border-stone-100 bg-stone-50 p-2 font-mono text-xs">
           {sortedMarks.length === 0 ? (
