@@ -26,6 +26,8 @@ import { MushafView } from "./MushafView";
 import { BottomSheet } from "./BottomSheet";
 import { DebugPanel } from "./DebugPanel";
 import { PageNav } from "./PageNav";
+import { WordPopover } from "./WordPopover";
+import type { SubCategory } from "./types";
 
 const amiriQuran = Amiri_Quran({ subsets: ["arabic"], weight: "400" });
 
@@ -47,6 +49,11 @@ function MushafPlayground() {
   const [historicalMistakes, setHistoricalMistakes] = useState<boolean>(false);
 
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
+
+  const [popover, setPopover] = useState<{
+    wordId: string;
+    anchor: DOMRect;
+  } | null>(null);
 
   const [paletteSize, setPaletteSize] = useState<PaletteSize>(4);
   const [countingMode, setCountingMode] = useState<CountingMode>("per-mark");
@@ -118,6 +125,23 @@ function MushafPlayground() {
     } else {
       pushHistory([...marks, { wordId, category: activeCategory }]);
     }
+  };
+
+  const updateMarkSub = (
+    wordId: string,
+    category: CategoryId,
+    sub: SubCategory | null,
+  ) => {
+    const next = marks.map((m) =>
+      m.wordId === wordId && m.category === category
+        ? { ...m, subCategory: sub ?? undefined }
+        : m,
+    );
+    pushHistory(next);
+  };
+
+  const openPopover = (wordId: string, anchor: DOMRect) => {
+    setPopover({ wordId, anchor });
   };
 
   const undo = () => {
@@ -195,8 +219,25 @@ function MushafPlayground() {
             fontClassName={amiriQuran.className}
             onTapWord={toggleWord}
             onCommitDrag={applyMarksToWordIds}
+            onLongPress={openPopover}
           />
         )}
+
+        {popover && page && (() => {
+          const w = page.words.find((x) => x.location === popover.wordId);
+          if (!w) return null;
+          return (
+            <WordPopover
+              anchor={popover.anchor}
+              wordId={popover.wordId}
+              wordText={w.text}
+              marks={marks}
+              categories={CATEGORIES}
+              onUpdateSub={updateMarkSub}
+              onClose={() => setPopover(null)}
+            />
+          );
+        })()}
       </section>
 
       <BottomSheet
