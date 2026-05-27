@@ -15,43 +15,58 @@
  * Pointer behavior is identical to v1 — tap a word, or drag across multiple
  * words. We use document.elementFromPoint + data-word-id so we never have to
  * compute geometry ourselves.
+ *
+ * Multi-category marks render as stacked color stripes directly below each
+ * word, ordered top-to-bottom in STRIPE_ORDER (tajweed / memorization /
+ * pronunciation / translation).
  */
 
 import { useMemo, useRef, useState } from "react";
-import { toArabicNumerals, type PageData } from "./data/pageIndex";
-import type { Category, CategoryId, Mark } from "./types";
+import { toArabicNumerals, type PageData, type PageWord } from "./data/pageIndex";
+import { STRIPE_ORDER } from "./samples";
+import type {
+  Category,
+  CategoryFilter,
+  CategoryId,
+  HistoricalMark,
+  Mark,
+} from "./types";
 
 type Props = {
   page: PageData;
   marks: Mark[];
+  historicalMarks?: HistoricalMark[];
   activeCategory: CategoryId;
+  categoryFilter: CategoryFilter;
   categories: Category[];
   fontClassName: string;
   onTapWord: (wordId: string) => void;
   onCommitDrag: (wordIds: string[]) => void;
+  onLongPress?: (wordId: string, anchor: DOMRect) => void;
 };
 
-function hexToRgba(hex: string, alpha: number): string {
-  const v = hex.replace("#", "");
-  const r = parseInt(v.slice(0, 2), 16);
-  const g = parseInt(v.slice(2, 4), 16);
-  const b = parseInt(v.slice(4, 6), 16);
-  return `rgba(${r},${g},${b},${alpha})`;
-}
+const STRIPE_HEIGHT = 3;
+const STRIPE_GAP = 1;
 
 export function MushafView({
   page,
   marks,
+  historicalMarks = [],
   activeCategory,
+  categoryFilter,
   categories,
   fontClassName,
   onTapWord,
   onCommitDrag,
+  onLongPress,
 }: Props) {
   const isDraggingRef = useRef<boolean>(false);
   const pendingRef = useRef<Set<string>>(new Set());
   const dragStartWordRef = useRef<string | null>(null);
   const dragMovedRef = useRef<boolean>(false);
+  const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressStartRef = useRef<{ x: number; y: number } | null>(null);
+  const longPressFiredRef = useRef<boolean>(false);
   const [, forcePendingRender] = useState<number>(0);
 
   const categoryById: Record<CategoryId, Category> = useMemo(() => {
@@ -61,19 +76,42 @@ export function MushafView({
     );
   }, [categories]);
 
-  const markByWordId: Map<string, Mark> = useMemo(() => {
-    const m = new Map<string, Mark>();
-    for (const mk of marks) m.set(mk.wordId, mk);
+  /** wordId -> set of categories currently marked on it */
+  const marksByWord = useMemo(() => {
+    const m = new Map<string, Set<CategoryId>>();
+    for (const mk of marks) {
+      if (!m.has(mk.wordId)) m.set(mk.wordId, new Set());
+      m.get(mk.wordId)!.add(mk.category);
+    }
     return m;
   }, [marks]);
 
-  const activeColor = categoryById[activeCategory]?.color ?? "#000";
+  /** wordId -> set of historical categories */
+  const historicalByWord = useMemo(() => {
+    const m = new Map<string, Set<CategoryId>>();
+    for (const hm of historicalMarks) {
+      if (!m.has(hm.wordId)) m.set(hm.wordId, new Set());
+      m.get(hm.wordId)!.add(hm.category);
+    }
+    return m;
+  }, [historicalMarks]);
+
+  const passesFilter = (cat: CategoryId): boolean =>
+    categoryFilter === "all" || categoryFilter === cat;
 
   const wordIdAtPoint = (x: number, y: number): string | null => {
     const el = document.elementFromPoint(x, y) as HTMLElement | null;
     if (!el) return null;
     const wid = el.closest<HTMLElement>("[data-word-id]")?.dataset.wordId;
     return wid ?? null;
+  };
+
+  const clearLongPress = () => {
+    if (longPressTimerRef.current) {
+      clearTimeout(longPressTimerRef.current);
+      longPressTimerRef.current = null;
+    }
+    longPressStartRef.current = null;
   };
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -88,11 +126,42 @@ export function MushafView({
     isDraggingRef.current = true;
     dragStartWordRef.current = wid;
     dragMovedRef.current = false;
+    longPressFiredRef.current = false;
     pendingRef.current = new Set<string>([wid]);
     forcePendingRender((n) => n + 1);
+
+    if (onLongPress && marksByWord.has(wid)) {
+      longPressStartRef.current = { x: e.clientX, y: e.clientY };
+      const startX = e.clientX;
+      const startY = e.clientY;
+      const targetWid = wid;
+      const targetEl = (e.target as HTMLElement)?.closest<HTMLElement>(
+        "[data-word-id]",
+      );
+      longPressTimerRef.current = setTimeout(() => {
+        const rect = targetEl?.getBoundingClientRect();
+        if (rect) {
+          longPressFiredRef.current = true;
+          onLongPress(targetWid, rect);
+        }
+        longPressTimerRef.current = null;
+        // Cancel the in-flight drag so we don't also commit a mark.
+        isDraggingRef.current = false;
+        pendingRef.current = new Set();
+        forcePendingRender((n) => n + 1);
+        // Suppress dummy reference warnings.
+        void startX;
+        void startY;
+      }, 500);
+    }
   };
 
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (longPressStartRef.current) {
+      const dx = e.clientX - longPressStartRef.current.x;
+      const dy = e.clientY - longPressStartRef.current.y;
+      if (dx * dx + dy * dy > 25) clearLongPress();
+    }
     if (!isDraggingRef.current) return;
     const wid = wordIdAtPoint(e.clientX, e.clientY);
     if (!wid) return;
@@ -110,7 +179,18 @@ export function MushafView({
   };
 
   const finishDrag = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isDraggingRef.current) return;
+    clearLongPress();
+    if (!isDraggingRef.current) {
+      // Pointer-up after the long-press timer already cancelled the drag.
+      if (longPressFiredRef.current) {
+        try {
+          e.currentTarget.releasePointerCapture(e.pointerId);
+        } catch {
+          // ignore
+        }
+      }
+      return;
+    }
     try {
       e.currentTarget.releasePointerCapture(e.pointerId);
     } catch {
@@ -181,38 +261,22 @@ export function MushafView({
                 flexDirection: "row",
                 direction: "rtl",
                 justifyContent: "space-between",
-                alignItems: "baseline",
+                alignItems: "flex-start",
                 gap: 4,
               }}
             >
-              {line.words.map((w) => {
-                const mark = markByWordId.get(w.location);
-                const isPending = pendingRef.current.has(w.location);
-                let bg: string | undefined;
-                if (mark) {
-                  const c = categoryById[mark.category]?.color ?? activeColor;
-                  bg = hexToRgba(c, 0.4);
-                } else if (isPending) {
-                  bg = hexToRgba(activeColor, 0.25);
-                }
-                return (
-                  <span
-                    key={w.location}
-                    data-word-id={w.location}
-                    style={{
-                      backgroundColor: bg,
-                      padding: bg ? "1px 3px" : 0,
-                      borderRadius: 4,
-                      cursor: "pointer",
-                      WebkitUserSelect: "none",
-                      userSelect: "none",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {w.text}
-                  </span>
-                );
-              })}
+              {line.words.map((w) => (
+                <WordSpan
+                  key={w.location}
+                  word={w}
+                  markedCats={marksByWord.get(w.location)}
+                  historicalCats={historicalByWord.get(w.location)}
+                  pending={pendingRef.current.has(w.location)}
+                  activeCategory={activeCategory}
+                  categoryById={categoryById}
+                  passesFilter={passesFilter}
+                />
+              ))}
             </div>
           ))
         )}
@@ -230,5 +294,96 @@ export function MushafView({
         {toArabicNumerals(page.pageNumber)}
       </div>
     </div>
+  );
+}
+
+function WordSpan({
+  word,
+  markedCats,
+  historicalCats,
+  pending,
+  activeCategory,
+  categoryById,
+  passesFilter,
+}: {
+  word: PageWord;
+  markedCats: Set<CategoryId> | undefined;
+  historicalCats: Set<CategoryId> | undefined;
+  pending: boolean;
+  activeCategory: CategoryId;
+  categoryById: Record<CategoryId, Category>;
+  passesFilter: (cat: CategoryId) => boolean;
+}) {
+  const visibleMarked: CategoryId[] = STRIPE_ORDER.filter(
+    (c) => markedCats?.has(c) && passesFilter(c),
+  );
+  const visibleHistorical: CategoryId[] = STRIPE_ORDER.filter(
+    (c) =>
+      historicalCats?.has(c) && passesFilter(c) && !markedCats?.has(c),
+  );
+
+  const showPendingStripe =
+    pending && !markedCats?.has(activeCategory) && passesFilter(activeCategory);
+
+  return (
+    <span
+      data-word-id={word.location}
+      style={{
+        display: "inline-flex",
+        flexDirection: "column",
+        alignItems: "stretch",
+        cursor: "pointer",
+        WebkitUserSelect: "none",
+        userSelect: "none",
+      }}
+    >
+      <span style={{ whiteSpace: "nowrap" }}>{word.text}</span>
+      {(visibleMarked.length > 0 ||
+        visibleHistorical.length > 0 ||
+        showPendingStripe) && (
+        <span
+          aria-hidden
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: STRIPE_GAP,
+            marginTop: 2,
+          }}
+        >
+          {visibleMarked.map((cat) => (
+            <span
+              key={`m-${cat}`}
+              style={{
+                height: STRIPE_HEIGHT,
+                borderRadius: 1,
+                backgroundColor: categoryById[cat].color,
+              }}
+            />
+          ))}
+          {visibleHistorical.map((cat) => (
+            <span
+              key={`h-${cat}`}
+              style={{
+                height: STRIPE_HEIGHT,
+                borderRadius: 1,
+                opacity: 0.4,
+                backgroundImage: `repeating-linear-gradient(45deg, ${categoryById[cat].color} 0 2px, transparent 2px 4px)`,
+                backgroundColor: "transparent",
+              }}
+            />
+          ))}
+          {showPendingStripe && (
+            <span
+              style={{
+                height: STRIPE_HEIGHT,
+                borderRadius: 1,
+                opacity: 0.5,
+                backgroundColor: categoryById[activeCategory].color,
+              }}
+            />
+          )}
+        </span>
+      )}
+    </span>
   );
 }

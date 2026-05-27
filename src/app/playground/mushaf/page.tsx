@@ -13,6 +13,7 @@ import { useSearchParams } from "next/navigation";
 
 import { CATEGORIES } from "./samples";
 import type {
+  CategoryFilter,
   CategoryId,
   CountingMode,
   Mark,
@@ -44,6 +45,8 @@ function MushafPlayground() {
   const [sessionType, setSessionType] = useState<SessionType>("audit");
   const [selfRating, setSelfRating] = useState<number>(7);
   const [historicalMistakes, setHistoricalMistakes] = useState<boolean>(false);
+
+  const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
 
   const [paletteSize, setPaletteSize] = useState<PaletteSize>(4);
   const [countingMode, setCountingMode] = useState<CountingMode>("per-mark");
@@ -82,31 +85,39 @@ function MushafPlayground() {
     setMarks(next);
   };
 
+  /**
+   * Drag commit: ADD the active category to every dragged word. Idempotent —
+   * a word that already has the active category is left alone (no toggle-off
+   * on drag, per spec).
+   */
   const applyMarksToWordIds = (wordIds: string[]) => {
     if (wordIds.length === 0) return;
-    const wordIdSet = new Set(wordIds);
-    const next = marks.filter((m) => !wordIdSet.has(m.wordId));
+    const next = [...marks];
     for (const wid of wordIds) {
-      next.push({ wordId: wid, category: activeCategory });
+      const exists = next.some(
+        (m) => m.wordId === wid && m.category === activeCategory,
+      );
+      if (!exists) next.push({ wordId: wid, category: activeCategory });
     }
+    if (next.length === marks.length) return;
     pushHistory(next);
   };
 
+  /**
+   * Tap behavior (multi-category aware): toggle the active category on this
+   * word. Other categories already on the word are preserved.
+   */
   const toggleWord = (wordId: string) => {
-    const existing = marks.find((m) => m.wordId === wordId);
-    if (!existing) {
-      pushHistory([...marks, { wordId, category: activeCategory }]);
-      return;
-    }
-    if (existing.category === activeCategory) {
-      pushHistory(marks.filter((m) => m.wordId !== wordId));
-      return;
-    }
-    pushHistory(
-      marks.map((m) =>
-        m.wordId === wordId ? { ...m, category: activeCategory } : m,
-      ),
+    const idx = marks.findIndex(
+      (m) => m.wordId === wordId && m.category === activeCategory,
     );
+    if (idx >= 0) {
+      const next = [...marks];
+      next.splice(idx, 1);
+      pushHistory(next);
+    } else {
+      pushHistory([...marks, { wordId, category: activeCategory }]);
+    }
   };
 
   const undo = () => {
@@ -179,6 +190,7 @@ function MushafPlayground() {
             page={page}
             marks={marks}
             activeCategory={activeCategory}
+            categoryFilter={categoryFilter}
             categories={CATEGORIES}
             fontClassName={amiriQuran.className}
             onTapWord={toggleWord}
