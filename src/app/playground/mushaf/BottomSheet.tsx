@@ -23,6 +23,7 @@ import type {
   CategoryId,
   CountingMode,
   Mark,
+  RecencyCategory,
   SessionType,
   SheetState,
 } from "./types";
@@ -44,10 +45,22 @@ type Props = {
   setSelfRating: (n: number) => void;
   historicalMistakes: boolean;
   setHistoricalMistakes: (b: boolean) => void;
+  durationMinutes: string;
+  setDurationMinutes: (s: string) => void;
+  timerRunning: boolean;
+  timerElapsedSec: number;
+  toggleTimer: () => void;
+  recency: RecencyCategory;
+  setRecency: (r: RecencyCategory) => void;
+  notes: string;
+  setNotes: (n: string) => void;
   onUndo: () => void;
   canUndo: boolean;
   onClearAll: () => void;
   onConfirm: () => void;
+  /** Sheet height transition tuning (debug panel). Defaults: 200ms / ease. */
+  sheetDurationMs?: number;
+  sheetEasing?: string;
 };
 
 const SESSION_TYPES: { id: SessionType; label: string }[] = [
@@ -74,10 +87,21 @@ export function BottomSheet({
   setSelfRating,
   historicalMistakes,
   setHistoricalMistakes,
+  durationMinutes,
+  setDurationMinutes,
+  timerRunning,
+  timerElapsedSec,
+  toggleTimer,
+  recency,
+  setRecency,
+  notes,
+  setNotes,
   onUndo,
   canUndo,
   onClearAll,
   onConfirm,
+  sheetDurationMs = 200,
+  sheetEasing = "ease",
 }: Props) {
   const sheetHeight =
     state === "collapsed" ? "80px" : state === "expanded" ? "50vh" : "90vh";
@@ -142,7 +166,7 @@ export function BottomSheet({
       className="fixed inset-x-0 bottom-0 z-30 flex flex-col rounded-t-3xl bg-white shadow-[0_-8px_24px_rgba(0,0,0,0.08)]"
       style={{
         height: sheetHeight,
-        transition: "height 200ms ease",
+        transition: `height ${sheetDurationMs}ms ${sheetEasing}`,
         overflow: "hidden",
       }}
     >
@@ -163,6 +187,8 @@ export function BottomSheet({
           countingMode={countingMode}
           markCount={filteredMarks.length}
           filterActive={categoryFilter !== "all"}
+          timerRunning={timerRunning}
+          timerElapsedSec={timerElapsedSec}
           onSwatchClick={cycleUp}
           onUndo={onUndo}
           canUndo={canUndo}
@@ -185,6 +211,15 @@ export function BottomSheet({
           setSelfRating={setSelfRating}
           historicalMistakes={historicalMistakes}
           setHistoricalMistakes={setHistoricalMistakes}
+          durationMinutes={durationMinutes}
+          setDurationMinutes={setDurationMinutes}
+          timerRunning={timerRunning}
+          timerElapsedSec={timerElapsedSec}
+          toggleTimer={toggleTimer}
+          recency={recency}
+          setRecency={setRecency}
+          notes={notes}
+          setNotes={setNotes}
           onClearAll={onClearAll}
           markCount={marks.length}
           onCollapse={cycleDown}
@@ -203,6 +238,10 @@ export function BottomSheet({
           displayCount={displayCount}
           countingMode={countingMode}
           categoryFilter={categoryFilter}
+          durationMinutes={durationMinutes}
+          timerElapsedSec={timerElapsedSec}
+          recency={recency}
+          notes={notes}
           onConfirm={onConfirm}
           onCancel={() => setState("expanded")}
         />
@@ -218,6 +257,8 @@ function CollapsedBody({
   countingMode,
   markCount,
   filterActive,
+  timerRunning,
+  timerElapsedSec,
   onSwatchClick,
   onUndo,
   canUndo,
@@ -230,6 +271,8 @@ function CollapsedBody({
   countingMode: CountingMode;
   markCount: number;
   filterActive: boolean;
+  timerRunning: boolean;
+  timerElapsedSec: number;
   onSwatchClick: () => void;
   onUndo: () => void;
   canUndo: boolean;
@@ -270,6 +313,19 @@ function CollapsedBody({
       </button>
 
       <div className="ml-auto flex items-center gap-3">
+        {(timerRunning || timerElapsedSec > 0) && (
+          <span
+            className={`rounded-full px-2 py-0.5 font-mono text-xs ${
+              timerRunning
+                ? "bg-emerald-50 text-emerald-700"
+                : "bg-stone-100 text-stone-500"
+            }`}
+            aria-label="Session duration"
+          >
+            {timerRunning ? "● " : ""}
+            {formatDuration(timerElapsedSec)}
+          </span>
+        )}
         <span className="text-sm text-stone-600">
           <strong className="text-stone-900">{count}</strong>{" "}
           {countingMode === "per-range" ? "ranges" : "marks"}
@@ -319,6 +375,15 @@ function ExpandedBody({
   setSelfRating,
   historicalMistakes,
   setHistoricalMistakes,
+  durationMinutes,
+  setDurationMinutes,
+  timerRunning,
+  timerElapsedSec,
+  toggleTimer,
+  recency,
+  setRecency,
+  notes,
+  setNotes,
   onClearAll,
   markCount,
   onCollapse,
@@ -336,6 +401,15 @@ function ExpandedBody({
   setSelfRating: (n: number) => void;
   historicalMistakes: boolean;
   setHistoricalMistakes: (b: boolean) => void;
+  durationMinutes: string;
+  setDurationMinutes: (s: string) => void;
+  timerRunning: boolean;
+  timerElapsedSec: number;
+  toggleTimer: () => void;
+  recency: RecencyCategory;
+  setRecency: (r: RecencyCategory) => void;
+  notes: string;
+  setNotes: (n: string) => void;
   onClearAll: () => void;
   markCount: number;
   onCollapse: () => void;
@@ -435,9 +509,6 @@ function ExpandedBody({
 
       <label className="flex items-center justify-between">
         <span className="text-sm text-stone-700">Historical Mistakes</span>
-        <span className="text-xs text-stone-400">
-          (placeholder, no logic yet)
-        </span>
         <input
           type="checkbox"
           checked={historicalMistakes}
@@ -445,6 +516,80 @@ function ExpandedBody({
           className="ml-2 h-5 w-5 accent-stone-900"
         />
       </label>
+
+      <div>
+        <p className="mb-2 text-xs uppercase tracking-wide text-stone-400">
+          Duration
+        </p>
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            min={1}
+            max={120}
+            placeholder="minutes"
+            value={durationMinutes}
+            onChange={(e) => setDurationMinutes(e.target.value)}
+            className="w-28 rounded-md border border-stone-200 bg-white px-2 py-1.5 text-sm text-stone-900 placeholder:text-stone-400"
+            aria-label="Duration in minutes"
+          />
+          <button
+            type="button"
+            onClick={toggleTimer}
+            className={`rounded-md border px-3 py-1.5 text-sm transition ${
+              timerRunning
+                ? "border-emerald-500 bg-emerald-50 text-emerald-700"
+                : "border-stone-200 text-stone-700 hover:bg-stone-50"
+            }`}
+            aria-pressed={timerRunning}
+          >
+            {timerRunning ? "Stop timer" : "Start timer"}
+          </button>
+          {(timerRunning || timerElapsedSec > 0) && (
+            <span className="font-mono text-sm text-stone-600">
+              {timerRunning ? "● " : ""}
+              {formatDuration(timerElapsedSec)}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <p className="mb-2 text-xs uppercase tracking-wide text-stone-400">
+          Recency
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {(["new", "near", "far"] as RecencyCategory[]).map((r) => {
+            const active = r === recency;
+            return (
+              <button
+                key={r}
+                type="button"
+                onClick={() => setRecency(r)}
+                className={`rounded-full border px-3 py-1.5 text-sm capitalize transition ${
+                  active
+                    ? "border-stone-900 bg-stone-900 text-white"
+                    : "border-stone-200 text-stone-600 hover:bg-stone-50"
+                }`}
+              >
+                {r}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div>
+        <p className="mb-2 text-xs uppercase tracking-wide text-stone-400">
+          Notes
+        </p>
+        <textarea
+          rows={3}
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Reflections from this session…"
+          className="w-full resize-y rounded-md border border-stone-200 bg-white px-2 py-1.5 text-sm text-stone-900 placeholder:text-stone-400"
+        />
+      </div>
 
       <div className="mt-auto flex items-center gap-3 pt-2">
         <button
@@ -515,6 +660,10 @@ function FullBody({
   displayCount,
   countingMode,
   categoryFilter,
+  durationMinutes,
+  timerElapsedSec,
+  recency,
+  notes,
   onConfirm,
   onCancel,
 }: {
@@ -527,6 +676,10 @@ function FullBody({
   displayCount: number;
   countingMode: CountingMode;
   categoryFilter: CategoryFilter;
+  durationMinutes: string;
+  timerElapsedSec: number;
+  recency: RecencyCategory;
+  notes: string;
   onConfirm: () => void;
   onCancel: () => void;
 }) {
@@ -584,7 +737,29 @@ function FullBody({
           label="Historical"
           value={historicalMistakes ? "on" : "off"}
         />
+        <SummaryRow label="Recency" value={recency} />
+        <SummaryRow
+          label="Duration"
+          value={
+            durationMinutes
+              ? `${durationMinutes} min`
+              : timerElapsedSec > 0
+                ? formatDuration(timerElapsedSec)
+                : "—"
+          }
+        />
       </div>
+
+      {notes.trim().length > 0 && (
+        <div className="mt-3">
+          <p className="text-[10px] uppercase tracking-wide text-stone-400">
+            Notes
+          </p>
+          <p className="mt-0.5 whitespace-pre-wrap rounded-lg border border-stone-100 bg-white px-3 py-2 text-sm text-stone-700">
+            {notes}
+          </p>
+        </div>
+      )}
 
       <div className="mt-4">
         <p className="text-xs uppercase tracking-wide text-stone-400">
@@ -680,6 +855,17 @@ function compareWordId(a: string, b: string): number {
     if (pa[i] !== pb[i]) return pa[i] - pb[i];
   }
   return 0;
+}
+
+/** Formats elapsed seconds as M:SS (or H:MM:SS past an hour). */
+function formatDuration(totalSec: number): string {
+  const s = Math.max(0, Math.floor(totalSec));
+  const hrs = Math.floor(s / 3600);
+  const mins = Math.floor((s % 3600) / 60);
+  const secs = s % 60;
+  const pad = (n: number) => String(n).padStart(2, "0");
+  if (hrs > 0) return `${hrs}:${pad(mins)}:${pad(secs)}`;
+  return `${mins}:${pad(secs)}`;
 }
 
 /**

@@ -11,13 +11,14 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { Amiri_Quran } from "next/font/google";
 import { useSearchParams } from "next/navigation";
 
-import { CATEGORIES } from "./samples";
+import { CATEGORIES, MOCK_HISTORICAL_MARKS } from "./samples";
 import type {
   CategoryFilter,
   CategoryId,
   CountingMode,
   Mark,
   PaletteSize,
+  RecencyCategory,
   SessionType,
   SheetState,
 } from "./types";
@@ -48,7 +49,16 @@ function MushafPlayground() {
   const [selfRating, setSelfRating] = useState<number>(7);
   const [historicalMistakes, setHistoricalMistakes] = useState<boolean>(false);
 
+  const [durationMinutes, setDurationMinutes] = useState<string>("");
+  const [timerRunning, setTimerRunning] = useState<boolean>(false);
+  const [timerElapsedSec, setTimerElapsedSec] = useState<number>(0);
+  const [recency, setRecency] = useState<RecencyCategory>("new");
+  const [notes, setNotes] = useState<string>("");
+
   const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("all");
+
+  const [sheetDurationMs, setSheetDurationMs] = useState<number>(200);
+  const [sheetEasing, setSheetEasing] = useState<string>("ease");
 
   const [popover, setPopover] = useState<{
     wordId: string;
@@ -73,6 +83,14 @@ function MushafPlayground() {
       cancelled = true;
     };
   }, [pageNumber]);
+
+  useEffect(() => {
+    if (!timerRunning) return;
+    const id = setInterval(() => setTimerElapsedSec((s) => s + 1), 1000);
+    return () => clearInterval(id);
+  }, [timerRunning]);
+
+  const toggleTimer = () => setTimerRunning((r) => !r);
 
   const visibleCategories = useMemo(() => {
     if (paletteSize === 2) {
@@ -160,6 +178,11 @@ function MushafPlayground() {
     setMarks([]);
     setHistory([]);
     setSheetState("collapsed");
+    setTimerRunning(false);
+    setTimerElapsedSec(0);
+    setDurationMinutes("");
+    setNotes("");
+    setRecency("new");
   };
 
   const confirmSession = () => {
@@ -168,6 +191,10 @@ function MushafPlayground() {
       sessionType,
       selfRating,
       historicalMistakes,
+      durationMinutes: durationMinutes || null,
+      timerElapsedSec,
+      recency,
+      notes: notes || null,
       activeCategory,
       paletteSize,
       countingMode,
@@ -213,6 +240,7 @@ function MushafPlayground() {
           <MushafView
             page={page}
             marks={marks}
+            historicalMarks={historicalMistakes ? MOCK_HISTORICAL_MARKS : []}
             activeCategory={activeCategory}
             categoryFilter={categoryFilter}
             categories={CATEGORIES}
@@ -257,10 +285,21 @@ function MushafPlayground() {
         setSelfRating={setSelfRating}
         historicalMistakes={historicalMistakes}
         setHistoricalMistakes={setHistoricalMistakes}
+        durationMinutes={durationMinutes}
+        setDurationMinutes={setDurationMinutes}
+        timerRunning={timerRunning}
+        timerElapsedSec={timerElapsedSec}
+        toggleTimer={toggleTimer}
+        recency={recency}
+        setRecency={setRecency}
+        notes={notes}
+        setNotes={setNotes}
         onUndo={undo}
         canUndo={history.length > 0}
         onClearAll={clearAll}
         onConfirm={confirmSession}
+        sheetDurationMs={sheetDurationMs}
+        sheetEasing={sheetEasing}
       />
 
       {debugMode && (
@@ -269,6 +308,10 @@ function MushafPlayground() {
           setPaletteSize={setPaletteSize}
           countingMode={countingMode}
           setCountingMode={setCountingMode}
+          sheetDurationMs={sheetDurationMs}
+          setSheetDurationMs={setSheetDurationMs}
+          sheetEasing={sheetEasing}
+          setSheetEasing={setSheetEasing}
         />
       )}
     </main>

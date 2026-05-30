@@ -14,13 +14,23 @@ type Props = {
   setPaletteSize: (n: PaletteSize) => void;
   countingMode: CountingMode;
   setCountingMode: (m: CountingMode) => void;
+  sheetDurationMs: number;
+  setSheetDurationMs: (n: number) => void;
+  sheetEasing: string;
+  setSheetEasing: (s: string) => void;
 };
+
+const EASINGS = ["linear", "ease", "ease-in", "ease-out", "ease-in-out"];
 
 export function DebugPanel({
   paletteSize,
   setPaletteSize,
   countingMode,
   setCountingMode,
+  sheetDurationMs,
+  setSheetDurationMs,
+  sheetEasing,
+  setSheetEasing,
 }: Props) {
   return (
     <aside
@@ -80,6 +90,39 @@ export function DebugPanel({
               );
             })}
           </div>
+        </div>
+
+        <div>
+          <div className="mb-1 flex items-center justify-between">
+            <p className="text-xs font-medium text-stone-600">Sheet speed</p>
+            <span className="text-[10px] text-stone-400">{sheetDurationMs}ms</span>
+          </div>
+          <input
+            type="range"
+            min={100}
+            max={500}
+            step={50}
+            value={sheetDurationMs}
+            onChange={(e) => setSheetDurationMs(Number(e.target.value))}
+            className="w-full accent-stone-900"
+            aria-label="Sheet transition duration"
+          />
+        </div>
+
+        <div>
+          <p className="mb-1 text-xs font-medium text-stone-600">Easing</p>
+          <select
+            value={sheetEasing}
+            onChange={(e) => setSheetEasing(e.target.value)}
+            className="w-full rounded-md border border-stone-200 bg-white px-2 py-1 text-xs text-stone-700"
+            aria-label="Sheet transition easing"
+          >
+            {EASINGS.map((e) => (
+              <option key={e} value={e}>
+                {e}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
     </aside>
