@@ -21,6 +21,19 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { alignPageWordBoxes } from "./data/alignPageBoxes";
+import { normalizePageBoxes } from "./data/normalizeBoxes";
+import type { PageWord } from "./data/pageIndex";
+import {
+  boxIntersectsRect,
+  classifyDecorationGlyph,
+  fillAyahPositionGaps,
+  isRealWord,
+  isRubElHizbStart,
+  isWaqfGlyph,
+  resolvePointHit,
+  RUB_SYMBOL_WIDTH_FRACTION,
+} from "./data/wordIndex";
 import { STRIPE_ORDER } from "./samples";
 import type {
   Category,
@@ -55,20 +68,48 @@ type PageBoxes = {
 
 type Props = {
   pageNumber: number;
+  /** pages-index words for this page — drives id→bbox alignment. */
+  indexWords?: PageWord[];
   marks: Mark[];
   historicalMarks?: HistoricalMark[];
   activeCategory: CategoryId;
   categoryFilter: CategoryFilter;
   categories: Category[];
-  onTapWord: (wordId: string) => void;
+  onTapWord: (wordIds: string[]) => void;
   onCommitDrag: (wordIds: string[]) => void;
   onLongPress?: (wordId: string, anchor: DOMRect) => void;
   /** When true, draws every hitbox with a faint outline to check alignment. */
   debugBoxes?: boolean;
+  /** Fired on each pointer commit for ?debug=1 inspection. */
+  onHitDebug?: (info: HitDebugInfo) => void;
 };
 
-// Module-level cache: page number -> parsed bbox payload. Never changes.
-const pageBoxesCache = new Map<number, PageBoxes>();
+export type HitDebugInfo = {
+  pageNumber: number;
+  mode: "tap" | "drag";
+  hitCount: number;
+  firstId: string;
+  lastId: string;
+  ayahKey: string | null;
+  ayahTotal: number | null;
+  /** pause-mark vs word vs full-ayah */
+  hitKind: "word" | "waqf" | "full-ayah";
+};
+
+// Module-level cache: normalized raw ayahinfo (before index alignment).
+const rawPageBoxesCache = new Map<number, PageBoxes>();
+
+function normalizeRawPageBoxes(data: PageBoxes): PageBoxes {
+  return { ...data, words: normalizePageBoxes(data.words) };
+}
+
+function alignWithIndex(data: PageBoxes, indexWords: PageWord[]): PageBoxes {
+  if (indexWords.length === 0) return data;
+  return {
+    ...data,
+    words: alignPageWordBoxes(indexWords, data.words),
+  };
+}
 
 function pageImageUrl(pageNumber: number): string {
   const padded = String(pageNumber).padStart(3, "0");
@@ -86,6 +127,7 @@ function hexToRgba(hex: string, alpha: number): string {
 
 export function MushafPageView({
   pageNumber,
+  indexWords = [],
   marks,
   historicalMarks = [],
   activeCategory,
@@ -95,10 +137,9 @@ export function MushafPageView({
   onCommitDrag,
   onLongPress,
   debugBoxes = false,
+  onHitDebug,
 }: Props) {
-  const [boxes, setBoxes] = useState<PageBoxes | null>(
-    () => pageBoxesCache.get(pageNumber) ?? null,
-  );
+  const [boxes, setBoxes] = useState<PageBoxes | null>(null);
   const [boxesError, setBoxesError] = useState<string | null>(null);
   const [imgLoaded, setImgLoaded] = useState<boolean>(false);
 
@@ -111,40 +152,58 @@ export function MushafPageView({
   const pendingRef = useRef<Set<string>>(new Set());
   const dragStartWordRef = useRef<string | null>(null);
   const dragMovedRef = useRef<boolean>(false);
+  /** Full-ayah ids from marker / rub tap — preserved for the whole gesture. */
+  const lockedAyahIdsRef = useRef<string[] | null>(null);
+  const dragRectRef = useRef<{
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+  } | null>(null);
   const longPressTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const longPressStartRef = useRef<{ x: number; y: number } | null>(null);
   const longPressFiredRef = useRef<boolean>(false);
   const [, forcePendingRender] = useState<number>(0);
 
-  // Load the per-page bbox JSON (cached at module scope).
+  // Load ayahinfo bboxes and align with pages-index word ids.
   useEffect(() => {
-    const cached = pageBoxesCache.get(pageNumber);
-    if (cached) {
-      setBoxes(cached);
-      setBoxesError(null);
-      return;
-    }
     let cancelled = false;
+
+    const applyBoxes = (raw: PageBoxes) => {
+      if (!cancelled) setBoxes(alignWithIndex(raw, indexWords));
+    };
+
+    const cached = rawPageBoxesCache.get(pageNumber);
+    if (cached) {
+      applyBoxes(cached);
+      setBoxesError(null);
+      return () => {
+        cancelled = true;
+      };
+    }
+
     setBoxes(null);
     setBoxesError(null);
     const padded = String(pageNumber).padStart(3, "0");
-    fetch(`/data/ayahinfo/page-${padded}.json`)
+    fetch(`/data/ayahinfo/page-${padded}.json?v=2`)
       .then((r) => {
         if (!r.ok) throw new Error(`page-${padded}.json: ${r.status}`);
         return r.json() as Promise<PageBoxes>;
       })
       .then((data) => {
-        pageBoxesCache.set(pageNumber, data);
-        if (!cancelled) setBoxes(data);
+        const normalized = normalizeRawPageBoxes(data);
+        rawPageBoxesCache.set(pageNumber, normalized);
+        applyBoxes(normalized);
       })
       .catch((err) => {
         if (!cancelled)
           setBoxesError(err instanceof Error ? err.message : String(err));
       });
+
     return () => {
       cancelled = true;
     };
-  }, [pageNumber]);
+  }, [pageNumber, indexWords]);
 
   // New page -> reset the image-loaded flag so we show the loader again.
   useEffect(() => {
@@ -194,27 +253,80 @@ export function MushafPageView({
   const passesFilter = (cat: CategoryId): boolean =>
     categoryFilter === "all" || categoryFilter === cat;
 
-  /**
-   * Coordinate hit-test: map a client point into source-image space and find
-   * the word whose box contains it. Returns the word id or null.
-   */
-  const wordIdAtPoint = (clientX: number, clientY: number): string | null => {
+  const sourcePoint = (clientX: number, clientY: number) => {
     const overlay = overlayRef.current;
-    if (!overlay || !boxes || scale <= 0) return null;
+    if (!overlay || scale <= 0) return null;
     const rect = overlay.getBoundingClientRect();
-    const sx = (clientX - rect.left) / scale;
-    const sy = (clientY - rect.top) / scale;
-    for (const word of boxes.words) {
-      if (
-        sx >= word.x &&
-        sx <= word.x + word.w &&
-        sy >= word.y &&
-        sy <= word.y + word.h
-      ) {
-        return word.id;
+    return {
+      sx: (clientX - rect.left) / scale,
+      sy: (clientY - rect.top) / scale,
+    };
+  };
+
+  /**
+   * Resolve a screen point to markable word ids (ayah markers, rub ۞ zones,
+   * and real words). Parent must gate rendering until initWordIndex() completes.
+   */
+  const wordIdsAtPoint = (clientX: number, clientY: number): string[] => {
+    if (!boxes) return [];
+    const pt = sourcePoint(clientX, clientY);
+    if (!pt) return [];
+    return resolvePointHit(boxes.words, pt.sx, pt.sy);
+  };
+
+  /** All real words on this page whose bbox overlaps the drag rectangle. */
+  const wordIdsInDragRect = (
+    x1: number,
+    y1: number,
+    x2: number,
+    y2: number,
+  ): string[] => {
+    if (!boxes) return [];
+    const ids = boxes.words
+      .filter(
+        (w) =>
+          isRealWord(w.id) &&
+          boxIntersectsRect(w, x1, y1, x2, y2),
+      )
+      .map((w) => w.id);
+    return fillAyahPositionGaps(
+      ids,
+      boxes.words.filter((w) => isRealWord(w.id)).map((w) => w.id),
+    );
+  };
+
+  const reportHitDebug = (mode: "tap" | "drag", ids: string[]) => {
+    if (!onHitDebug || ids.length === 0) return;
+    const sorted = [...ids].sort((a, b) => {
+      const pa = a.split(":").map(Number);
+      const pb = b.split(":").map(Number);
+      for (let i = 0; i < 3; i++) {
+        if (pa[i] !== pb[i]) return pa[i] - pb[i];
       }
-    }
-    return null;
+      return 0;
+    });
+    const first = sorted[0];
+    const last = sorted[sorted.length - 1];
+    const ayahKey = first.split(":").slice(0, 2).join(":");
+    const box = boxes?.words.find((w) => w.id === first);
+    const hitKind: HitDebugInfo["hitKind"] =
+      ids.length > 1
+        ? "full-ayah"
+        : isRealWord(first)
+          ? "word"
+          : box && isWaqfGlyph(first, box)
+            ? "waqf"
+            : "word";
+    onHitDebug({
+      pageNumber,
+      mode,
+      hitCount: ids.length,
+      firstId: first,
+      lastId: last,
+      ayahKey: ids.length > 1 ? ayahKey : null,
+      ayahTotal: ids.length > 1 ? ids.length : null,
+      hitKind,
+    });
   };
 
   /** Screen-space DOMRect for a word box (for the long-press popover anchor). */
@@ -222,10 +334,13 @@ export function MushafPageView({
     const overlay = overlayRef.current;
     if (!overlay) return null;
     const rect = overlay.getBoundingClientRect();
+    const rubInset = isRubElHizbStart(word.id)
+      ? word.w * RUB_SYMBOL_WIDTH_FRACTION
+      : 0;
     return new DOMRect(
-      rect.left + word.x * scale,
+      rect.left + (word.x + rubInset) * scale,
       rect.top + word.y * scale,
-      word.w * scale,
+      (word.w - rubInset) * scale,
       word.h * scale,
     );
   };
@@ -240,34 +355,45 @@ export function MushafPageView({
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0 && e.pointerType === "mouse") return;
-    const wid = wordIdAtPoint(e.clientX, e.clientY);
-    if (!wid) return;
+    const pt = sourcePoint(e.clientX, e.clientY);
+    if (!pt) return;
+    const ids = wordIdsAtPoint(e.clientX, e.clientY);
+    if (ids.length === 0) return;
     try {
       e.currentTarget.setPointerCapture(e.pointerId);
     } catch {
       // ignore
     }
     isDraggingRef.current = true;
-    dragStartWordRef.current = wid;
+    dragStartWordRef.current = ids[0];
     dragMovedRef.current = false;
     longPressFiredRef.current = false;
-    pendingRef.current = new Set<string>([wid]);
+    lockedAyahIdsRef.current = ids.length > 1 ? ids : null;
+    dragRectRef.current = {
+      x1: pt.sx,
+      y1: pt.sy,
+      x2: pt.sx,
+      y2: pt.sy,
+    };
+    pendingRef.current = new Set(ids);
     forcePendingRender((n) => n + 1);
 
-    if (onLongPress && marksByWord.has(wid)) {
+    const markedId = ids.find((id) => marksByWord.has(id));
+    if (onLongPress && markedId) {
       longPressStartRef.current = { x: e.clientX, y: e.clientY };
-      const targetWid = wid;
-      const targetWord = boxes?.words.find((w) => w.id === wid) ?? null;
+      const targetWord = boxes?.words.find((w) => w.id === markedId) ?? null;
       longPressTimerRef.current = setTimeout(() => {
         const rect = targetWord ? wordScreenRect(targetWord) : null;
         if (rect) {
           longPressFiredRef.current = true;
-          onLongPress(targetWid, rect);
+          onLongPress(markedId, rect);
         }
         longPressTimerRef.current = null;
         // Cancel the in-flight drag so we don't also commit a mark.
         isDraggingRef.current = false;
         pendingRef.current = new Set();
+        lockedAyahIdsRef.current = null;
+        dragRectRef.current = null;
         forcePendingRender((n) => n + 1);
       }, 500);
     }
@@ -280,19 +406,43 @@ export function MushafPageView({
       if (dx * dx + dy * dy > 25) clearLongPress();
     }
     if (!isDraggingRef.current) return;
-    const wid = wordIdAtPoint(e.clientX, e.clientY);
-    if (!wid) return;
-    if (!pendingRef.current.has(wid)) {
-      pendingRef.current.add(wid);
-      dragMovedRef.current = true;
-      forcePendingRender((n) => n + 1);
-    } else if (
-      dragStartWordRef.current &&
-      wid !== dragStartWordRef.current &&
-      !dragMovedRef.current
-    ) {
-      dragMovedRef.current = true;
+
+    const pt = sourcePoint(e.clientX, e.clientY);
+    if (!pt) return;
+
+    if (lockedAyahIdsRef.current) {
+      // Ayah-marker / rub-el-hizb seed — keep the full ayah set for the gesture.
+      dragRectRef.current = {
+        x1: Math.min(dragRectRef.current?.x1 ?? pt.sx, pt.sx),
+        y1: Math.min(dragRectRef.current?.y1 ?? pt.sy, pt.sy),
+        x2: Math.max(dragRectRef.current?.x2 ?? pt.sx, pt.sx),
+        y2: Math.max(dragRectRef.current?.y2 ?? pt.sy, pt.sy),
+      };
+      if (
+        dragRectRef.current.x2 - dragRectRef.current.x1 > 3 ||
+        dragRectRef.current.y2 - dragRectRef.current.y1 > 3
+      ) {
+        dragMovedRef.current = true;
+      }
+      return;
     }
+
+    const rect = dragRectRef.current ?? {
+      x1: pt.sx,
+      y1: pt.sy,
+      x2: pt.sx,
+      y2: pt.sy,
+    };
+    rect.x2 = pt.sx;
+    rect.y2 = pt.sy;
+    dragRectRef.current = rect;
+
+    const rectIds = wordIdsInDragRect(rect.x1, rect.y1, rect.x2, rect.y2);
+    if (rectIds.length === 0) return;
+
+    pendingRef.current = new Set(rectIds);
+    dragMovedRef.current = true;
+    forcePendingRender((n) => n + 1);
   };
 
   const finishDrag = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -314,18 +464,26 @@ export function MushafPageView({
       // ignore
     }
     isDraggingRef.current = false;
-    const ids = Array.from(pendingRef.current);
+    const ids = lockedAyahIdsRef.current
+      ? lockedAyahIdsRef.current
+      : Array.from(pendingRef.current);
     pendingRef.current = new Set();
+    lockedAyahIdsRef.current = null;
+    dragRectRef.current = null;
     const moved = dragMovedRef.current;
     dragMovedRef.current = false;
     dragStartWordRef.current = null;
     forcePendingRender((n) => n + 1);
 
-    if (!moved && ids.length === 1) {
-      onTapWord(ids[0]);
+    if (!moved) {
+      reportHitDebug("tap", ids);
+      onTapWord(ids);
       return;
     }
-    if (ids.length > 0) onCommitDrag(ids);
+    if (ids.length > 0) {
+      reportHitDebug("drag", ids);
+      onCommitDrag(ids);
+    }
   };
 
   return (
@@ -386,20 +544,39 @@ export function MushafPageView({
               userSelect: "none",
             }}
           >
-            {boxes?.words.map((word, i) => (
-              <WordBox
-                key={`${word.id}-${i}`}
-                word={word}
-                scale={scale}
-                markedCats={marksByWord.get(word.id)}
-                historicalCats={historicalByWord.get(word.id)}
-                pending={pendingRef.current.has(word.id)}
-                activeCategory={activeCategory}
-                categoryById={categoryById}
-                passesFilter={passesFilter}
-                debugBoxes={debugBoxes}
-              />
-            ))}
+            {boxes?.words.map((word, i) => {
+              const isWord = isRealWord(word.id);
+              const isWaqf = !isWord && isWaqfGlyph(word.id, word);
+              const isAyahEnd =
+                !isWord &&
+                !isWaqf &&
+                classifyDecorationGlyph(word.id, word) === "ayah-end";
+              const hasMark =
+                marksByWord.has(word.id) || pendingRef.current.has(word.id);
+
+              if (isAyahEnd && !debugBoxes) return null;
+              if (isWaqf && !hasMark && !debugBoxes) return null;
+              if (!isWord && !isWaqf && !debugBoxes) return null;
+
+              return (
+                <WordBox
+                  key={`${word.id}-${i}`}
+                  word={word}
+                  scale={scale}
+                  glyphKind={
+                    isWord ? "word" : isWaqf ? "waqf" : "ayah-end"
+                  }
+                  isRubStart={isRubElHizbStart(word.id)}
+                  markedCats={marksByWord.get(word.id)}
+                  historicalCats={historicalByWord.get(word.id)}
+                  pending={pendingRef.current.has(word.id)}
+                  activeCategory={activeCategory}
+                  categoryById={categoryById}
+                  passesFilter={passesFilter}
+                  debugBoxes={debugBoxes}
+                />
+              );
+            })}
           </div>
         </>
       )}
@@ -410,6 +587,8 @@ export function MushafPageView({
 function WordBox({
   word,
   scale,
+  glyphKind,
+  isRubStart,
   markedCats,
   historicalCats,
   pending,
@@ -420,6 +599,8 @@ function WordBox({
 }: {
   word: BBoxWord;
   scale: number;
+  glyphKind: "word" | "waqf" | "ayah-end";
+  isRubStart: boolean;
   markedCats: Set<CategoryId> | undefined;
   historicalCats: Set<CategoryId> | undefined;
   pending: boolean;
@@ -442,29 +623,50 @@ function WordBox({
     visibleHistorical.length > 0 ||
     showPending ||
     debugBoxes;
-  if (!hasContent || scale <= 0) return null;
+  if (!hasContent || scale <= 0 || word.w <= 0 || word.h <= 0) return null;
+
+  // Rub-el-hizb (۞) shares the first word's bbox. Skip the symbol portion
+  // (right edge in RTL) so marks never paint over the quarter-juz marker.
+  const rubInset = isRubStart ? word.w * RUB_SYMBOL_WIDTH_FRACTION : 0;
+  const boxLeft = (word.x + rubInset) * scale;
+  const boxWidth = (word.w - rubInset) * scale;
 
   // Fill: marked words get the top-most marked category's color at 0.18;
   // a live drag selection gets the active category at 0.10.
   let fill: string | undefined;
   if (visibleMarked.length > 0) {
-    fill = hexToRgba(categoryById[visibleMarked[0]].color, 0.18);
+    fill = hexToRgba(
+      categoryById[visibleMarked[0]].color,
+      glyphKind === "waqf" ? 0.35 : 0.18,
+    );
   } else if (showPending) {
-    fill = hexToRgba(categoryById[activeCategory].color, 0.1);
+    fill = hexToRgba(
+      categoryById[activeCategory].color,
+      glyphKind === "waqf" ? 0.25 : 0.1,
+    );
   }
+
+  const debugOutline =
+    glyphKind === "waqf"
+      ? "1px dashed rgba(168, 85, 247, 0.65)"
+      : glyphKind === "ayah-end"
+        ? "1px dashed rgba(234, 88, 12, 0.55)"
+        : isRubStart
+          ? "1px solid rgba(168, 85, 247, 0.5)"
+          : "1px solid rgba(59, 130, 246, 0.4)";
 
   return (
     <div
       aria-hidden
       style={{
         position: "absolute",
-        left: word.x * scale,
+        left: boxLeft,
         top: word.y * scale,
-        width: word.w * scale,
+        width: boxWidth,
         height: word.h * scale,
         backgroundColor: fill,
-        borderRadius: 2,
-        outline: debugBoxes ? "1px solid rgba(59, 130, 246, 0.4)" : undefined,
+        borderRadius: glyphKind === "waqf" ? 3 : 2,
+        outline: debugBoxes ? debugOutline : undefined,
         pointerEvents: "none",
       }}
     >
@@ -473,7 +675,10 @@ function WordBox({
           position: "absolute",
           left: 0,
           right: 0,
-          bottom: 0,
+          // Stack stripes just BELOW the word box (in the line gap) so they
+          // never overlap the glyph. There is room under each Mushaf line.
+          top: "100%",
+          marginTop: 1,
           display: "flex",
           flexDirection: "column",
           gap: STRIPE_GAP,

@@ -20,6 +20,8 @@ import { getPageBounds, getSurahList, toArabicNumerals } from "./data/pageIndex"
 type Props = {
   pageNumber: number;
   setPageNumber: (n: number) => void;
+  /** How many pages prev/next move by. 2 in two-page spread mode. */
+  step?: number;
 };
 
 type SurahMeta = {
@@ -30,7 +32,7 @@ type SurahMeta = {
   lastPage: number;
 };
 
-export function PageNav({ pageNumber, setPageNumber }: Props) {
+export function PageNav({ pageNumber, setPageNumber, step = 1 }: Props) {
   const [bounds, setBounds] = useState<{ min: number; max: number }>({
     min: 1,
     max: 604,
@@ -55,15 +57,15 @@ export function PageNav({ pageNumber, setPageNumber }: Props) {
       if (isTextEditing(document.activeElement)) return;
       if (e.key === "ArrowLeft") {
         e.preventDefault();
-        setPageNumber(Math.min(bounds.max, pageNumber + 1));
+        setPageNumber(Math.min(bounds.max, pageNumber + step));
       } else if (e.key === "ArrowRight") {
         e.preventDefault();
-        setPageNumber(Math.max(bounds.min, pageNumber - 1));
+        setPageNumber(Math.max(bounds.min, pageNumber - step));
       }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [pageNumber, bounds, setPageNumber]);
+  }, [pageNumber, bounds, setPageNumber, step]);
 
   const pageOptions = useMemo(() => {
     const arr: number[] = [];
@@ -87,7 +89,7 @@ export function PageNav({ pageNumber, setPageNumber }: Props) {
     <div className="mx-auto flex max-w-3xl flex-wrap items-center gap-3 px-6 pb-3">
       <button
         type="button"
-        onClick={() => canPrev && setPageNumber(pageNumber - 1)}
+        onClick={() => canPrev && setPageNumber(Math.max(bounds.min, pageNumber - step))}
         disabled={!canPrev}
         aria-label="Previous page"
         className="rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-50 disabled:opacity-30"
@@ -134,7 +136,7 @@ export function PageNav({ pageNumber, setPageNumber }: Props) {
 
       <button
         type="button"
-        onClick={() => canNext && setPageNumber(pageNumber + 1)}
+        onClick={() => canNext && setPageNumber(Math.min(bounds.max, pageNumber + step))}
         disabled={!canNext}
         aria-label="Next page"
         className="ml-auto rounded-lg border border-stone-200 bg-white px-3 py-1.5 text-sm text-stone-700 hover:bg-stone-50 disabled:opacity-30"

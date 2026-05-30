@@ -20,6 +20,7 @@ import Database from "better-sqlite3";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { normalizePageBoxes, normalizeRawBox } from "./bbox-normalize.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -49,18 +50,35 @@ function main() {
 
   let pagesWritten = 0;
   let totalWords = 0;
+  let repairedBoxes = 0;
 
   for (let page = FIRST_PAGE; page <= LAST_PAGE; page++) {
     const rows = stmt.all(page);
 
-    const words = rows.map((r) => ({
-      id: `${r.sura_number}:${r.ayah_number}:${r.position}`,
-      line: r.line_number,
-      x: r.min_x,
-      y: r.min_y,
-      w: r.max_x - r.min_x,
-      h: r.max_y - r.min_y,
-    }));
+    const words = normalizePageBoxes(
+      rows.map((r) => {
+        const { x, y, w, h } = normalizeRawBox(
+          r.min_x,
+          r.max_x,
+          r.min_y,
+          r.max_y,
+        );
+        if (
+          Math.abs(r.max_x - r.min_x) < 10 ||
+          Math.abs(r.max_y - r.min_y) < 8
+        ) {
+          repairedBoxes += 1;
+        }
+        return {
+          id: `${r.sura_number}:${r.ayah_number}:${r.position}`,
+          line: r.line_number,
+          x,
+          y,
+          w,
+          h,
+        };
+      }),
+    );
 
     const payload = {
       page,
@@ -79,7 +97,7 @@ function main() {
   db.close();
 
   console.log(
-    `[export-ayahinfo] wrote ${pagesWritten} pages, ${totalWords} words -> ${outDir}`,
+    `[export-ayahinfo] wrote ${pagesWritten} pages, ${totalWords} words, ${repairedBoxes} repaired boxes -> ${outDir}`,
   );
 }
 

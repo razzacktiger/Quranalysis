@@ -7,6 +7,7 @@
  * let the user feel what each variant is like.
  */
 
+import type { HitDebugInfo } from "./MushafPageView";
 import type { CountingMode, PaletteSize } from "./types";
 
 type Props = {
@@ -18,6 +19,7 @@ type Props = {
   setSheetDurationMs: (n: number) => void;
   sheetEasing: string;
   setSheetEasing: (s: string) => void;
+  lastHit: HitDebugInfo | null;
 };
 
 const EASINGS = ["linear", "ease", "ease-in", "ease-out", "ease-in-out"];
@@ -31,6 +33,7 @@ export function DebugPanel({
   setSheetDurationMs,
   sheetEasing,
   setSheetEasing,
+  lastHit,
 }: Props) {
   return (
     <aside
@@ -72,20 +75,25 @@ export function DebugPanel({
             Counting mode
           </p>
           <div className="flex gap-1">
-            {(["per-mark", "per-range"] as CountingMode[]).map((m) => {
-              const active = countingMode === m;
+            {(
+              [
+                { id: "per-range", label: "Mistakes" },
+                { id: "per-mark", label: "Words" },
+              ] as { id: CountingMode; label: string }[]
+            ).map((m) => {
+              const active = countingMode === m.id;
               return (
                 <button
-                  key={m}
+                  key={m.id}
                   type="button"
-                  onClick={() => setCountingMode(m)}
+                  onClick={() => setCountingMode(m.id)}
                   className={`flex-1 rounded-md px-2 py-1 text-xs transition ${
                     active
                       ? "bg-stone-900 text-white"
                       : "bg-stone-100 text-stone-600 hover:bg-stone-200"
                   }`}
                 >
-                  {m}
+                  {m.label}
                 </button>
               );
             })}
@@ -107,6 +115,35 @@ export function DebugPanel({
             className="w-full accent-stone-900"
             aria-label="Sheet transition duration"
           />
+        </div>
+
+        <div>
+          <p className="text-[10px] text-stone-400">
+            Outlines: blue=word, purple=waqf, orange=ayah #
+          </p>
+        </div>
+
+        <div>
+          <p className="mb-1 text-xs font-medium text-stone-600">Last hit</p>
+          {lastHit ? (
+            <div className="rounded-md bg-stone-50 px-2 py-1.5 font-mono text-[10px] leading-relaxed text-stone-700">
+              <div>
+                p{lastHit.pageNumber} · {lastHit.mode} · {lastHit.hitKind} ·{" "}
+                {lastHit.hitCount} ids
+              </div>
+              <div>
+                {lastHit.firstId}
+                {lastHit.hitCount > 1 ? ` → ${lastHit.lastId}` : ""}
+              </div>
+              {lastHit.ayahKey && (
+                <div className="text-stone-500">
+                  ayah {lastHit.ayahKey} ({lastHit.ayahTotal} words)
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="text-[10px] text-stone-400">Tap or drag a word</p>
+          )}
         </div>
 
         <div>

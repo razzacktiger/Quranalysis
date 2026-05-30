@@ -23,9 +23,11 @@ import type {
   CategoryId,
   CountingMode,
   Mark,
+  MarkGrouping,
   RecencyCategory,
   SessionType,
   SheetState,
+  SubCategory,
 } from "./types";
 
 type Props = {
@@ -39,6 +41,8 @@ type Props = {
   categoryFilter: CategoryFilter;
   setCategoryFilter: (f: CategoryFilter) => void;
   countingMode: CountingMode;
+  markGrouping: MarkGrouping;
+  setMarkGrouping: (g: MarkGrouping) => void;
   sessionType: SessionType;
   setSessionType: (s: SessionType) => void;
   selfRating: number;
@@ -81,6 +85,8 @@ export function BottomSheet({
   categoryFilter,
   setCategoryFilter,
   countingMode,
+  markGrouping,
+  setMarkGrouping,
   sessionType,
   setSessionType,
   selfRating,
@@ -140,11 +146,15 @@ export function BottomSheet({
     [categories, activeCategory],
   );
 
+  /** Distinct mistake groups per category (the meaningful per-category count). */
   const countByCategory = useMemo(() => {
-    const map = new Map<CategoryId, number>();
+    const groupsByCat = new Map<CategoryId, Set<string>>();
     for (const m of marks) {
-      map.set(m.category, (map.get(m.category) ?? 0) + 1);
+      if (!groupsByCat.has(m.category)) groupsByCat.set(m.category, new Set());
+      groupsByCat.get(m.category)!.add(m.groupId);
     }
+    const map = new Map<CategoryId, number>();
+    for (const [cat, groups] of groupsByCat) map.set(cat, groups.size);
     return map;
   }, [marks]);
 
@@ -156,7 +166,7 @@ export function BottomSheet({
 
   const displayCount = useMemo(() => {
     if (countingMode === "per-mark") return filteredMarks.length;
-    return computePerRangeCount(filteredMarks);
+    return countDistinctGroups(filteredMarks);
   }, [filteredMarks, countingMode]);
 
   return (
@@ -205,6 +215,8 @@ export function BottomSheet({
           setActiveCategory={setActiveCategory}
           categoryFilter={categoryFilter}
           setCategoryFilter={setCategoryFilter}
+          markGrouping={markGrouping}
+          setMarkGrouping={setMarkGrouping}
           sessionType={sessionType}
           setSessionType={setSessionType}
           selfRating={selfRating}
@@ -328,7 +340,7 @@ function CollapsedBody({
         )}
         <span className="text-sm text-stone-600">
           <strong className="text-stone-900">{count}</strong>{" "}
-          {countingMode === "per-range" ? "ranges" : "marks"}
+          {countingMode === "per-range" ? "mistakes" : "words"}
           {countingMode === "per-range" && count !== markCount && (
             <span className="ml-1 text-xs text-stone-400">
               ({markCount} words)
@@ -369,6 +381,8 @@ function ExpandedBody({
   setActiveCategory,
   categoryFilter,
   setCategoryFilter,
+  markGrouping,
+  setMarkGrouping,
   sessionType,
   setSessionType,
   selfRating,
@@ -395,6 +409,8 @@ function ExpandedBody({
   setActiveCategory: (id: CategoryId) => void;
   categoryFilter: CategoryFilter;
   setCategoryFilter: (f: CategoryFilter) => void;
+  markGrouping: MarkGrouping;
+  setMarkGrouping: (g: MarkGrouping) => void;
   sessionType: SessionType;
   setSessionType: (s: SessionType) => void;
   selfRating: number;
@@ -438,6 +454,43 @@ function ExpandedBody({
           activeCategory={activeCategory}
           onSelect={setActiveCategory}
         />
+      </div>
+
+      <div>
+        <p className="mb-2 text-xs uppercase tracking-wide text-stone-400">
+          Drag selection counts as
+        </p>
+        <div className="inline-flex rounded-lg border border-stone-200 p-0.5">
+          {(
+            [
+              { id: "one", label: "One mistake" },
+              { id: "separate", label: "Separate mistakes" },
+            ] as { id: MarkGrouping; label: string }[]
+          ).map((opt) => {
+            const active = markGrouping === opt.id;
+            return (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => setMarkGrouping(opt.id)}
+                aria-pressed={active}
+                className={`rounded-md px-3 py-1 text-sm transition ${
+                  active
+                    ? "bg-stone-900 text-white"
+                    : "text-stone-600 hover:bg-stone-50"
+                }`}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+        <p className="mt-1.5 text-xs text-stone-400">
+          {markGrouping === "one"
+            ? "A dragged range is one mistake. Drag over existing marks to merge them."
+            : "Each dragged word is its own mistake."}{" "}
+          Tap a marked word and use Split to break a range apart.
+        </p>
       </div>
 
       <div>
@@ -683,11 +736,16 @@ function FullBody({
   onConfirm: () => void;
   onCancel: () => void;
 }) {
-  const sortedMarks = useMemo(
+  const categoryById = useMemo(
     () =>
-      [...marks].sort((a, b) => compareWordId(a.wordId, b.wordId)),
-    [marks],
+      categories.reduce(
+        (acc, c) => ({ ...acc, [c.id]: c }),
+        {} as Record<CategoryId, Category>,
+      ),
+    [categories],
   );
+
+  const mistakeGroups = useMemo(() => buildMistakeGroups(marks), [marks]);
 
   return (
     <div className="flex flex-1 flex-col overflow-y-auto px-5 pb-5">
@@ -763,28 +821,75 @@ function FullBody({
 
       <div className="mt-4">
         <p className="text-xs uppercase tracking-wide text-stone-400">
-          Marked words ({displayCount} {countingMode === "per-range" ? "ranges" : "marks"})
+          Mistakes ({displayCount})
           {categoryFilter !== "all" && (
             <span className="ml-1 normal-case text-stone-500">
               · filtered to {categoryFilter}
             </span>
           )}
         </p>
-        <div className="mt-2 max-h-48 overflow-y-auto rounded-lg border border-stone-100 bg-stone-50 p-2 font-mono text-xs">
-          {sortedMarks.length === 0 ? (
-            <p className="text-stone-400">No marks yet.</p>
+        <p className="mt-0.5 text-xs text-stone-400">
+          Each card is one mistake. Words inside a card were marked together.
+        </p>
+        <div className="mt-2 max-h-56 space-y-2 overflow-y-auto rounded-lg border border-stone-100 bg-stone-50 p-2">
+          {mistakeGroups.length === 0 ? (
+            <p className="p-1 text-sm text-stone-400">No marks yet.</p>
           ) : (
-            sortedMarks.map((m) => (
-              <div
-                key={m.wordId}
-                className="flex items-center justify-between py-0.5"
-              >
-                <span className="text-stone-700">{m.wordId}</span>
-                <span className="text-stone-400">{m.category}</span>
-              </div>
-            ))
+            mistakeGroups.map((group, idx) => {
+              const cat = categoryById[group.category];
+              const multi = group.wordIds.length > 1;
+              return (
+                <div
+                  key={group.groupId}
+                  className="overflow-hidden rounded-lg border border-stone-200 bg-white"
+                  style={{ borderLeftWidth: 4, borderLeftColor: cat.color }}
+                >
+                  <div className="flex items-center justify-between gap-2 px-2.5 py-1.5">
+                    <div className="flex items-center gap-2">
+                      <span
+                        aria-hidden
+                        style={{
+                          width: 8,
+                          height: 8,
+                          borderRadius: 2,
+                          backgroundColor: cat.color,
+                        }}
+                      />
+                      <span className="text-xs font-medium text-stone-700">
+                        {cat.label}
+                      </span>
+                      {group.subCategory && (
+                        <span className="rounded-full bg-stone-100 px-2 py-0.5 text-[10px] capitalize text-stone-500">
+                          {group.subCategory.replace(/_/g, " ")}
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[10px] text-stone-400">
+                      #{idx + 1}
+                      {multi && (
+                        <span className="ml-1 font-medium text-stone-500">
+                          · {group.wordIds.length} words
+                        </span>
+                      )}
+                    </span>
+                  </div>
+                  <div
+                    className={`border-t border-stone-100 px-2.5 py-1.5 font-mono text-xs text-stone-600 ${
+                      multi ? "bg-stone-50/80" : ""
+                    }`}
+                  >
+                    {formatGroupWordIds(group.wordIds)}
+                  </div>
+                </div>
+              );
+            })
           )}
         </div>
+        {marks.length > displayCount && countingMode === "per-range" && (
+          <p className="mt-1.5 text-xs text-stone-400">
+            {marks.length} marked words across {displayCount} mistakes.
+          </p>
+        )}
       </div>
 
       <div className="mt-auto flex items-center gap-3 pt-4">
@@ -868,33 +973,65 @@ function formatDuration(totalSec: number): string {
   return `${mins}:${pad(secs)}`;
 }
 
-/**
- * Per-range counting: sort marks by surah:ayah:position and group consecutive
- * marks of the same category that are sequential within the same ayah.
- *
- * Example: 1:1:1, 1:1:2 same category = 1 range. 1:1:1, 1:1:3 same category
- * = 2 ranges (gap). 1:1:1, 1:2:1 same category = 2 ranges (ayah boundary).
- */
-function computePerRangeCount(marks: Mark[]): number {
-  if (marks.length === 0) return 0;
-  const sorted = [...marks].sort((a, b) => compareWordId(a.wordId, b.wordId));
-  let ranges = 0;
-  let prev: { surah: number; ayah: number; pos: number; cat: CategoryId } | null =
-    null;
-  for (const m of sorted) {
-    const [s, a, p] = m.wordId.split(":").map(Number);
-    if (
-      prev &&
-      prev.cat === m.category &&
-      prev.surah === s &&
-      prev.ayah === a &&
-      prev.pos + 1 === p
-    ) {
-      // continuation of current range
-    } else {
-      ranges += 1;
-    }
-    prev = { surah: s, ayah: a, pos: p, cat: m.category };
+type MistakeGroupDisplay = {
+  groupId: string;
+  category: CategoryId;
+  wordIds: string[];
+  subCategory?: SubCategory;
+};
+
+/** Collapse marks into one display row per mistake group. */
+function buildMistakeGroups(marks: Mark[]): MistakeGroupDisplay[] {
+  const byGroup = new Map<string, Mark[]>();
+  for (const m of marks) {
+    if (!byGroup.has(m.groupId)) byGroup.set(m.groupId, []);
+    byGroup.get(m.groupId)!.push(m);
   }
-  return ranges;
+  const groups: MistakeGroupDisplay[] = [];
+  for (const [groupId, members] of byGroup) {
+    const wordIds = [...members]
+      .sort((a, b) => compareWordId(a.wordId, b.wordId))
+      .map((m) => m.wordId);
+    groups.push({
+      groupId,
+      category: members[0].category,
+      wordIds,
+      subCategory: members.find((m) => m.subCategory)?.subCategory,
+    });
+  }
+  return groups.sort((a, b) => compareWordId(a.wordIds[0], b.wordIds[0]));
+}
+
+/**
+ * Compact word-id display for a mistake group. Consecutive words in the same
+ * ayah collapse to a range like `1:7:1–3`.
+ */
+function formatGroupWordIds(wordIds: string[]): string {
+  if (wordIds.length === 0) return "";
+  if (wordIds.length === 1) return wordIds[0];
+
+  const parsed = wordIds.map((id) => {
+    const [s, a, p] = id.split(":").map(Number);
+    return { s, a, p };
+  });
+  const { s, a } = parsed[0];
+  const sameAyah = parsed.every((w) => w.s === s && w.a === a);
+  const consecutive =
+    sameAyah &&
+    parsed.every((w, i) => i === 0 || w.p === parsed[i - 1].p + 1);
+
+  if (consecutive) {
+    return `${s}:${a}:${parsed[0].p}–${parsed[parsed.length - 1].p}`;
+  }
+  return wordIds.join(" · ");
+}
+
+/**
+ * Mistake count = number of distinct mistake groups. Each group (a tap, or a
+ * "one mistake" drag spanning several words) counts once regardless of how
+ * many words it covers.
+ */
+function countDistinctGroups(marks: Mark[]): number {
+  if (marks.length === 0) return 0;
+  return new Set(marks.map((m) => m.groupId)).size;
 }

@@ -33,6 +33,8 @@ type Props = {
     category: CategoryId,
     sub: SubCategory | null,
   ) => void;
+  /** Break the multi-word mistake group this (word, category) belongs to apart. */
+  onSplitGroup: (wordId: string, category: CategoryId) => void;
   onClose: () => void;
 };
 
@@ -60,6 +62,7 @@ export function WordPopover({
   marks,
   categories,
   onUpdateSub,
+  onSplitGroup,
   onClose,
 }: Props) {
   const cardRef = useRef<HTMLDivElement | null>(null);
@@ -68,6 +71,18 @@ export function WordPopover({
     () => marks.filter((m) => m.wordId === wordId),
     [marks, wordId],
   );
+
+  /** category -> number of words in this word's mistake group for that category. */
+  const groupSizeByCategory = useMemo(() => {
+    const map = new Map<CategoryId, number>();
+    for (const wm of wordMarks) {
+      const size = marks.filter(
+        (m) => m.category === wm.category && m.groupId === wm.groupId,
+      ).length;
+      map.set(wm.category, size);
+    }
+    return map;
+  }, [marks, wordMarks]);
 
   const categoryById = useMemo(() => {
     return categories.reduce(
@@ -162,6 +177,7 @@ export function WordPopover({
             const cat = categoryById[catId];
             const mark = wordMarks.find((m) => m.category === catId);
             const currentSub = mark?.subCategory;
+            const groupSize = groupSizeByCategory.get(catId) ?? 1;
             return (
               <div
                 key={catId}
@@ -203,6 +219,20 @@ export function WordPopover({
                     );
                   })}
                 </div>
+                {groupSize > 1 && (
+                  <div className="mt-2 flex items-center justify-between gap-2">
+                    <span className="text-xs text-stone-400">
+                      Part of a {groupSize}-word mistake
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => onSplitGroup(wordId, catId)}
+                      className="rounded-md border border-stone-200 bg-white px-2.5 py-1 text-xs text-stone-700 hover:bg-stone-100"
+                    >
+                      Split into {groupSize} separate
+                    </button>
+                  </div>
+                )}
               </div>
             );
           })}
