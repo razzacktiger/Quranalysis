@@ -8,7 +8,6 @@
  */
 
 import { Suspense, useEffect, useMemo, useState } from "react";
-import { Amiri_Quran } from "next/font/google";
 import { useSearchParams } from "next/navigation";
 
 import { CATEGORIES, MOCK_HISTORICAL_MARKS } from "./samples";
@@ -23,14 +22,12 @@ import type {
   SheetState,
 } from "./types";
 import { getPage, type PageData } from "./data/pageIndex";
-import { MushafView } from "./MushafView";
+import { MushafPageView } from "./MushafPageView";
 import { BottomSheet } from "./BottomSheet";
 import { DebugPanel } from "./DebugPanel";
 import { PageNav } from "./PageNav";
 import { WordPopover } from "./WordPopover";
 import type { SubCategory } from "./types";
-
-const amiriQuran = Amiri_Quran({ subsets: ["arabic"], weight: "400" });
 
 function MushafPlayground() {
   const searchParams = useSearchParams();
@@ -227,29 +224,23 @@ function MushafPlayground() {
 
       <section className="mx-auto max-w-3xl px-4">
         {pageError && (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-            Failed to load page: {pageError}
+          <div className="mb-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
+            Word-text lookup unavailable ({pageError}); the page image still
+            renders.
           </div>
         )}
-        {!page && !pageError && (
-          <div className="rounded-lg border border-stone-200 bg-white p-6 text-center text-sm text-stone-500">
-            Loading page {pageNumber}…
-          </div>
-        )}
-        {page && (
-          <MushafView
-            page={page}
-            marks={marks}
-            historicalMarks={historicalMistakes ? MOCK_HISTORICAL_MARKS : []}
-            activeCategory={activeCategory}
-            categoryFilter={categoryFilter}
-            categories={CATEGORIES}
-            fontClassName={amiriQuran.className}
-            onTapWord={toggleWord}
-            onCommitDrag={applyMarksToWordIds}
-            onLongPress={openPopover}
-          />
-        )}
+        <MushafPageView
+          pageNumber={pageNumber}
+          marks={marks}
+          historicalMarks={historicalMistakes ? MOCK_HISTORICAL_MARKS : []}
+          activeCategory={activeCategory}
+          categoryFilter={categoryFilter}
+          categories={CATEGORIES}
+          onTapWord={toggleWord}
+          onCommitDrag={applyMarksToWordIds}
+          onLongPress={openPopover}
+          debugBoxes={debugMode}
+        />
 
         {popover && page && (() => {
           const w = page.words.find((x) => x.location === popover.wordId);
