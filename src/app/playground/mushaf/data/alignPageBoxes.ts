@@ -6,10 +6,9 @@
  * at the SAME position ids. Using ids naively maps `"2:2:5"` → three-dot bbox
  * instead of `"فِيهِ"`.
  *
- * Fix: per ayah line, pair index words (by position) with non-tiny visual boxes
- * in RTL order (ignore ayahinfo box ids — they can name a different glyph on
- * another line). Extra boxes on the line are union-merged into the last index
- * word. Split-symbol boxes get a `waqf:` id prefix so they never collide.
+ * Fix: per ayah line, walk boxes RTL and merge only gap-0 (touching) glyphs into
+ * one index word, then advance to the next word. This keeps أو + its split box
+ * together and مِثْلِهَا separate. Split-symbol boxes get a `waqf:` prefix.
  */
 
 import type { PageWord } from "./pageIndex";
@@ -67,6 +66,53 @@ function unionBoxes(
   return { x: x1, y: y1, w: x2 - x1, h: y2 - y1 };
 }
 
+/** Horizontal gap between two boxes on the same line (RTL: prev is farther right). */
+function horizontalGap(prev: BBoxWord, next: BBoxWord): number {
+  return prev.x - (next.x + next.w);
+}
+
+/**
+ * Assign index words to ayahinfo boxes on one line (RTL).
+ * Only boxes with gap 0 (touching) merge into the same index word — e.g. أو + split
+ * diacritic. A positive gap starts the next word (e.g. مِثْلِهَا after أو).
+ */
+function assignLineWordsRTL(
+  lineWords: PageWord[],
+  lineBoxes: BBoxWord[],
+  lineNum: number,
+  indexLocs: Set<string>,
+  usedKeys: Set<string>,
+  result: BBoxWord[],
+): void {
+  const sorted = [...lineBoxes].sort((a, b) => b.x - a.x);
+  let bi = 0;
+
+  for (let wi = 0; wi < lineWords.length; wi++) {
+    if (bi >= sorted.length) break;
+
+    const cluster: BBoxWord[] = [sorted[bi]];
+    bi++;
+    while (bi < sorted.length && horizontalGap(cluster[cluster.length - 1], sorted[bi]) <= 0) {
+      cluster.push(sorted[bi]);
+      bi++;
+    }
+
+    for (const box of cluster) usedKeys.add(boxKey(box));
+    result.push({
+      ...unionBoxes(cluster),
+      id: lineWords[wi].location,
+      line: lineNum,
+    });
+  }
+
+  for (; bi < sorted.length; bi++) {
+    const box = sorted[bi];
+    if (indexLocs.has(box.id)) continue;
+    usedKeys.add(boxKey(box));
+    result.push(box);
+  }
+}
+
 /**
  * Remap raw ayahinfo boxes so each pages-index word id sits on the correct
  * visual glyph. Returns the merged list used for hit-testing and highlights.
@@ -113,56 +159,21 @@ export function alignPageWordBoxes(
       lineWords.sort((a, b) => a.position - b.position);
       const lineNum = lineWords[0].line;
 
-      const lineBoxes = ayahBoxes
-        .filter(
-          (b) =>
-            b.line === lineNum &&
-            !isTinyWaqfBox(b) &&
-            !usedKeys.has(boxKey(b)),
-        )
-        .sort((a, b) => b.x - a.x);
+      const lineBoxes = ayahBoxes.filter(
+        (b) =>
+          b.line === lineNum &&
+          !isTinyWaqfBox(b) &&
+          !usedKeys.has(boxKey(b)),
+      );
 
-      const n = Math.min(lineWords.length, lineBoxes.length);
-      for (let i = 0; i < n; i++) {
-        const iw = lineWords[i];
-        const box = lineBoxes[i];
-        usedKeys.add(boxKey(box));
-        result.push({
-          ...box,
-          id: iw.location,
-          line: iw.line,
-        });
-      }
-
-      if (n > 0 && lineBoxes.length > n) {
-        const lastLoc = lineWords[n - 1].location;
-        const leftovers = lineBoxes.slice(n);
-        for (const box of leftovers) usedKeys.add(boxKey(box));
-
-        const tailDeco: BBoxWord[] = [];
-        const tailMerge: BBoxWord[] = [];
-        for (const box of leftovers) {
-          if (!indexLocs.has(box.id)) tailDeco.push(box);
-          else tailMerge.push(box);
-        }
-
-        if (tailMerge.length > 0) {
-          const idx = result.findIndex(
-            (r) => r.id === lastLoc && r.line === lineNum,
-          );
-          if (idx >= 0) {
-            const merged = unionBoxes([result[idx], ...tailMerge]);
-            result[idx] = { ...result[idx], ...merged };
-          }
-        }
-        for (const box of tailDeco) result.push(box);
-      } else if (n === 0) {
-        for (const box of lineBoxes) {
-          if (indexLocs.has(box.id)) continue;
-          usedKeys.add(boxKey(box));
-          result.push(box);
-        }
-      }
+      assignLineWordsRTL(
+        lineWords,
+        lineBoxes,
+        lineNum,
+        indexLocs,
+        usedKeys,
+        result,
+      );
     }
 
     // Fallback: direct id lookup when line pairing missed a word.
