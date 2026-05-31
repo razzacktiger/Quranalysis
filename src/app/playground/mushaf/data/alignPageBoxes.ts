@@ -6,9 +6,10 @@
  * at the SAME position ids. Using ids naively maps `"2:2:5"` → three-dot bbox
  * instead of `"فِيهِ"`.
  *
- * Fix: per ayah line, walk boxes RTL and merge only gap-0 (touching) glyphs into
- * one index word, then advance to the next word. This keeps أو + its split box
- * together and مِثْلِهَا separate. Split-symbol boxes get a `waqf:` prefix.
+ * Fix: per ayah line, walk boxes RTL and merge only gap-0 glyphs that share the
+ * same ayah position id as the index word (split diacritics). Gap-0 with a
+ * different position (e.g. `2:106:10` + `2:106:11`) starts the next word.
+ * Rub `"۞ مَا"` entries are split into `rub:` + word boxes. Waqf → `waqf:` prefix.
  */
 
 import type { PageWord } from "./pageIndex";
@@ -20,6 +21,14 @@ const WAQF_MAX_H = 45;
 
 export const WAQF_ID_PREFIX = "waqf:";
 
+/** Synthetic id for the ۞ (rub el hizb) zone split from a merged index word box. */
+export const RUB_ID_PREFIX = "rub:";
+
+const RUB_EL_HIZB = "\u06DE";
+
+/** Fraction of a combined rub+word ayahinfo box occupied by ۞ (RTL right edge). */
+const RUB_SYMBOL_WIDTH_FRACTION = 0.52;
+
 export function isTinyWaqfBox(box: { w: number; h: number }): boolean {
   return (
     box.w > 0 &&
@@ -30,6 +39,15 @@ export function isTinyWaqfBox(box: { w: number; h: number }): boolean {
 
 export function isWaqfMarkId(wordId: string): boolean {
   return wordId.startsWith(WAQF_ID_PREFIX);
+}
+
+export function isRubMarkId(wordId: string): boolean {
+  return wordId.startsWith(RUB_ID_PREFIX);
+}
+
+/** Location id under a `rub:` synthetic box (e.g. `rub:2:106:1` → `2:106:1`). */
+export function rubMarkBaseId(wordId: string): string {
+  return isRubMarkId(wordId) ? wordId.slice(RUB_ID_PREFIX.length) : wordId;
 }
 
 /** Strip `waqf:` prefix to show underlying glyph location in debug UI. */
@@ -71,6 +89,61 @@ function horizontalGap(prev: BBoxWord, next: BBoxWord): number {
   return prev.x - (next.x + next.w);
 }
 
+function idPosition(id: string): number | null {
+  const parts = id.split(":");
+  if (parts.length !== 3) return null;
+  const pos = Number(parts[2]);
+  return Number.isFinite(pos) ? pos : null;
+}
+
+function textStartsWithRub(text: string): boolean {
+  return text.trimStart().startsWith(RUB_EL_HIZB);
+}
+
+/**
+ * Split one combined ayahinfo box into ۞ (rub) + recitable text zones for
+ * pages-index entries like `"۞ مَا"`.
+ */
+function splitRubElHizbWordBox(box: BBoxWord): BBoxWord[] {
+  const rubW = Math.round(box.w * RUB_SYMBOL_WIDTH_FRACTION);
+  const textW = box.w - rubW;
+  if (rubW < 4 || textW < 4) return [box];
+
+  return [
+    {
+      ...box,
+      w: textW,
+    },
+    {
+      id: `${RUB_ID_PREFIX}${box.id}`,
+      line: box.line,
+      x: box.x + textW,
+      y: box.y,
+      w: rubW,
+      h: box.h,
+    },
+  ];
+}
+
+/** After line assignment, split rub-el-hizb starts into separate hit targets. */
+function applyRubSplits(
+  result: BBoxWord[],
+  indexWords: PageWord[],
+): BBoxWord[] {
+  const rubLocs = new Set(
+    indexWords.filter((w) => textStartsWithRub(w.text)).map((w) => w.location),
+  );
+  const out: BBoxWord[] = [];
+  for (const box of result) {
+    if (rubLocs.has(box.id) && !isRubMarkId(box.id)) {
+      out.push(...splitRubElHizbWordBox(box));
+    } else {
+      out.push(box);
+    }
+  }
+  return out;
+}
+
 /**
  * Assign index words to ayahinfo boxes on one line (RTL).
  * Only boxes with gap 0 (touching) merge into the same index word — e.g. أو + split
@@ -86,13 +159,19 @@ function assignLineWordsRTL(
 ): void {
   const sorted = [...lineBoxes].sort((a, b) => b.x - a.x);
   let bi = 0;
+  let lastAssignedWordIdx = -1;
 
   for (let wi = 0; wi < lineWords.length; wi++) {
     if (bi >= sorted.length) break;
 
+    const wordPos = lineWords[wi].position;
     const cluster: BBoxWord[] = [sorted[bi]];
     bi++;
-    while (bi < sorted.length && horizontalGap(cluster[cluster.length - 1], sorted[bi]) <= 0) {
+    while (bi < sorted.length) {
+      const gap = horizontalGap(cluster[cluster.length - 1], sorted[bi]);
+      if (gap > 0) break;
+      const nextPos = idPosition(sorted[bi].id);
+      if (nextPos !== null && nextPos !== wordPos) break;
       cluster.push(sorted[bi]);
       bi++;
     }
@@ -103,6 +182,29 @@ function assignLineWordsRTL(
       id: lineWords[wi].location,
       line: lineNum,
     });
+    lastAssignedWordIdx = wi;
+  }
+
+  // Line-end glyphs whose android id belongs to the next line in pages-index
+  // (e.g. `2:106:12` on L1 vs `أَلَمْ` on L2) — merge into last word here.
+  if (bi < sorted.length && lastAssignedWordIdx >= 0) {
+    const lastLoc = lineWords[lastAssignedWordIdx].location;
+    const resultIdx = result.findIndex(
+      (r) => r.id === lastLoc && r.line === lineNum,
+    );
+    for (; bi < sorted.length; bi++) {
+      const box = sorted[bi];
+      usedKeys.add(boxKey(box));
+      if (!indexLocs.has(box.id)) {
+        result.push(box);
+        continue;
+      }
+      if (resultIdx >= 0) {
+        const merged = unionBoxes([result[resultIdx], box]);
+        result[resultIdx] = { ...result[resultIdx], ...merged };
+      }
+    }
+    return;
   }
 
   for (; bi < sorted.length; bi++) {
@@ -198,5 +300,5 @@ export function alignPageWordBoxes(
     usedKeys.add(boxKey(box));
   }
 
-  return result;
+  return applyRubSplits(result, indexWords);
 }

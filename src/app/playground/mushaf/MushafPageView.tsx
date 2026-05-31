@@ -21,7 +21,10 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { alignPageWordBoxes } from "./data/alignPageBoxes";
+import {
+  alignPageWordBoxes,
+  isRubMarkId,
+} from "./data/alignPageBoxes";
 import { normalizePageBoxes } from "./data/normalizeBoxes";
 import type { PageWord } from "./data/pageIndex";
 import {
@@ -29,10 +32,8 @@ import {
   classifyDecorationGlyph,
   fillAyahPositionGaps,
   isRealWord,
-  isRubElHizbStart,
   isWaqfGlyph,
   resolvePointHit,
-  RUB_SYMBOL_WIDTH_FRACTION,
 } from "./data/wordIndex";
 import { STRIPE_ORDER } from "./samples";
 import type {
@@ -334,13 +335,10 @@ export function MushafPageView({
     const overlay = overlayRef.current;
     if (!overlay) return null;
     const rect = overlay.getBoundingClientRect();
-    const rubInset = isRubElHizbStart(word.id)
-      ? word.w * RUB_SYMBOL_WIDTH_FRACTION
-      : 0;
     return new DOMRect(
-      rect.left + (word.x + rubInset) * scale,
+      rect.left + word.x * scale,
       rect.top + word.y * scale,
-      (word.w - rubInset) * scale,
+      word.w * scale,
       word.h * scale,
     );
   };
@@ -546,17 +544,20 @@ export function MushafPageView({
           >
             {boxes?.words.map((word, i) => {
               const isWord = isRealWord(word.id);
-              const isWaqf = !isWord && isWaqfGlyph(word.id, word);
+              const isRub = isRubMarkId(word.id);
+              const isWaqf = !isWord && !isRub && isWaqfGlyph(word.id, word);
               const isAyahEnd =
                 !isWord &&
+                !isRub &&
                 !isWaqf &&
                 classifyDecorationGlyph(word.id, word) === "ayah-end";
               const hasMark =
                 marksByWord.has(word.id) || pendingRef.current.has(word.id);
 
               if (isAyahEnd && !debugBoxes) return null;
+              if (isRub && !debugBoxes) return null;
               if (isWaqf && !hasMark && !debugBoxes) return null;
-              if (!isWord && !isWaqf && !debugBoxes) return null;
+              if (!isWord && !isWaqf && !isRub && !debugBoxes) return null;
 
               return (
                 <WordBox
@@ -564,9 +565,9 @@ export function MushafPageView({
                   word={word}
                   scale={scale}
                   glyphKind={
-                    isWord ? "word" : isWaqf ? "waqf" : "ayah-end"
+                    isWord ? "word" : isRub ? "rub" : isWaqf ? "waqf" : "ayah-end"
                   }
-                  isRubStart={isRubElHizbStart(word.id)}
+                  isRubStart={isRub}
                   markedCats={marksByWord.get(word.id)}
                   historicalCats={historicalByWord.get(word.id)}
                   pending={pendingRef.current.has(word.id)}
@@ -599,7 +600,7 @@ function WordBox({
 }: {
   word: BBoxWord;
   scale: number;
-  glyphKind: "word" | "waqf" | "ayah-end";
+  glyphKind: "word" | "waqf" | "rub" | "ayah-end";
   isRubStart: boolean;
   markedCats: Set<CategoryId> | undefined;
   historicalCats: Set<CategoryId> | undefined;
@@ -625,11 +626,8 @@ function WordBox({
     debugBoxes;
   if (!hasContent || scale <= 0 || word.w <= 0 || word.h <= 0) return null;
 
-  // Rub-el-hizb (۞) shares the first word's bbox. Skip the symbol portion
-  // (right edge in RTL) so marks never paint over the quarter-juz marker.
-  const rubInset = isRubStart ? word.w * RUB_SYMBOL_WIDTH_FRACTION : 0;
-  const boxLeft = (word.x + rubInset) * scale;
-  const boxWidth = (word.w - rubInset) * scale;
+  const boxLeft = word.x * scale;
+  const boxWidth = word.w * scale;
 
   // Fill: marked words get the top-most marked category's color at 0.18;
   // a live drag selection gets the active category at 0.10.
@@ -651,8 +649,8 @@ function WordBox({
       ? "1px dashed rgba(168, 85, 247, 0.65)"
       : glyphKind === "ayah-end"
         ? "1px dashed rgba(234, 88, 12, 0.55)"
-        : isRubStart
-          ? "1px solid rgba(168, 85, 247, 0.5)"
+        : glyphKind === "rub"
+          ? "1px solid rgba(168, 85, 247, 0.65)"
           : "1px solid rgba(59, 130, 246, 0.4)";
 
   return (

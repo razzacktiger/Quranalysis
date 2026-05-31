@@ -1,8 +1,10 @@
 "use client";
 
 import {
+  isRubMarkId,
   isTinyWaqfBox,
   isWaqfMarkId,
+  rubMarkBaseId,
   waqfMarkBaseId,
 } from "./alignPageBoxes";
 
@@ -319,13 +321,16 @@ export function resolvePointHit(
   const hits = boxes.filter((w) => pointInBox(w, sx, sy));
   if (hits.length === 0) return [];
 
-  // 1) Rub symbol zone — must run before smallest-box pick because the ۞
-  //    shares a bbox with "مَا" and the star is visually distinct on the right.
+  // 1) Rub el hizb (۞) — separate box after align split, or legacy combined zone.
   for (const w of hits) {
-    if (
-      isRubElHizbStart(w.id) &&
-      isTapInRubSymbolZone(w, sx)
-    ) {
+    if (isRubMarkId(w.id)) {
+      const base = rubMarkBaseId(w.id);
+      const [surah, ayah] = base.split(":").map(Number);
+      return getAyahWordIds(surah, ayah);
+    }
+  }
+  for (const w of hits) {
+    if (isRubElHizbStart(w.id) && isTapInRubSymbolZone(w, sx)) {
       const [surah, ayah] = w.id.split(":").map(Number);
       return getAyahWordIds(surah, ayah);
     }
