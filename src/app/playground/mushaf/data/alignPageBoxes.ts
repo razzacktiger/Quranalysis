@@ -7,7 +7,9 @@
  * instead of `"فِيهِ"`.
  *
  * Fix: per ayah line, pair index words (by position) with non-tiny visual boxes
- * (RTL). Split-symbol boxes get a `waqf:` id prefix so they never collide.
+ * in RTL order (ignore ayahinfo box ids — they can name a different glyph on
+ * another line). Extra boxes on the line are union-merged into the last index
+ * word. Split-symbol boxes get a `waqf:` id prefix so they never collide.
  */
 
 import type { PageWord } from "./pageIndex";
@@ -44,6 +46,25 @@ function ayahKeyFromId(id: string): string | null {
 
 function boxKey(box: BBoxWord): string {
   return `${box.id}:${box.x}:${box.y}:${box.w}`;
+}
+
+/** Union of one or more boxes (e.g. split glyphs merged into one index word). */
+function unionBoxes(
+  boxes: Array<Pick<BBoxWord, "x" | "y" | "w" | "h">>,
+): Pick<BBoxWord, "x" | "y" | "w" | "h"> {
+  let x1 = Infinity;
+  let y1 = Infinity;
+  let x2 = -Infinity;
+  let y2 = -Infinity;
+  for (const b of boxes) {
+    if (b.w <= 0 || b.h <= 0) continue;
+    x1 = Math.min(x1, b.x);
+    y1 = Math.min(y1, b.y);
+    x2 = Math.max(x2, b.x + b.w);
+    y2 = Math.max(y2, b.y + b.h);
+  }
+  if (!Number.isFinite(x1)) return { x: 0, y: 0, w: 0, h: 0 };
+  return { x: x1, y: y1, w: x2 - x1, h: y2 - y1 };
 }
 
 /**
@@ -113,12 +134,34 @@ export function alignPageWordBoxes(
         });
       }
 
-      // Leftover boxes on this line are usually ayah-end markers.
-      for (let i = n; i < lineBoxes.length; i++) {
-        const box = lineBoxes[i];
-        if (indexLocs.has(box.id)) continue;
-        usedKeys.add(boxKey(box));
-        result.push(box);
+      if (n > 0 && lineBoxes.length > n) {
+        const lastLoc = lineWords[n - 1].location;
+        const leftovers = lineBoxes.slice(n);
+        for (const box of leftovers) usedKeys.add(boxKey(box));
+
+        const tailDeco: BBoxWord[] = [];
+        const tailMerge: BBoxWord[] = [];
+        for (const box of leftovers) {
+          if (!indexLocs.has(box.id)) tailDeco.push(box);
+          else tailMerge.push(box);
+        }
+
+        if (tailMerge.length > 0) {
+          const idx = result.findIndex(
+            (r) => r.id === lastLoc && r.line === lineNum,
+          );
+          if (idx >= 0) {
+            const merged = unionBoxes([result[idx], ...tailMerge]);
+            result[idx] = { ...result[idx], ...merged };
+          }
+        }
+        for (const box of tailDeco) result.push(box);
+      } else if (n === 0) {
+        for (const box of lineBoxes) {
+          if (indexLocs.has(box.id)) continue;
+          usedKeys.add(boxKey(box));
+          result.push(box);
+        }
       }
     }
 
