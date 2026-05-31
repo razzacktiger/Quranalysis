@@ -24,7 +24,7 @@ import type {
 } from "./types";
 import { getPage, type PageData } from "./data/pageIndex";
 import { getDisplayWordText, getMarkableGlyphLabel, initWordIndex, isRealWord } from "./data/wordIndex";
-import { isWaqfMarkId } from "./data/alignPageBoxes";
+import { isRubMarkId, isWaqfMarkId, rubMarkBaseId } from "./data/alignPageBoxes";
 import { MushafPageView, type HitDebugInfo } from "./MushafPageView";
 import { BottomSheet } from "./BottomSheet";
 import { DebugPanel } from "./DebugPanel";
@@ -468,20 +468,26 @@ function MushafPlayground() {
         )}
 
         {popover && (() => {
+          const baseLoc = isRubMarkId(popover.wordId)
+            ? rubMarkBaseId(popover.wordId)
+            : popover.wordId;
           const w =
-            page?.words.find((x) => x.location === popover.wordId) ??
-            partnerPage?.words.find((x) => x.location === popover.wordId);
-          const isWaqfMark = isWaqfMarkId(popover.wordId);
-          if (!w && !isWaqfMark) return null;
+            page?.words.find((x) => x.location === baseLoc) ??
+            partnerPage?.words.find((x) => x.location === baseLoc);
+          const isDecoMark =
+            isWaqfMarkId(popover.wordId) || isRubMarkId(popover.wordId);
+          if (!w && !isDecoMark) return null;
           return (
             <WordPopover
               anchor={popover.anchor}
               wordId={popover.wordId}
               wordText={
-                w
-                  ? getDisplayWordText(popover.wordId) ||
-                    w.text.replace(/^\u06DE\s*/, "")
-                  : getMarkableGlyphLabel(popover.wordId)
+                isRubMarkId(popover.wordId)
+                  ? getMarkableGlyphLabel(popover.wordId)
+                  : w
+                    ? getDisplayWordText(baseLoc) ||
+                      w.text.replace(/^\u06DE\s*/, "")
+                    : getMarkableGlyphLabel(popover.wordId)
               }
               marks={marks}
               categories={CATEGORIES}

@@ -21,10 +21,7 @@
  */
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  alignPageWordBoxes,
-  isRubMarkId,
-} from "./data/alignPageBoxes";
+import { alignPageWordBoxes, isRubMarkId } from "./data/alignPageBoxes";
 import { normalizePageBoxes } from "./data/normalizeBoxes";
 import type { PageWord } from "./data/pageIndex";
 import {
@@ -94,7 +91,7 @@ export type HitDebugInfo = {
   ayahKey: string | null;
   ayahTotal: number | null;
   /** pause-mark vs word vs full-ayah */
-  hitKind: "word" | "waqf" | "full-ayah";
+  hitKind: "word" | "waqf" | "rub" | "full-ayah";
 };
 
 // Module-level cache: normalized raw ayahinfo (before index alignment).
@@ -313,11 +310,13 @@ export function MushafPageView({
     const hitKind: HitDebugInfo["hitKind"] =
       ids.length > 1
         ? "full-ayah"
-        : isRealWord(first)
-          ? "word"
-          : box && isWaqfGlyph(first, box)
-            ? "waqf"
-            : "word";
+        : isRubMarkId(first)
+          ? "rub"
+          : isRealWord(first)
+            ? "word"
+            : box && isWaqfGlyph(first, box)
+              ? "waqf"
+              : "word";
     onHitDebug({
       pageNumber,
       mode,
@@ -379,7 +378,11 @@ export function MushafPageView({
     const markedId = ids.find((id) => marksByWord.has(id));
     if (onLongPress && markedId) {
       longPressStartRef.current = { x: e.clientX, y: e.clientY };
-      const targetWord = boxes?.words.find((w) => w.id === markedId) ?? null;
+      const hitId = ids[0];
+      const targetWord =
+        boxes?.words.find((w) => w.id === markedId) ??
+        boxes?.words.find((w) => w.id === hitId) ??
+        null;
       longPressTimerRef.current = setTimeout(() => {
         const rect = targetWord ? wordScreenRect(targetWord) : null;
         if (rect) {
@@ -653,9 +656,17 @@ function WordBox({
           ? "1px solid rgba(168, 85, 247, 0.65)"
           : "1px solid rgba(59, 130, 246, 0.4)";
 
+  const debugTitle =
+    debugBoxes && glyphKind === "rub"
+      ? "Rub el hizb (۞) — selects full ayah"
+      : debugBoxes
+        ? word.id
+        : undefined;
+
   return (
     <div
       aria-hidden
+      title={debugTitle}
       style={{
         position: "absolute",
         left: boxLeft,

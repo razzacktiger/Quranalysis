@@ -165,6 +165,9 @@ export function isWaqfGlyph(
 
 /** Label for popover / summary when a pause-mark glyph is marked. */
 export function getMarkableGlyphLabel(wordId: string): string {
+  if (isRubMarkId(wordId)) {
+    return `Rub el hizb (۞) — ${rubMarkBaseId(wordId)}`;
+  }
   if (isWaqfMarkId(wordId)) {
     return `Pause mark (${waqfMarkBaseId(wordId)})`;
   }

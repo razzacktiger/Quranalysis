@@ -145,9 +145,17 @@ function applyRubSplits(
 }
 
 /**
+ * Touching next box uses the following android position id but belongs to the
+ * current index word (split glyph), e.g. `2:106:11` glued to `2:106:10`.
+ */
+function isSplitGlyphOfWord(nextPos: number | null, wordPos: number): boolean {
+  return nextPos !== null && nextPos === wordPos + 1;
+}
+
+/**
  * Assign index words to ayahinfo boxes on one line (RTL).
- * Only boxes with gap 0 (touching) merge into the same index word — e.g. أو + split
- * diacritic. A positive gap starts the next word (e.g. مِثْلِهَا after أو).
+ * Walk all boxes in order; merge gap-0 same position and position+1 split glyphs.
+ * Line-end homonym ids replace the last word's geometry (not union with wrong slice).
  */
 function assignLineWordsRTL(
   lineWords: PageWord[],
@@ -158,53 +166,57 @@ function assignLineWordsRTL(
   result: BBoxWord[],
 ): void {
   const sorted = [...lineBoxes].sort((a, b) => b.x - a.x);
+  const assigned = new Map<string, BBoxWord[]>();
   let bi = 0;
-  let lastAssignedWordIdx = -1;
+  let lastWordIdx = -1;
 
   for (let wi = 0; wi < lineWords.length; wi++) {
     if (bi >= sorted.length) break;
 
-    const wordPos = lineWords[wi].position;
+    const iw = lineWords[wi];
+    const wordPos = iw.position;
     const cluster: BBoxWord[] = [sorted[bi]];
     bi++;
     while (bi < sorted.length) {
       const gap = horizontalGap(cluster[cluster.length - 1], sorted[bi]);
       if (gap > 0) break;
       const nextPos = idPosition(sorted[bi].id);
-      if (nextPos !== null && nextPos !== wordPos) break;
-      cluster.push(sorted[bi]);
-      bi++;
+      if (nextPos !== null && nextPos < wordPos) break;
+      if (nextPos === wordPos || isSplitGlyphOfWord(nextPos, wordPos)) {
+        cluster.push(sorted[bi]);
+        bi++;
+        continue;
+      }
+      break;
     }
 
     for (const box of cluster) usedKeys.add(boxKey(box));
-    result.push({
-      ...unionBoxes(cluster),
-      id: lineWords[wi].location,
-      line: lineNum,
-    });
-    lastAssignedWordIdx = wi;
+    assigned.set(iw.location, cluster);
+    lastWordIdx = wi;
   }
 
-  // Line-end glyphs whose android id belongs to the next line in pages-index
-  // (e.g. `2:106:12` on L1 vs `أَلَمْ` on L2) — merge into last word here.
-  if (bi < sorted.length && lastAssignedWordIdx >= 0) {
-    const lastLoc = lineWords[lastAssignedWordIdx].location;
-    const resultIdx = result.findIndex(
-      (r) => r.id === lastLoc && r.line === lineNum,
-    );
-    for (; bi < sorted.length; bi++) {
-      const box = sorted[bi];
-      usedKeys.add(boxKey(box));
-      if (!indexLocs.has(box.id)) {
-        result.push(box);
-        continue;
-      }
-      if (resultIdx >= 0) {
-        const merged = unionBoxes([result[resultIdx], box]);
-        result[resultIdx] = { ...result[resultIdx], ...merged };
-      }
+  if (bi < sorted.length && lastWordIdx >= 0) {
+    const lastIw = lineWords[lastWordIdx];
+    const homonymTail = sorted.slice(bi).filter((b) => {
+      if (!indexLocs.has(b.id)) return false;
+      const pos = idPosition(b.id);
+      return pos !== null && pos !== lastIw.position;
+    });
+    if (homonymTail.length > 0) {
+      for (const b of homonymTail) usedKeys.add(boxKey(b));
+      assigned.set(lastIw.location, homonymTail);
+      bi = sorted.length;
     }
-    return;
+  }
+
+  for (const w of lineWords) {
+    const cluster = assigned.get(w.location);
+    if (!cluster?.length) continue;
+    result.push({
+      ...unionBoxes(cluster),
+      id: w.location,
+      line: lineNum,
+    });
   }
 
   for (; bi < sorted.length; bi++) {
