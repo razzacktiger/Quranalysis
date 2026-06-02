@@ -91,7 +91,7 @@ export type HitDebugInfo = {
   ayahKey: string | null;
   ayahTotal: number | null;
   /** pause-mark vs word vs full-ayah */
-  hitKind: "word" | "waqf" | "rub" | "full-ayah";
+  hitKind: "word" | "waqf" | "full-ayah";
 };
 
 // Module-level cache: normalized raw ayahinfo (before index alignment).
@@ -101,11 +101,17 @@ function normalizeRawPageBoxes(data: PageBoxes): PageBoxes {
   return { ...data, words: normalizePageBoxes(data.words) };
 }
 
-function alignWithIndex(data: PageBoxes, indexWords: PageWord[]): PageBoxes {
+function alignWithIndex(
+  data: PageBoxes,
+  indexWords: PageWord[],
+  debugBoxes: boolean,
+): PageBoxes {
   if (indexWords.length === 0) return data;
   return {
     ...data,
-    words: alignPageWordBoxes(indexWords, data.words),
+    words: alignPageWordBoxes(indexWords, data.words, {
+      includeRubDecor: debugBoxes,
+    }),
   };
 }
 
@@ -168,7 +174,7 @@ export function MushafPageView({
     let cancelled = false;
 
     const applyBoxes = (raw: PageBoxes) => {
-      if (!cancelled) setBoxes(alignWithIndex(raw, indexWords));
+      if (!cancelled) setBoxes(alignWithIndex(raw, indexWords, debugBoxes));
     };
 
     const cached = rawPageBoxesCache.get(pageNumber);
@@ -201,7 +207,7 @@ export function MushafPageView({
     return () => {
       cancelled = true;
     };
-  }, [pageNumber, indexWords]);
+  }, [pageNumber, indexWords, debugBoxes]);
 
   // New page -> reset the image-loaded flag so we show the loader again.
   useEffect(() => {
@@ -310,13 +316,11 @@ export function MushafPageView({
     const hitKind: HitDebugInfo["hitKind"] =
       ids.length > 1
         ? "full-ayah"
-        : isRubMarkId(first)
-          ? "rub"
-          : isRealWord(first)
-            ? "word"
-            : box && isWaqfGlyph(first, box)
-              ? "waqf"
-              : "word";
+        : isRealWord(first)
+          ? "word"
+          : box && isWaqfGlyph(first, box)
+            ? "waqf"
+            : "word";
     onHitDebug({
       pageNumber,
       mode,
@@ -558,7 +562,6 @@ export function MushafPageView({
                 marksByWord.has(word.id) || pendingRef.current.has(word.id);
 
               if (isAyahEnd && !debugBoxes) return null;
-              if (isRub && !debugBoxes) return null;
               if (isWaqf && !hasMark && !debugBoxes) return null;
               if (!isWord && !isWaqf && !isRub && !debugBoxes) return null;
 
@@ -571,6 +574,7 @@ export function MushafPageView({
                     isWord ? "word" : isRub ? "rub" : isWaqf ? "waqf" : "ayah-end"
                   }
                   isRubStart={isRub}
+                  rubDecorOnly={isRub}
                   markedCats={marksByWord.get(word.id)}
                   historicalCats={historicalByWord.get(word.id)}
                   pending={pendingRef.current.has(word.id)}
@@ -605,6 +609,8 @@ function WordBox({
   scale: number;
   glyphKind: "word" | "waqf" | "rub" | "ayah-end";
   isRubStart: boolean;
+  /** ۞ outline for debug — not selectable, does not select ayah. */
+  rubDecorOnly?: boolean;
   markedCats: Set<CategoryId> | undefined;
   historicalCats: Set<CategoryId> | undefined;
   pending: boolean;
@@ -632,6 +638,25 @@ function WordBox({
   const boxLeft = word.x * scale;
   const boxWidth = word.w * scale;
 
+  if (rubDecorOnly) {
+    return (
+      <div
+        aria-hidden
+        title="Rub el hizb (۞) — decorative, not selectable"
+        style={{
+          position: "absolute",
+          left: boxLeft,
+          top: word.y * scale,
+          width: boxWidth,
+          height: word.h * scale,
+          pointerEvents: "none",
+          outline: "1px solid rgba(168, 85, 247, 0.65)",
+          boxSizing: "border-box",
+        }}
+      />
+    );
+  }
+
   // Fill: marked words get the top-most marked category's color at 0.18;
   // a live drag selection gets the active category at 0.10.
   let fill: string | undefined;
@@ -656,12 +681,7 @@ function WordBox({
           ? "1px solid rgba(168, 85, 247, 0.65)"
           : "1px solid rgba(59, 130, 246, 0.4)";
 
-  const debugTitle =
-    debugBoxes && glyphKind === "rub"
-      ? "Rub el hizb (۞) — selects full ayah"
-      : debugBoxes
-        ? word.id
-        : undefined;
+  const debugTitle = debugBoxes ? word.id : undefined;
 
   return (
     <div

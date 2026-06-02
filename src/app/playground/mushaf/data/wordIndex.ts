@@ -309,10 +309,11 @@ export function getAyahWordIds(surah: number, ayah: number): string[] {
  * Resolve a screen point against all page boxes to markable word ids.
  *
  * Priority:
- *  1. Rub-el-hizb symbol zone → entire ayah
- *  2. Real word (smallest box) — wins over overlapping waqf marks
- *  3. Waqf / pause mark → that glyph only (markable, no index shift)
- *  4. Ayah-end marker → entire ayah
+ *  1. Real word (smallest box) — wins over overlapping waqf marks
+ *  2. Waqf / pause mark → that glyph only (markable, no index shift)
+ *  3. Ayah-end marker → entire ayah
+ *
+ * ۞ (rub el hizb) is not interactive — taps on the symbol zone are ignored.
  */
 export function resolvePointHit(
   boxes: BBoxLike[],
@@ -321,25 +322,12 @@ export function resolvePointHit(
 ): string[] {
   if (!indexReady || !validWords || !ayahWordMap) return [];
 
-  const hits = boxes.filter((w) => pointInBox(w, sx, sy));
+  const hits = boxes.filter(
+    (w) => pointInBox(w, sx, sy) && !isRubMarkId(w.id),
+  );
   if (hits.length === 0) return [];
 
-  // 1) Rub el hizb (۞) — separate box after align split, or legacy combined zone.
-  for (const w of hits) {
-    if (isRubMarkId(w.id)) {
-      const base = rubMarkBaseId(w.id);
-      const [surah, ayah] = base.split(":").map(Number);
-      return getAyahWordIds(surah, ayah);
-    }
-  }
-  for (const w of hits) {
-    if (isRubElHizbStart(w.id) && isTapInRubSymbolZone(w, sx)) {
-      const [surah, ayah] = w.id.split(":").map(Number);
-      return getAyahWordIds(surah, ayah);
-    }
-  }
-
-  // 2) Real word — smallest overlapping box wins (including over waqf marks).
+  // 1) Real word — smallest overlapping box wins (including over waqf marks).
   const realHits = hits.filter((w) => validWords!.has(w.id));
   if (realHits.length > 0) {
     const pick = realHits.reduce((best, w) =>

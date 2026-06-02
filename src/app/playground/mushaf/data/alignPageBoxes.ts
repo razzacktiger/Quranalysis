@@ -6,10 +6,9 @@
  * at the SAME position ids. Using ids naively maps `"2:2:5"` → three-dot bbox
  * instead of `"فِيهِ"`.
  *
- * Fix: per ayah line, walk boxes RTL and merge only gap-0 glyphs that share the
- * same ayah position id as the index word (split diacritics). Gap-0 with a
- * different position (e.g. `2:106:10` + `2:106:11`) starts the next word.
- * Rub `"۞ مَا"` entries are split into `rub:` + word boxes. Waqf → `waqf:` prefix.
+ * Fix: per line, map each index word by direct ayahinfo id on that line; homonym
+ * tail for the last word; ۞ is clipped off the combined box (decorative only).
+ * Waqf → `waqf:` prefix.
  */
 
 import type { PageWord } from "./pageIndex";
@@ -100,35 +99,36 @@ function textStartsWithRub(text: string): boolean {
   return text.trimStart().startsWith(RUB_EL_HIZB);
 }
 
-/**
- * Split one combined ayahinfo box into ۞ (rub) + recitable text zones for
- * pages-index entries like `"۞ مَا"`.
- */
-function splitRubElHizbWordBox(box: BBoxWord): BBoxWord[] {
+/** Recitable text zone only (RTL left portion of a combined ۞ + word ayahinfo box). */
+function rubWordTextBox(box: BBoxWord): BBoxWord {
   const rubW = Math.round(box.w * RUB_SYMBOL_WIDTH_FRACTION);
   const textW = box.w - rubW;
-  if (rubW < 4 || textW < 4) return [box];
-
-  return [
-    {
-      ...box,
-      w: textW,
-    },
-    {
-      id: `${RUB_ID_PREFIX}${box.id}`,
-      line: box.line,
-      x: box.x + textW,
-      y: box.y,
-      w: rubW,
-      h: box.h,
-    },
-  ];
+  if (rubW < 4 || textW < 4) return box;
+  return { ...box, w: textW };
 }
 
-/** After line assignment, split rub-el-hizb starts into separate hit targets. */
+/** Optional debug-only outline for ۞ (not used for hit-testing). */
+function rubSymbolDecorBox(box: BBoxWord): BBoxWord {
+  const rubW = Math.round(box.w * RUB_SYMBOL_WIDTH_FRACTION);
+  const textW = box.w - rubW;
+  return {
+    id: `${RUB_ID_PREFIX}${box.id}`,
+    line: box.line,
+    x: box.x + textW,
+    y: box.y,
+    w: rubW,
+    h: box.h,
+  };
+}
+
+/**
+ * Keep only the مَا (text) box for interaction; ۞ is omitted from hit targets.
+ * In debug mode the caller may render `rub:` decor separately.
+ */
 function applyRubSplits(
   result: BBoxWord[],
   indexWords: PageWord[],
+  includeRubDecor: boolean,
 ): BBoxWord[] {
   const rubLocs = new Set(
     indexWords.filter((w) => textStartsWithRub(w.text)).map((w) => w.location),
@@ -136,7 +136,8 @@ function applyRubSplits(
   const out: BBoxWord[] = [];
   for (const box of result) {
     if (rubLocs.has(box.id) && !isRubMarkId(box.id)) {
-      out.push(...splitRubElHizbWordBox(box));
+      out.push(rubWordTextBox(box));
+      if (includeRubDecor) out.push(rubSymbolDecorBox(box));
     } else {
       out.push(box);
     }
@@ -145,17 +146,12 @@ function applyRubSplits(
 }
 
 /**
- * Touching next box uses the following android position id but belongs to the
- * current index word (split glyph), e.g. `2:106:11` glued to `2:106:10`.
- */
-function isSplitGlyphOfWord(nextPos: number | null, wordPos: number): boolean {
-  return nextPos !== null && nextPos === wordPos + 1;
-}
-
-/**
  * Assign index words to ayahinfo boxes on one line (RTL).
- * Walk all boxes in order; merge gap-0 same position and position+1 split glyphs.
- * Line-end homonym ids replace the last word's geometry (not union with wrong slice).
+ *
+ * 1. Direct `box.id === word.location` on this line (canonical mapping).
+ * 2. Unmatched words: walk remaining boxes; merge gap-0 only when position ids match.
+ * 3. Last word: homonym tail boxes (android id used on another index line) replace
+ *    a misleading direct match (e.g. `2:106:12` → مِثْلِهَا, not the `2:106:11` slice).
  */
 function assignLineWordsRTL(
   lineWords: PageWord[],
@@ -167,45 +163,50 @@ function assignLineWordsRTL(
 ): void {
   const sorted = [...lineBoxes].sort((a, b) => b.x - a.x);
   const assigned = new Map<string, BBoxWord[]>();
-  let bi = 0;
-  let lastWordIdx = -1;
+  const used = new Set<string>();
 
-  for (let wi = 0; wi < lineWords.length; wi++) {
-    if (bi >= sorted.length) break;
-
-    const iw = lineWords[wi];
-    const wordPos = iw.position;
-    const cluster: BBoxWord[] = [sorted[bi]];
-    bi++;
-    while (bi < sorted.length) {
-      const gap = horizontalGap(cluster[cluster.length - 1], sorted[bi]);
-      if (gap > 0) break;
-      const nextPos = idPosition(sorted[bi].id);
-      if (nextPos !== null && nextPos < wordPos) break;
-      if (nextPos === wordPos || isSplitGlyphOfWord(nextPos, wordPos)) {
-        cluster.push(sorted[bi]);
-        bi++;
-        continue;
-      }
-      break;
+  for (const w of lineWords) {
+    const direct = sorted.find(
+      (b) => b.id === w.location && !used.has(boxKey(b)),
+    );
+    if (direct) {
+      assigned.set(w.location, [direct]);
+      used.add(boxKey(direct));
     }
-
-    for (const box of cluster) usedKeys.add(boxKey(box));
-    assigned.set(iw.location, cluster);
-    lastWordIdx = wi;
   }
 
-  if (bi < sorted.length && lastWordIdx >= 0) {
-    const lastIw = lineWords[lastWordIdx];
-    const homonymTail = sorted.slice(bi).filter((b) => {
+  const unassigned = lineWords.filter((w) => !assigned.has(w.location));
+  const remaining = sorted.filter((b) => !used.has(boxKey(b)));
+  let bi = 0;
+
+  for (const w of unassigned) {
+    if (bi >= remaining.length) break;
+    const wordPos = w.position;
+    const cluster: BBoxWord[] = [remaining[bi]];
+    bi++;
+    while (bi < remaining.length) {
+      const gap = horizontalGap(cluster[cluster.length - 1], remaining[bi]);
+      if (gap > 0) break;
+      const nextPos = idPosition(remaining[bi].id);
+      if (nextPos !== wordPos) break;
+      cluster.push(remaining[bi]);
+      bi++;
+    }
+    for (const box of cluster) usedKeys.add(boxKey(box));
+    assigned.set(w.location, cluster);
+  }
+
+  if (lineWords.length > 0 && bi < remaining.length) {
+    const lastW = lineWords[lineWords.length - 1];
+    const homonymTail = remaining.slice(bi).filter((b) => {
       if (!indexLocs.has(b.id)) return false;
       const pos = idPosition(b.id);
-      return pos !== null && pos !== lastIw.position;
+      return pos !== null && pos !== lastW.position;
     });
     if (homonymTail.length > 0) {
       for (const b of homonymTail) usedKeys.add(boxKey(b));
-      assigned.set(lastIw.location, homonymTail);
-      bi = sorted.length;
+      assigned.set(lastW.location, homonymTail);
+      bi = remaining.length;
     }
   }
 
@@ -219,8 +220,8 @@ function assignLineWordsRTL(
     });
   }
 
-  for (; bi < sorted.length; bi++) {
-    const box = sorted[bi];
+  for (; bi < remaining.length; bi++) {
+    const box = remaining[bi];
     if (indexLocs.has(box.id)) continue;
     usedKeys.add(boxKey(box));
     result.push(box);
@@ -231,9 +232,15 @@ function assignLineWordsRTL(
  * Remap raw ayahinfo boxes so each pages-index word id sits on the correct
  * visual glyph. Returns the merged list used for hit-testing and highlights.
  */
+export type AlignPageBoxesOptions = {
+  /** When true, add non-interactive `rub:` decor outlines (debug UI only). */
+  includeRubDecor?: boolean;
+};
+
 export function alignPageWordBoxes(
   indexWords: PageWord[],
   rawBoxes: BBoxWord[],
+  options: AlignPageBoxesOptions = {},
 ): BBoxWord[] {
   if (indexWords.length === 0) return rawBoxes;
 
@@ -312,5 +319,5 @@ export function alignPageWordBoxes(
     usedKeys.add(boxKey(box));
   }
 
-  return applyRubSplits(result, indexWords);
+  return applyRubSplits(result, indexWords, options.includeRubDecor === true);
 }
