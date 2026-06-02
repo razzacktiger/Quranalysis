@@ -597,6 +597,7 @@ function WordBox({
   scale,
   glyphKind,
   isRubStart,
+  rubDecorOnly = false,
   markedCats,
   historicalCats,
   pending,
