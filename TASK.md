@@ -110,6 +110,23 @@
 
 ---
 
+## 🌳 **Git worktrees (2026-06-03)**
+
+| Folder | Branch | Purpose |
+|--------|--------|---------|
+| `Quranalysis/` | `playground/mushaf-prototype` | Mushaf UI prototype (reference) |
+| `Quranalysis-audit/` | `learn/repo-audit` | Read-only audit → refactor → merge to `main` |
+
+**Deferred:** `feature/mushaf-…` worktree until audit/refactor is merged to `main`.
+
+**Prototype WIP stashed:** `git stash list` → restore in `Quranalysis/` with `git stash pop`.
+
+**Audit worktree:** `cd Quranalysis-audit && npm run dev` (copy `.env.local` from Vercel/prod notes if missing).
+
+**After audit:** merge PRs to `main`, then `git worktree add ../Quranalysis-feature -b feature/mushaf-mistake-marking origin/main`.
+
+---
+
 ## 🚀 **CURRENT PRIORITIES - MVP Deployment Strategy**
 
 ### 🎯 **Phase A: MVP Validation & Deployment (HIGH PRIORITY)**
@@ -150,6 +167,7 @@
 
 6. **Code Refactoring & Optimization**
 
+   - [ ] **Active:** repo audit on `learn/repo-audit` (`Quranalysis-audit/` worktree)
    - [ ] Code review and cleanup (remove unnecessary complexity)
    - [ ] Performance optimization
    - [ ] LLM cost reduction (dynamic prompts, smarter tool calls)
@@ -231,5 +249,5 @@
 
 ---
 
-_Last Updated: 2025-01-25_
-_Next Task: Copy frontend from previous attempt and clean up_
+_Last Updated: 2026-06-03_
+_Next Task: Read-only repo audit in `Quranalysis-audit/` (routes → Supabase → sessions/mistakes)_
