@@ -34,7 +34,7 @@ export default function Home() {
             Your AI-Powered
             <span className="text-emerald-600 dark:text-emerald-400">
               {" "}
-              Quran Coach
+              Quran Tracker
             </span>
           </h1>
           <p className="text-xl text-gray-600 dark:text-gray-300 mb-8 max-w-3xl mx-auto">
@@ -48,7 +48,7 @@ export default function Home() {
               href="/auth/register"
               className="px-8 py-4 bg-emerald-600 text-white text-lg font-semibold rounded-xl hover:bg-emerald-700 transition-colors shadow-lg"
             >
-              Start Learning Today
+              Start Tracking Today
             </Link>
             <Link
               href="/dashboard"
@@ -67,15 +67,14 @@ export default function Home() {
               AI Analysis
             </h3>
             <p className="text-gray-600 dark:text-gray-300">
-              Get detailed feedback on your recitation with intelligent mistake
-              detection and correction suggestions.
+              Get detailed feedback on your Quran Progress with AI Analysis.
             </p>
           </div>
 
           <div className="text-center p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
             <div className="text-4xl mb-4">📊</div>
             <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
-              Progress Tracking
+              Hifz Journey Tracker
             </h3>
             <p className="text-gray-600 dark:text-gray-300">
               Monitor your memorization journey with detailed analytics and
@@ -86,11 +85,11 @@ export default function Home() {
           <div className="text-center p-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
             <div className="text-4xl mb-4">🎯</div>
             <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">
-              Adaptive Learning
+              Detailed Mistake Tracking
             </h3>
             <p className="text-gray-600 dark:text-gray-300">
-              Experience personalized learning paths that adapt to your pace and
-              focus on your specific needs.
+              Track your Quran Progress with personalized metrics for
+              Memorization, Tajweed, and Recitation Mistakes.
             </p>
           </div>
         </div>
