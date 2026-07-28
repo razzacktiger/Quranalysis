@@ -1,4 +1,4 @@
-# Quranalysis - AI Quran Coach
+# Quranalysis - Your Quran Fast-tracked Quran Analytics
 
 Your AI-powered Quran memorization and practice companion.
 
